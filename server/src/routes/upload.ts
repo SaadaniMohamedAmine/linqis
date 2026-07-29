@@ -5,6 +5,7 @@ import fs from "fs";
 import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../services/media";
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
+import { subscribeToProgress } from "../services/sse";
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = [".mp3", ".mp4", ".wav", ".m4a", ".mov", ".webm"];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -41,7 +42,6 @@ router.post("/", upload.single("file"), async (req, res) => {
     const filePath = req.file.path;
     const isVideo = req.file.mimetype.startsWith("video");
 
-    // Create meeting record
     const prisma = getPrisma();
     const meeting = await prisma.meeting.create({
       data: {
@@ -52,13 +52,11 @@ router.post("/", upload.single("file"), async (req, res) => {
       },
     });
 
-    // Extract audio if video
     let audioPath = filePath;
     if (isVideo) {
       audioPath = await extractAudio(filePath);
     }
 
-    // Check if chunking is needed
     const shouldChunk = await needsChunking(audioPath);
     const duration = await getAudioDuration(audioPath);
 
@@ -67,7 +65,6 @@ router.post("/", upload.single("file"), async (req, res) => {
       chunks = await chunkAudio(audioPath, duration);
     }
 
-    // Add to queue
     const job = await meetingQueue.add("process-meeting", {
       meetingId: meeting.id,
       audioPath,
@@ -86,4 +83,10 @@ router.post("/", upload.single("file"), async (req, res) => {
     console.error("Upload error:", error);
     res.status(500).json({ error: "Upload failed" });
   }
+});
+
+// SSE endpoint for real-time progress
+router.get("/progress/:jobId", (req, res) => {
+  const { jobId } = req.params;
+  subscribeToProgress(jobId, res);
 });
