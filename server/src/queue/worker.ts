@@ -1,8 +1,9 @@
 import { Worker, Job } from "bullmq";
 import { redis } from "./config";
 import { transcribeWithTimestamps, diarizeSpeakers, reassembleTranscript, mergeTranscripts } from "../services/transcription";
-import { ai } from "../services/ai";
+import { ai, detectDisagreements, detectMoodWithAnalysis } from "../services/ai";
 import { getPrisma } from "../db";
+import { publishProgress, publishComplete, publishError } from "../services/sse";
 
 interface MeetingJob {
   meetingId: string;
@@ -16,24 +17,26 @@ export const worker = new Worker<MeetingJob>(
     const { meetingId, audioPath, chunks } = job.data;
     const prisma = getPrisma();
 
-    job.progress(10);
-    console.log(`Transcribing meeting ${meetingId}`);
+    await publishProgress(job.id, { status: "transcribing", progress: 10 });
 
-    // Transcribe audio (chunk by chunk or full file)
+    // Transcribe audio
     const audioFiles = chunks && chunks.length > 0 ? chunks : [audioPath];
     let allSegments: any[] = [];
 
     for (let i = 0; i < audioFiles.length; i++) {
       const segments = await transcribeWithTimestamps(audioFiles[i]);
       allSegments.push(segments);
-      job.progress(10 + (i / audioFiles.length) * 30);
+      await publishProgress(job.id, {
+        status: "transcribing",
+        progress: 10 + (i / audioFiles.length) * 30,
+        chunk: i + 1,
+        total: audioFiles.length,
+      });
     }
 
     // Merge and diarize
     const merged = mergeTranscripts(allSegments);
     const diarized = await diarizeSpeakers(merged);
-
-    // Reassemble with corrected timestamps
     const fullTranscript = reassembleTranscript(diarized);
 
     // Save transcripts
@@ -46,39 +49,25 @@ export const worker = new Worker<MeetingJob>(
       })),
     });
 
-    job.progress(45);
-    console.log(`Analyzing meeting ${meetingId}`);
+    await publishProgress(job.id, { status: "analyzing", progress: 45 });
 
-    // Extract decisions
-    const decisions = await ai.extractDecisions(fullTranscript);
+    // AI analysis
+    const [decisions, actionItems, disagreements, moodAnalysis] = await Promise.all([
+      ai.extractDecisions(fullTranscript),
+      ai.extractActionItems(fullTranscript),
+      detectDisagreements(fullTranscript),
+      detectMoodWithAnalysis(fullTranscript),
+    ]);
 
-    job.progress(60);
-
-    // Extract action items
-    const actionItems = await ai.extractActionItems(fullTranscript);
-
-    job.progress(75);
-
-    // Detect disagreements
-    const disagreements = await ai.detectDisagreements(fullTranscript);
-
-    job.progress(85);
-
-    // Detect mood
-    const mood = await ai.detectMood(fullTranscript);
-
-    // Generate summary
-    const summary = await ai.generateExecutiveSummary(fullTranscript);
-
-    job.progress(95);
+    await publishProgress(job.id, { status: "saving", progress: 90 });
 
     // Update meeting
     await prisma.meeting.update({
       where: { id: meetingId },
       data: {
         status: "DONE",
-        summary,
-        mood,
+        summary: await ai.generateExecutiveSummary(fullTranscript),
+        mood: moodAnalysis.mood,
         decisions: {
           create: decisions.map((d: any) => ({
             statement: d.statement,
@@ -98,17 +87,17 @@ export const worker = new Worker<MeetingJob>(
       },
     });
 
-    job.progress(100);
-    console.log(`Meeting ${meetingId} processed successfully`);
-
-    return {
+    await publishComplete(job.id, {
+      status: "completed",
+      progress: 100,
       meetingId,
-      transcriptLength: fullTranscript.length,
-      segments: diarized.length,
       decisions: decisions.length,
       actionItems: actionItems.length,
-      mood,
-    };
+      disagreements: disagreements.length,
+      mood: moodAnalysis.mood,
+    });
+
+    return { meetingId, status: "completed" };
   },
   {
     connection: redis,
@@ -121,6 +110,9 @@ worker.on("completed", (job) => {
   console.log(`Job ${job.id} completed`);
 });
 
-worker.on("failed", (job, err) => {
+worker.on("failed", async (job, err) => {
   console.error(`Job ${job?.id} failed: ${err.message}`);
+  if (job) {
+    await publishError(job.id, err.message);
+  }
 });
