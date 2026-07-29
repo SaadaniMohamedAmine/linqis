@@ -5,12 +5,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const adapter = new PrismaNeon({
-  connectionString: process.env.DATABASE_URL!,
-});
+export function getPrisma() {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({ adapter });
+  const adapter = new PrismaNeon({
+    connectionString: process.env.DATABASE_URL!,
+  });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  globalForPrisma.prisma = new PrismaClient({ adapter });
+  return globalForPrisma.prisma;
+}
