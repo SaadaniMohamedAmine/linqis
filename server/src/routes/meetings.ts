@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPrisma } from "@/lib/db";
+import { getPrisma } from "../db";
 
 export const router = Router();
 
