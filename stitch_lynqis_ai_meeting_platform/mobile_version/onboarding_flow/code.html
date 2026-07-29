@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-primary-fixed": "#002109",
+                  "on-error": "#690005",
+                  "tertiary-container": "#ff8b7c",
+                  "on-tertiary": "#60130d",
+                  "on-secondary": "#003914",
+                  "primary-container": "#22c55e",
+                  "background": "#0e150e",
+                  "on-secondary-fixed": "#002109",
+                  "error": "#ffb4ab",
+                  "surface-container-highest": "#2f372e",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-high": "#242c24",
+                  "primary": "#4be277",
+                  "surface-variant": "#2f372e",
+                  "inverse-primary": "#006e2f",
+                  "surface-tint": "#4ae176",
+                  "surface": "#0e150e",
+                  "inverse-surface": "#dce5d9",
+                  "on-primary": "#003915",
+                  "surface-container-low": "#161d16",
+                  "tertiary-fixed": "#ffdad5",
+                  "primary-fixed": "#6bff8f",
+                  "secondary-fixed-dim": "#62df7d",
+                  "on-primary-container": "#004b1e",
+                  "on-tertiary-container": "#76231b",
+                  "on-surface-variant": "#bccbb9",
+                  "surface-bright": "#333b33",
+                  "surface-container-lowest": "#091009",
+                  "on-tertiary-fixed": "#410001",
+                  "primary-fixed-dim": "#4ae176",
+                  "on-surface": "#dce5d9",
+                  "inverse-on-surface": "#2a322a",
+                  "surface-dim": "#0e150e",
+                  "secondary-fixed": "#7ffc97",
+                  "tertiary-fixed-dim": "#ffb4a9",
+                  "outline-variant": "#3d4a3d",
+                  "outline": "#869585",
+                  "secondary-container": "#1ca64d",
+                  "on-primary-fixed-variant": "#005321",
+                  "secondary": "#62df7d",
+                  "surface-container": "#1a221a",
+                  "on-secondary-fixed-variant": "#005320",
+                  "on-secondary-container": "#003111",
+                  "tertiary": "#ffb5ab",
+                  "on-background": "#dce5d9",
+                  "on-tertiary-fixed-variant": "#7f2a21",
+                  "error-container": "#93000a"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "8px",
+                  "xl": "12px",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "md": "16px",
+                  "xxl": "48px",
+                  "base": "8px",
+                  "sm": "8px",
+                  "container-max": "1440px",
+                  "lg": "24px",
+                  "xs": "4px",
+                  "gutter": "24px",
+                  "xl": "32px"
+          },
+          "fontFamily": {
+                  "mono-ui": ["Geist"],
+                  "headline-sm": ["Geist"],
+                  "body-md": ["Inter"],
+                  "body-lg": ["Inter"],
+                  "label-md": ["Inter"],
+                  "display": ["Geist"],
+                  "body-sm": ["Inter"],
+                  "headline-lg": ["Geist"],
+                  "headline-md": ["Geist"],
+                  "label-sm": ["Inter"]
+          },
+          "fontSize": {
+                  "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                  "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                  "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0A0A0A;
+      color: #dce5d9;
+      -webkit-font-smoothing: antialiased;
+    }
+    .glass-morphism {
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .onboarding-step {
+      display: none;
+    }
+    .onboarding-step.active {
+      display: flex;
+      animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3d4a3d;
+      transition: all 0.3s ease;
+    }
+    .dot.active {
+      background: #22c55e;
+      width: 20px;
+      border-radius: 4px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-md">
+<!-- Background Atmospheric Shader -->
+
+<!-- Onboarding Modal Container -->
+<main class="relative z-10 w-full max-w-[400px] glass-morphism rounded-lg overflow-hidden shadow-2xl">
+<div class="p-xl flex flex-col items-center text-center">
+<!-- Brand Anchor -->
+<div class="mb-xxl">
+<h1 class="font-display text-headline-md font-bold text-primary tracking-tight">Lynqis</h1>
+</div>
+<!-- Step 1: Connect your calendar -->
+<section class="onboarding-step active flex-col items-center w-full" id="step-1">
+<div class="mb-lg w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary text-[32px]">calendar_today</span>
+</div>
+<h2 class="font-headline-md text-on-surface mb-xs">Connect your calendar</h2>
+<p class="font-body-sm text-on-surface-variant mb-xl px-md">Sync your schedules to stay ahead of upcoming deadlines and team syncs.</p>
+<button class="w-full flex items-center justify-center gap-base bg-surface-container-highest border border-outline-variant hover:bg-surface-variant transition-colors rounded-lg py-md px-lg mb-base group" onclick="nextStep(2)">
+<span class="material-symbols-outlined text-on-surface">google</span>
+<span class="font-label-md text-on-surface">Continue with Google Calendar</span>
+</button>
+<button class="w-full font-label-sm text-on-surface-variant hover:text-on-surface transition-colors py-xs" onclick="nextStep(2)">
+          Skip for now
+        </button>
+</section>
+<!-- Step 2: Link your workspace -->
+<section class="onboarding-step flex-col items-center w-full" id="step-2">
+<div class="mb-lg w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary text-[32px]">hub</span>
+</div>
+<h2 class="font-headline-md text-on-surface mb-xs">Link your workspace</h2>
+<p class="font-body-sm text-on-surface-variant mb-xl px-md">Integrate with your favorite tools to centralize documentation and communication.</p>
+<div class="grid grid-cols-1 gap-md w-full mb-xl">
+<button class="flex items-center justify-center gap-base bg-surface-container-highest border border-outline-variant hover:bg-surface-variant transition-colors rounded-lg py-md group" onclick="nextStep(3)">
+<span class="material-symbols-outlined text-on-surface">description</span>
+<span class="font-label-md text-on-surface">Connect Notion</span>
+</button>
+<button class="flex items-center justify-center gap-base bg-surface-container-highest border border-outline-variant hover:bg-surface-variant transition-colors rounded-lg py-md group" onclick="nextStep(3)">
+<span class="material-symbols-outlined text-on-surface">chat_bubble</span>
+<span class="font-label-md text-on-surface">Connect Slack</span>
+</button>
+</div>
+<button class="font-label-sm text-on-surface-variant hover:text-on-surface transition-colors py-xs" onclick="nextStep(3)">
+          I'll do this later
+        </button>
+</section>
+<!-- Step 3: You're all set -->
+<section class="onboarding-step flex-col items-center w-full" id="step-3">
+<div class="mb-lg w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary/30 relative">
+<span class="material-symbols-outlined text-primary text-[32px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<!-- Subtle pulse effect -->
+<div class="absolute inset-0 rounded-full border border-primary opacity-40 animate-ping"></div>
+</div>
+<h2 class="font-headline-md text-on-surface mb-xs">You're all set</h2>
+<p class="font-body-sm text-on-surface-variant mb-xl px-md">Your workspace is ready. Let's begin by organizing your first dataset.</p>
+<div class="w-full glass-morphism rounded-lg p-lg mb-xl border-dashed border-outline-variant/50">
+<div class="flex flex-col items-center gap-sm">
+<div class="w-full aspect-video rounded bg-surface-container-low overflow-hidden mb-sm relative">
+<img class="w-full h-full object-cover opacity-50" data-alt="A macro shot of sleek, high-tech carbon fiber textures with emerald green light leaking from the edges. The environment is dark, professional, and minimalist, suggesting a premium SaaS dashboard background. The lighting is focused and dramatic, highlighting the mathematical precision of the surface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnfLzScTPBB3ADtdPFztkFakT7NVYAdzSUELvH4cSEBei75FFq4ZYVqe7GHPA2ez9_zKn3VoIzD0tlW8Ce4uIFqAbXxoMb387ieiqW6yMSqgyDjeaNI_a5Oa0yG23-jZbJkuNPHDVLSY6bk4R-rA1zm6FVr5hs4QVvqrnw_E_bcBk3mDyRfPQfC1EuurqX28CW_X3mMbHMi33N0nbJI2dwO3S5MNnYlT0YeiNLGRu2j9J4E1e9fuac"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-[48px] opacity-20">cloud_upload</span>
+</div>
+</div>
+<button class="w-full bg-primary-container text-on-primary-container hover:bg-primary-container/90 transition-all font-label-md py-md rounded-lg flex items-center justify-center gap-sm active:scale-95">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+               Start by uploading
+             </button>
+</div>
+</div>
+</section>
+<!-- Progress Dots -->
+<div class="flex gap-sm mt-xl" id="progress-container">
+<div class="dot active" id="dot-1"></div>
+<div class="dot" id="dot-2"></div>
+<div class="dot" id="dot-3"></div>
+</div>
+</div>
+</main>
+<script>
+    function nextStep(step) {
+      // Hide all steps
+      document.querySelectorAll('.onboarding-step').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      // Show selected step
+      const nextEl = document.getElementById(`step-${step}`);
+      if (nextEl) {
+        nextEl.classList.add('active');
+      }
+
+      // Update dots
+      document.querySelectorAll('.dot').forEach((dot, index) => {
+        if (index + 1 === step) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    // Micro-interaction for buttons
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        if (btn.classList.contains('bg-primary-container')) {
+          btn.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.3)';
+        }
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.boxShadow = 'none';
+      });
+    });
+  </script>
+</body></html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Integrations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=Geist:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-surface {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid #2a2a2a;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed-variant": "#004395",
+                      "primary-fixed-dim": "#62df7d",
+                      "surface-container-lowest": "#0e0e0e",
+                      "inverse-primary": "#006e2d",
+                      "inverse-on-surface": "#313030",
+                      "on-tertiary-fixed": "#001a42",
+                      "on-primary-fixed-variant": "#005320",
+                      "outline-variant": "#3e4a3d",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-highest": "#353534",
+                      "background": "#0A0A0A",
+                      "surface-container-high": "#2a2a2a",
+                      "on-primary": "#003914",
+                      "surface-container": "#201f1f",
+                      "secondary-fixed-dim": "#f7be1d",
+                      "error": "#ffb4ab",
+                      "on-surface-variant": "#bdcaba",
+                      "surface-container-low": "#1c1b1b",
+                      "secondary-fixed": "#ffdf9a",
+                      "outline": "#879485",
+                      "tertiary-fixed-dim": "#adc6ff",
+                      "on-primary-container": "#003111",
+                      "surface-bright": "#393939",
+                      "primary": "#62df7d",
+                      "surface-tint": "#62df7d",
+                      "on-secondary-fixed": "#251a00",
+                      "on-tertiary-container": "#00285d",
+                      "tertiary-fixed": "#d8e2ff",
+                      "on-background": "#e5e2e1",
+                      "inverse-surface": "#e5e2e1",
+                      "primary-fixed": "#7ffc97",
+                      "surface": "#131313",
+                      "on-primary-fixed": "#002109",
+                      "secondary": "#ffca45",
+                      "error-container": "#93000a",
+                      "tertiary": "#adc6ff",
+                      "on-secondary-fixed-variant": "#5a4300",
+                      "on-tertiary": "#002e6a",
+                      "on-error": "#690005",
+                      "tertiary-container": "#4d8eff",
+                      "surface-variant": "#353534",
+                      "on-secondary-container": "#5b4400",
+                      "primary-container": "#1ca64d",
+                      "on-surface": "#e5e2e1",
+                      "surface-dim": "#131313",
+                      "secondary-container": "#e4ae00",
+                      "on-secondary": "#3f2e00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "6px",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "2xl": "48px",
+                      "base": "8px",
+                      "margin": "40px",
+                      "lg": "24px",
+                      "gutter": "24px",
+                      "xs": "4px",
+                      "xl": "32px",
+                      "sm": "8px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "headline-sm": ["Geist"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              }
+            }
+          }
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="bg-background border-b border-outline-variant fixed top-0 w-full h-[64px] z-50">
+<div class="flex justify-between items-center w-full px-lg max-w-[1440px] mx-auto h-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">Lynqis</span>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Meetings</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Action Items</a>
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 transition-colors cursor-pointer" href="#">Integrations</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-sm cursor-pointer" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors p-sm cursor-pointer" data-icon="settings">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a user for their digital workspace profile. The lighting is crisp and cinematic with a cool-toned dark background that matches the high-fidelity dark minimalist aesthetic of the app. The subject is centered and clearly visible." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Xg_SPIW3QsyLvmNONIO_M68bsrZ1enA0oyuhRK_-9aAxT3RzTRmzbPjCQ90YL0NQOaLTCCzz9KYtInK5dRPfS0-HUQUrIAvIvzYlC04S-oEibMW4yT9o0-pSEShZ_2IZlBj8NpC3QrFS4RQyi0cPB5BCSp4uL65T9n828pMas6ywKqouHGi-PcgeDpzNVgiJX0_UDFu9nucCShQH4N7pdzso-44QhCViWZe2T3gC6prNhY9Xca_r"/>
+</div>
+</div>
+</div>
+</nav>
+<div class="flex min-h-screen pt-[64px]">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-[260px] bg-background border-r border-outline-variant p-md gap-base fixed left-0">
+<div class="mb-lg px-sm">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Meeting List</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">AI-summarized sessions</p>
+</div>
+<nav class="flex flex-col gap-xs flex-grow">
+<div class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 cursor-pointer active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</div>
+<div class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 cursor-pointer active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-label-md text-label-md">Recent Meetings</span>
+</div>
+<div class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 cursor-pointer active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Shared with Me</span>
+</div>
+<div class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 cursor-pointer active:scale-[0.98]">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-label-md text-label-md">Archived</span>
+</div>
+</nav>
+<button class="w-full py-md bg-primary text-on-primary font-label-md rounded-lg hover:opacity-90 transition-opacity active:scale-[0.98]">
+                New Meeting
+            </button>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow ml-0 md:ml-[260px] p-xl max-w-[1440px]">
+<header class="mb-2xl">
+<h1 class="font-headline-lg text-headline-lg mb-xs">Connected Workspace</h1>
+<p class="text-on-surface-variant font-body-md max-w-2xl">Streamline your workflow by connecting your essential productivity tools. AI summaries will automatically sync to your calendar and communication channels.</p>
+</header>
+<!-- Integration Grid (3-Column) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Google Calendar -->
+<div class="bg-[#141414] border border-[#1F1F1F] p-lg rounded-lg hover:border-[#2A2A2A] transition-all duration-200 flex flex-col justify-between min-h-[220px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-primary scale-125" data-icon="calendar_month">calendar_month</span>
+</div>
+<span class="px-md py-1 rounded-full bg-primary-container text-on-primary-container font-label-sm">Active</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Google Calendar</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Automatically fetch meeting details and update schedule statuses.</p>
+</div>
+<div class="flex gap-md">
+<button class="flex-grow py-sm bg-[#1A1A1A] border border-[#1F1F1F] text-on-surface font-label-md rounded-lg hover:bg-[#2A2A2A] transition-colors">Manage</button>
+<button class="px-md py-sm border border-[#1F1F1F] text-error font-label-md rounded-lg hover:bg-[#93000a20] transition-colors">Disconnect</button>
+</div>
+</div>
+<!-- Zoom -->
+<div class="bg-[#141414] border border-[#1F1F1F] p-lg rounded-lg hover:border-[#2A2A2A] transition-all duration-200 flex flex-col justify-between min-h-[220px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary scale-125" data-icon="video_chat">video_chat</span>
+</div>
+<span class="px-md py-1 rounded-full bg-primary-container text-on-primary-container font-label-sm">Active</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Zoom</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Record meetings directly and generate AI transcripts in real-time.</p>
+</div>
+<div class="flex gap-md">
+<button class="flex-grow py-sm bg-[#1A1A1A] border border-[#1F1F1F] text-on-surface font-label-md rounded-lg hover:bg-[#2A2A2A] transition-colors">Manage</button>
+<button class="px-md py-sm border border-[#1F1F1F] text-error font-label-md rounded-lg hover:bg-[#93000a20] transition-colors">Disconnect</button>
+</div>
+</div>
+<!-- Notion -->
+<div class="bg-[#141414] border border-[#1F1F1F] p-lg rounded-lg hover:border-[#2A2A2A] transition-all duration-200 flex flex-col justify-between min-h-[220px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface scale-125" data-icon="sticky_note_2">sticky_note_2</span>
+</div>
+<span class="px-md py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm">Not Linked</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Notion</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Sync meeting summaries and action items to your workspace databases.</p>
+</div>
+<button class="w-full py-sm bg-primary text-on-primary font-label-md rounded-lg hover:opacity-90 transition-opacity">Connect Notion</button>
+</div>
+<!-- Slack -->
+<div class="bg-[#141414] border border-[#1F1F1F] p-lg rounded-lg hover:border-[#2A2A2A] transition-all duration-200 flex flex-col justify-between min-h-[220px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary scale-125" data-icon="forum">forum</span>
+</div>
+<span class="px-md py-1 rounded-full bg-primary-container text-on-primary-container font-label-sm">Active</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Slack</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Push summaries to designated channels and tag participants.</p>
+</div>
+<div class="flex gap-md">
+<button class="flex-grow py-sm bg-[#1A1A1A] border border-[#1F1F1F] text-on-surface font-label-md rounded-lg hover:bg-[#2A2A2A] transition-colors">Configure</button>
+<button class="px-md py-sm border border-[#1F1F1F] text-error font-label-md rounded-lg hover:bg-[#93000a20] transition-colors">Disconnect</button>
+</div>
+</div>
+<!-- Resend -->
+<div class="bg-[#141414] border border-[#1F1F1F] p-lg rounded-lg hover:border-[#2A2A2A] transition-all duration-200 flex flex-col justify-between min-h-[220px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed-dim scale-125" data-icon="mail">mail</span>
+</div>
+<span class="px-md py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm">Not Linked</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Resend</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Send clean, formatted email digests to all meeting attendees automatically.</p>
+</div>
+<button class="w-full py-sm bg-primary text-on-primary font-label-md rounded-lg hover:opacity-90 transition-opacity">Setup API Key</button>
+</div>
+<!-- Google Meet -->
+<div class="bg-[#141414] border border-[#1F1F1F] p-lg rounded-lg hover:border-[#2A2A2A] transition-all duration-200 flex flex-col justify-between min-h-[220px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg bg-[#1A1A1A] flex items-center justify-center">
+<span class="material-symbols-outlined text-[#3B82F6] scale-125" data-icon="groups">groups</span>
+</div>
+<span class="px-md py-1 rounded-full bg-primary-container text-on-primary-container font-label-sm">Active</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Google Meet</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Native integration for seamless capturing of browser-based video calls.</p>
+</div>
+<div class="flex gap-md">
+<button class="flex-grow py-sm bg-[#1A1A1A] border border-[#1F1F1F] text-on-surface font-label-md rounded-lg hover:bg-[#2A2A2A] transition-colors">Manage</button>
+<button class="px-md py-sm border border-[#1F1F1F] text-error font-label-md rounded-lg hover:bg-[#93000a20] transition-colors">Disconnect</button>
+</div>
+</div>
+</div>
+<!-- Developer / API Section (Bento Style Extra) -->
+<section class="mt-3xl mb-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<div class="lg:col-span-8 bg-[#141414] border border-[#1F1F1F] p-xl rounded-lg relative overflow-hidden group">
+<div class="relative z-10">
+<h2 class="font-headline-md text-headline-md mb-md">Custom Webhooks</h2>
+<p class="text-on-surface-variant font-body-md mb-xl max-w-lg">Build your own workflows. Send Lynqis data to any endpoint using our high-performance REST API and secure webhooks.</p>
+<div class="flex gap-md">
+<button class="px-xl py-md bg-[#16A34A] text-on-primary font-label-md rounded-lg hover:opacity-90 transition-opacity">View Documentation</button>
+<button class="px-xl py-md bg-[#1A1A1A] border border-[#1F1F1F] text-on-surface font-label-md rounded-lg hover:border-[#2A2A2A] transition-colors">API Keys</button>
+</div>
+</div>
+<!-- Micro-interaction element -->
+<div class="absolute right-[-10%] top-[-10%] w-64 h-64 bg-primary opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity"></div>
+</div>
+<div class="lg:col-span-4 glass-surface p-xl rounded-lg flex flex-col justify-center text-center">
+<span class="material-symbols-outlined text-secondary text-5xl mb-md mx-auto" data-icon="bolt">bolt</span>
+<h3 class="font-headline-sm text-headline-sm mb-xs">Enterprise Security</h3>
+<p class="text-on-surface-variant font-body-sm">All integrations use OAuth 2.0 with end-to-end encryption for your workspace data.</p>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Floating Action Element for Mobile (Hidden on Desktop per instructions) -->
+<button class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center z-50">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<script>
+        // Micro-interaction for integration cards
+        document.querySelectorAll('.integration-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Simple mock for notification toggle
+        const notifyBtn = document.querySelector('[data-icon="notifications"]');
+        notifyBtn.addEventListener('click', () => {
+            notifyBtn.classList.toggle('text-primary');
+            alert('Recent activity: Zoom meeting transcript is ready.');
+        });
+    </script>
+</body></html>

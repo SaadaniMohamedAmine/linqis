@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis - Meeting Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Component Config -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-primary-fixed": "#002109",
+                  "on-error": "#690005",
+                  "tertiary-container": "#ff8b7c",
+                  "on-tertiary": "#60130d",
+                  "on-secondary": "#003914",
+                  "primary-container": "#22c55e",
+                  "background": "#0e150e",
+                  "on-secondary-fixed": "#002109",
+                  "error": "#ffb4ab",
+                  "surface-container-highest": "#2f372e",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-high": "#242c24",
+                  "primary": "#4be277",
+                  "surface-variant": "#2f372e",
+                  "inverse-primary": "#006e2f",
+                  "surface-tint": "#4ae176",
+                  "surface": "#0e150e",
+                  "inverse-surface": "#dce5d9",
+                  "on-primary": "#003915",
+                  "surface-container-low": "#161d16",
+                  "tertiary-fixed": "#ffdad5",
+                  "primary-fixed": "#6bff8f",
+                  "secondary-fixed-dim": "#62df7d",
+                  "on-primary-container": "#004b1e",
+                  "on-tertiary-container": "#76231b",
+                  "on-surface-variant": "#bccbb9",
+                  "surface-bright": "#333b33",
+                  "surface-container-lowest": "#091009",
+                  "on-tertiary-fixed": "#410001",
+                  "primary-fixed-dim": "#4ae176",
+                  "on-surface": "#dce5d9",
+                  "inverse-on-surface": "#2a322a",
+                  "surface-dim": "#0e150e",
+                  "secondary-fixed": "#7ffc97",
+                  "tertiary-fixed-dim": "#ffb4a9",
+                  "outline-variant": "#3d4a3d",
+                  "outline": "#869585",
+                  "secondary-container": "#1ca64d",
+                  "on-primary-fixed-variant": "#005321",
+                  "secondary": "#62df7d",
+                  "surface-container": "#1a221a",
+                  "on-secondary-fixed-variant": "#005320",
+                  "on-secondary-container": "#003111",
+                  "tertiary": "#ffb5ab",
+                  "on-background": "#dce5d9",
+                  "on-tertiary-fixed-variant": "#7f2a21",
+                  "error-container": "#93000a"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "md": "16px",
+                  "xxl": "48px",
+                  "base": "8px",
+                  "sm": "8px",
+                  "container-max": "1440px",
+                  "lg": "24px",
+                  "xs": "4px",
+                  "gutter": "24px",
+                  "xl": "32px"
+          },
+          "fontFamily": {
+                  "mono-ui": ["Geist"],
+                  "headline-sm": ["Geist"],
+                  "body-md": ["Inter"],
+                  "body-lg": ["Inter"],
+                  "label-md": ["Inter"],
+                  "display": ["Geist"],
+                  "body-sm": ["Inter"],
+                  "headline-lg": ["Geist"],
+                  "headline-md": ["Geist"],
+                  "label-sm": ["Inter"]
+          },
+          "fontSize": {
+                  "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                  "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                  "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0A0A0A;
+      color: #DCE5D9;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-panel {
+      background: #141414;
+      border: 1px solid #1F1F1F;
+    }
+    .pulse-green {
+      animation: pulse-green 3s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.05); }
+    }
+    .score-gradient {
+      background: conic-gradient(#22C55E var(--percentage), #1F1F1F 0);
+    }
+  </style>
+</head>
+<body class="flex min-h-screen bg-background">
+<!-- Navigation Drawer (Desktop) -->
+<aside class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md gap-base bg-surface-container-low border-r border-outline-variant w-72 z-50">
+<div class="px-md py-lg">
+<span class="font-display text-headline-md tracking-tight text-primary font-bold">Lynqis</span>
+</div>
+<nav class="flex flex-col gap-xs flex-1">
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="font-label-md text-label-md">Meetings</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Action Items</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-label-md text-label-md">Integrations</span>
+</a>
+</nav>
+<div class="mt-auto">
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-lg h-16 z-50 fixed top-0 bg-background border-b border-outline-variant md:left-72 md:w-[calc(100%-18rem)]">
+<div class="flex items-center gap-md">
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Analysis: Project Aurora Sync</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="text-on-surface-variant font-label-md text-label-md hidden sm:block">Oct 24, 2023 • 45m</span>
+<button class="p-base hover:bg-surface-container-high transition-colors text-primary rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 mt-16 pb-24 md:pb-8 md:ml-72 p-lg">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Top Row: Mood and Score -->
+<section class="md:col-span-4 flex flex-col gap-lg">
+<!-- Mood Card -->
+<div class="glass-panel p-lg rounded-xl flex flex-col justify-between h-48 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-widest">Meeting Mood</p>
+<h2 class="font-headline-md text-headline-md text-primary mt-xs">Highly Positive</h2>
+</div>
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center pulse-green">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">sentiment_satisfied</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Tone was collaborative with 84% positive sentiment across all key milestones.</p>
+<div class="absolute bottom-0 left-0 h-1 bg-primary w-full"></div>
+</div>
+<!-- Meeting Quality Score -->
+<div class="glass-panel p-lg rounded-xl flex flex-col gap-md">
+<p class="font-label-sm text-label-sm text-outline uppercase tracking-widest">Quality Score</p>
+<div class="flex items-center gap-xl">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="48" cy="48" fill="transparent" r="40" stroke="#1F1F1F" stroke-width="8"></circle>
+<circle cx="48" cy="48" fill="transparent" r="40" stroke="#4BE277" stroke-dasharray="251.2" stroke-dashoffset="37.6" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute font-display text-headline-md text-on-surface">8.5</span>
+</div>
+<div class="flex-1 flex flex-col gap-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-on-surface-variant">Agenda adherence</span>
+<span class="font-mono-ui text-mono-ui text-primary">9.0</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1 rounded-full">
+<div class="bg-primary h-1 rounded-full" style="width: 90%"></div>
+</div>
+<div class="flex justify-between items-center mt-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Participation balance</span>
+<span class="font-mono-ui text-mono-ui text-secondary">7.2</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1 rounded-full">
+<div class="bg-secondary h-1 rounded-full" style="width: 72%"></div>
+</div>
+<div class="flex justify-between items-center mt-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Action item clarity</span>
+<span class="font-mono-ui text-mono-ui text-primary">9.5</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1 rounded-full">
+<div class="bg-primary h-1 rounded-full" style="width: 95%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Center Column: Speaker Distribution -->
+<section class="md:col-span-8 flex flex-col gap-lg">
+<div class="glass-panel p-lg rounded-xl flex-1">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-headline-sm text-headline-sm">Speaker Contribution</h3>
+<span class="font-label-sm text-label-sm px-sm py-xs bg-surface-variant rounded text-on-surface-variant uppercase">Time distribution</span>
+</div>
+<div class="flex flex-col gap-lg">
+<!-- Sarah -->
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex-shrink-0" data-alt="A professional studio portrait of a mid-30s female tech executive with a confident expression, sharp lighting, against a dark minimalist tech background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA_qIJ807PYrUXkUvcKMw6m1HmOAQ0BLdD_ZznLhs0vXvA8jnM1s5I7VyE0UyNpAaJIrRWmvz_xqkrro-kzRCfCeFkTFqK_Jxgufb5dVVxEPmUfAg8AFABWq3SaF-NJEMJDb6PqOA8nT-JTOC5pXZK8V3ZvLrNutoz4Zv-b8afaQPIWJahjM6MnZVOnLiQTKfsfpUqLRLkIP5j51qu-wARMOi4kitEzFHp5RaVhKq4uUs6aIEDZjMAT')"></div>
+<div class="flex-1">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md">Sarah Chen (Host)</span>
+<span class="font-mono-ui text-mono-ui text-primary">42% • 18m 54s</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 42%"></div>
+</div>
+</div>
+</div>
+<!-- David -->
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex-shrink-0" data-alt="A professional studio portrait of a man in his late 20s wearing a modern dark sweater, high-tech office aesthetic, cinematic lighting, focused look." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAF5aXvYh0ZBBm6TPo2G37hpO7WeKaBbO3YMEsDA1bMLT4_MWEY1VfTMmWWrn286hkC7Xr9oY1anqEJJrkhiXaSuKmEokxJ9cpdZrhW_fpxsct0GtY3hS3ANUecDTpp_X0fgwPRTMbcUU3PrWAIdU2PwKj3KwmXXyay8EUpI2CaYBPFU5gkdw8E204LqK1Xnon0Mdr0gx8RsUZxP8TiSRxgIX1gfyOYSMhMUxA1mco4jgLfiqyy7rtu')"></div>
+<div class="flex-1">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md">David Miller</span>
+<span class="font-mono-ui text-mono-ui text-secondary">28% • 12m 36s</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 28%"></div>
+</div>
+</div>
+</div>
+<!-- Elena -->
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex-shrink-0" data-alt="A sharp, professional headshot of a mature woman with glasses, executive style, soft studio lighting on a dark background, refined tech vibe." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBQRFwBOvx-0LG9pM5VL-9RFDESZVm9QVfVwxyBUeutDBYGLQqRMySbZGb8G2k1ivPhGTbxIsTCTXgWgHEY0ILlOK1JnYIoi0ECLf1mxcjIO62_Ze37a2vwWrq0NUCmO3N62lUBNZePN3YWaQlMeeJOr_AfyvKW3NfYSRKZHxuzGSetZAmkgOf0ElIVAj_NFng8NsFwl9hzm6E47B9Y9_xkdketfZMGMwHPuQIgki1YJdheuEpXjf6y')"></div>
+<div class="flex-1">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md">Elena Rodriguez</span>
+<span class="font-mono-ui text-mono-ui text-outline">15% • 6m 45s</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-outline h-full rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<!-- Other -->
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center border border-outline-variant text-outline flex-shrink-0">
+<span class="material-symbols-outlined text-sm">group</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between mb-xs">
+<span class="font-label-md text-label-md text-outline">Others (3 speakers)</span>
+<span class="font-mono-ui text-mono-ui text-outline-variant">15% • 6m 45s</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden">
+<div class="bg-outline-variant h-full rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Row: Disagreement Topics -->
+<section class="md:col-span-12">
+<div class="glass-panel p-lg rounded-xl">
+<div class="flex items-center justify-between mb-lg">
+<div>
+<h3 class="font-headline-sm text-headline-sm">Cognitive Friction Analysis</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Identification of dissenting views and resolution status.</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">analytics</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Topic 1 -->
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant flex flex-col gap-md">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-md text-label-md text-tertiary font-semibold uppercase">Timeline Conflict</span>
+</div>
+<blockquote class="font-body-md text-body-md italic text-on-surface-variant border-l-2 border-outline-variant pl-md py-xs">
+                "The Q4 deployment window is unrealistic given the current hardware lead times. We are looking at a 6-week delay."
+              </blockquote>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant/30">
+<span class="font-label-sm text-label-sm text-outline">Resolution: Pending</span>
+<span class="font-mono-ui text-mono-ui text-xs px-xs py-1 rounded bg-tertiary/10 text-tertiary">Critical</span>
+</div>
+</div>
+<!-- Topic 2 -->
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant flex flex-col gap-md">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-md text-label-md text-primary font-semibold uppercase">Budget Allocation</span>
+</div>
+<blockquote class="font-body-md text-body-md italic text-on-surface-variant border-l-2 border-outline-variant pl-md py-xs">
+                "Moving resources from testing to dev is a risk, but I agree it's necessary to hit the alpha milestone."
+              </blockquote>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant/30">
+<span class="font-label-sm text-label-sm text-outline">Resolution: Consensual</span>
+<span class="font-mono-ui text-mono-ui text-xs px-xs py-1 rounded bg-primary/10 text-primary">Strategic</span>
+</div>
+</div>
+<!-- Topic 3 -->
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant flex flex-col gap-md">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-label-md text-label-md text-outline font-semibold uppercase">Feature Priority</span>
+</div>
+<blockquote class="font-body-md text-body-md italic text-on-surface-variant border-l-2 border-outline-variant pl-md py-xs">
+                "I'm not convinced the mobile-first approach serves our enterprise segment's core desktop needs."
+              </blockquote>
+<div class="flex justify-between items-center pt-md border-t border-outline-variant/30">
+<span class="font-label-sm text-label-sm text-outline">Resolution: Tabling for Sync</span>
+<span class="font-mono-ui text-mono-ui text-xs px-xs py-1 rounded bg-outline/10 text-outline">Debated</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Nav Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant/30 shadow-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="font-label-sm text-label-sm">Meetings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="font-label-sm text-label-sm">Actions</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-sm text-label-sm">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+</nav>
+<script>
+    // Lightweight atmospheric effect: Glow following mouse on cards
+    document.querySelectorAll('.glass-panel').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    // Score radial progress animation logic
+    // (Already implemented via SVG but could be enhanced with JS if dynamic)
+  </script>
+</body></html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #1F1F1F;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F1F1F;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2f372e;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002109",
+                        "on-error": "#690005",
+                        "tertiary-container": "#ff8b7c",
+                        "on-tertiary": "#60130d",
+                        "on-secondary": "#003914",
+                        "primary-container": "#22c55e",
+                        "background": "#0e150e",
+                        "on-secondary-fixed": "#002109",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#2f372e",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#242c24",
+                        "primary": "#4be277",
+                        "surface-variant": "#2f372e",
+                        "inverse-primary": "#006e2f",
+                        "surface-tint": "#4ae176",
+                        "surface": "#0e150e",
+                        "inverse-surface": "#dce5d9",
+                        "on-primary": "#003915",
+                        "surface-container-low": "#161d16",
+                        "tertiary-fixed": "#ffdad5",
+                        "primary-fixed": "#6bff8f",
+                        "secondary-fixed-dim": "#62df7d",
+                        "on-primary-container": "#004b1e",
+                        "on-tertiary-container": "#76231b",
+                        "on-surface-variant": "#bccbb9",
+                        "surface-bright": "#333b33",
+                        "surface-container-lowest": "#091009",
+                        "on-tertiary-fixed": "#410001",
+                        "primary-fixed-dim": "#4ae176",
+                        "on-surface": "#dce5d9",
+                        "inverse-on-surface": "#2a322a",
+                        "surface-dim": "#0e150e",
+                        "secondary-fixed": "#7ffc97",
+                        "tertiary-fixed-dim": "#ffb4a9",
+                        "outline-variant": "#3d4a3d",
+                        "outline": "#869585",
+                        "secondary-container": "#1ca64d",
+                        "on-primary-fixed-variant": "#005321",
+                        "secondary": "#62df7d",
+                        "surface-container": "#1a221a",
+                        "on-secondary-fixed-variant": "#005320",
+                        "on-secondary-container": "#003111",
+                        "tertiary": "#ffb5ab",
+                        "on-background": "#dce5d9",
+                        "on-tertiary-fixed-variant": "#7f2a21",
+                        "error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xxl": "48px",
+                        "base": "8px",
+                        "sm": "8px",
+                        "container-max": "1440px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "mono-ui": ["Geist"],
+                        "headline-sm": ["Geist"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display": ["Geist"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary/30 min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-background text-primary font-body-md docked full-width top-0 border-b border-outline-variant flex justify-between items-center w-full px-lg h-16 z-50 fixed">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high p-xs rounded-lg transition-colors">menu</span>
+<h1 class="font-display text-headline-md font-bold text-primary">Lynqis</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high p-xs rounded-lg transition-colors">notifications</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional high-resolution close-up portrait of a technical executive with subtle studio lighting, set against a dark minimalist background. The aesthetic is clean, sharp, and high-tech, using a monochrome palette with deep forest green accents to match the professional SaaS environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVn3BGZtGTJ_4_wEYsR7_MG2dcNb_Z6Bxid5nXmQyGHy_JTKOR7H538TCBvdGW2Y8ZdeJ9HMz4Y0QEinM-vzj0n-ZFn5PovY-uLND1pw56wWdx5ZTXDGUnU5w6X7ETpTWn5WZmc33uKIpybVfpgsP8sijbLkP_tRU5yyBWUV5ZCL2LZB67xEfgSvVrW7UIdp81Zkb2b85t5QD_xR51G2T0eATemveflRgl1x2Uoghp9bE3MLpIbLUp"/>
+</div>
+</div>
+</header>
+<!-- NavigationDrawer (Desktop) -->
+<aside class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md gap-base bg-surface-container-low border-r border-outline-variant w-72 pt-20">
+<div class="flex flex-col gap-xs">
+<nav class="space-y-1">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg font-label-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg font-label-md" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span>Meetings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg font-label-md" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Action Items</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg font-label-md" href="#">
+<span class="material-symbols-outlined">extension</span>
+<span>Integrations</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container rounded-lg font-bold flex items-center gap-md px-md py-sm scale-[0.98] transition-transform font-label-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pt-24 pb-32 md:pl-80 px-md md:pr-lg min-h-screen">
+<div class="max-w-6xl mx-auto">
+<header class="mb-xl">
+<h2 class="font-display text-headline-lg text-on-surface tracking-tight">Account Settings</h2>
+<p class="text-on-surface-variant font-body-md mt-xs">Manage your personal information, security, and preferences.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<!-- Profile Section -->
+<section class="bg-[#141414] border border-[#1F1F1F] p-xl rounded-xl flex flex-col gap-lg">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="font-headline-sm text-on-surface">Profile</h3>
+</div>
+<div class="flex flex-col md:flex-row items-center gap-lg">
+<div class="relative group">
+<div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-outline-variant group-hover:border-primary transition-colors">
+<img class="w-full h-full object-cover" data-alt="A detailed professional avatar photograph of a technical leader in a dark modern office setting. Sharp focus, cinematic lighting with emerald green highlights reflecting off glass surfaces. The mood is sophisticated, technical, and high-performance, fitting for a premium data analytics software platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDOFFcFJjgQZzzfqEbmhHPspqBAX5gwzSZGXkuzsOPYJ6zCNPkxXJw3Y2wolu-Wpv6TyypxEpOBJMP0A6OTFzYkiFJcH0cJ88eYrJsvMKVYIobGwRK1OZh12vvShnz7IuRMsB5KpnNrGFzOdu8WgU-vpsry6krWep2zx3hCftV9DCisneUdwHOnR5WfQGO_tDraQT0bDA-tPZeKf0kIMv3mjU9RosgX2lEvsbxg3f-HVDxzvrnVvh3"/>
+</div>
+<button class="absolute -bottom-2 -right-2 bg-primary text-on-primary w-8 h-8 rounded-lg flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<div class="flex-1 w-full space-y-md">
+<div>
+<label class="font-label-sm text-on-surface-variant uppercase tracking-wider block mb-xs">Full Name</label>
+<input class="w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="text" value="Alex Chen"/>
+</div>
+<div>
+<label class="font-label-sm text-on-surface-variant uppercase tracking-wider block mb-xs">Email Address</label>
+<input class="w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="email" value="alex.chen@lynqis.io"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Preferences Section -->
+<section class="bg-[#141414] border border-[#1F1F1F] p-xl rounded-xl flex flex-col gap-lg">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h3 class="font-headline-sm text-on-surface">Preferences</h3>
+</div>
+<div class="space-y-lg">
+<div>
+<label class="font-label-sm text-on-surface-variant uppercase tracking-wider block mb-xs">Export Format</label>
+<select class="w-full bg-background border border-outline-variant rounded-lg px-md py-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer">
+<option>JSON (Standard)</option>
+<option>CSV (Flattened)</option>
+<option>Markdown</option>
+<option>Excel (.xlsx)</option>
+</select>
+</div>
+<div class="flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline-variant/30">
+<div>
+<p class="text-on-surface font-label-md">Dark Mode</p>
+<p class="text-on-surface-variant text-label-sm">Use the system default theme</p>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-outline-variant rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Billing Section -->
+<section class="bg-[#141414] border border-[#1F1F1F] p-xl rounded-xl flex flex-col gap-lg">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">payments</span>
+<h3 class="font-headline-sm text-on-surface">Billing</h3>
+</div>
+<span class="bg-primary-container/10 text-primary px-sm py-xs rounded font-label-sm border border-primary/20">PRO PLAN</span>
+</div>
+<div class="space-y-md">
+<div class="p-md border border-outline-variant rounded-lg">
+<div class="flex justify-between items-end mb-sm">
+<p class="text-label-sm text-on-surface-variant uppercase">Usage this month</p>
+<p class="text-on-surface font-mono-ui">84%</p>
+</div>
+<div class="w-full bg-outline-variant h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[84%]"></div>
+</div>
+<p class="text-label-sm text-on-surface-variant mt-sm">2,512 of 3,000 API calls remaining</p>
+</div>
+<button class="w-full py-sm border border-outline-variant rounded-lg font-label-md hover:bg-surface-variant transition-colors">
+                            Manage Subscription
+                        </button>
+</div>
+</section>
+<!-- API Keys Section -->
+<section class="bg-[#141414] border border-[#1F1F1F] p-xl rounded-xl flex flex-col gap-lg">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">key</span>
+<h3 class="font-headline-sm text-on-surface">API Keys</h3>
+</div>
+<div class="space-y-md">
+<div>
+<label class="font-label-sm text-on-surface-variant uppercase tracking-wider block mb-xs">OpenAI API Key</label>
+<div class="flex gap-sm">
+<div class="relative flex-1">
+<input class="w-full bg-background border border-outline-variant rounded-lg pl-md pr-xxl py-sm text-on-surface font-mono-ui outline-none" readonly="" type="password" value="sk-proj-72948274928472948274928"/>
+<button class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility_off</span>
+</button>
+</div>
+<button class="px-md bg-secondary-container text-on-secondary-container rounded-lg font-label-md hover:opacity-90 transition-opacity">
+                                    Copy
+                                </button>
+</div>
+<p class="text-label-sm text-on-surface-variant mt-sm">Used for advanced natural language meeting summaries.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Danger Zone -->
+<section class="mt-xl bg-error-container/5 border border-error/20 p-xl rounded-xl">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-lg">
+<div>
+<h3 class="font-headline-sm text-error mb-xs">Danger Zone</h3>
+<p class="text-on-surface-variant font-body-md max-w-xl">Once you delete your account, there is no going back. Please be certain. All data, meetings, and integrations will be permanently wiped.</p>
+</div>
+<button class="border border-error text-error px-xl py-sm rounded-lg font-bold hover:bg-error hover:text-on-error transition-all active:scale-95 whitespace-nowrap">
+                        Delete account
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant/30 shadow-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="text-label-sm-mobile">Meetings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="text-label-sm-mobile">Actions</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-label-sm-mobile">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-sm-mobile">Settings</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', () => {
+                element.parentElement.classList.add('scale-[1.01]');
+            });
+            element.addEventListener('blur', () => {
+                element.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+
+        // Simple Toggle for API Key Visibility (Simulation)
+        const toggleBtn = document.querySelector('button .material-symbols-outlined[textContent="visibility_off"]');
+        if(toggleBtn) {
+            toggleBtn.parentElement.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('span');
+                if(input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = 'visibility';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = 'visibility_off';
+                }
+            });
+        }
+    </script>
+</body></html>

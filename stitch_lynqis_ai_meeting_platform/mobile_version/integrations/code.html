@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Integrations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(31, 31, 31, 1);
+        }
+        .integration-card {
+            background-color: #141414;
+            border: 1px solid #1F1F1F;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .integration-card:hover {
+            border-color: rgba(250, 250, 250, 0.15);
+            transform: translateY(-2px);
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #dce5d9;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-primary-fixed": "#002109",
+                "on-error": "#690005",
+                "tertiary-container": "#ff8b7c",
+                "on-tertiary": "#60130d",
+                "on-secondary": "#003914",
+                "primary-container": "#22c55e",
+                "background": "#0e150e",
+                "on-secondary-fixed": "#002109",
+                "error": "#ffb4ab",
+                "surface-container-highest": "#2f372e",
+                "on-error-container": "#ffdad6",
+                "surface-container-high": "#242c24",
+                "primary": "#4be277",
+                "surface-variant": "#2f372e",
+                "inverse-primary": "#006e2f",
+                "surface-tint": "#4ae176",
+                "surface": "#0e150e",
+                "inverse-surface": "#dce5d9",
+                "on-primary": "#003915",
+                "surface-container-low": "#161d16",
+                "tertiary-fixed": "#ffdad5",
+                "primary-fixed": "#6bff8f",
+                "secondary-fixed-dim": "#62df7d",
+                "on-primary-container": "#004b1e",
+                "on-tertiary-container": "#76231b",
+                "on-surface-variant": "#bccbb9",
+                "surface-bright": "#333b33",
+                "surface-container-lowest": "#091009",
+                "on-tertiary-fixed": "#410001",
+                "primary-fixed-dim": "#4ae176",
+                "on-surface": "#dce5d9",
+                "inverse-on-surface": "#2a322a",
+                "surface-dim": "#0e150e",
+                "secondary-fixed": "#7ffc97",
+                "tertiary-fixed-dim": "#ffb4a9",
+                "outline-variant": "#3d4a3d",
+                "outline": "#869585",
+                "secondary-container": "#1ca64d",
+                "on-primary-fixed-variant": "#005321",
+                "secondary": "#62df7d",
+                "surface-container": "#1a221a",
+                "on-secondary-fixed-variant": "#005320",
+                "on-secondary-container": "#003111",
+                "tertiary": "#ffb5ab",
+                "on-background": "#dce5d9",
+                "on-tertiary-fixed-variant": "#7f2a21",
+                "error-container": "#93000a"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "md": "16px",
+                "xxl": "48px",
+                "base": "8px",
+                "sm": "8px",
+                "container-max": "1440px",
+                "lg": "24px",
+                "xs": "4px",
+                "gutter": "24px",
+                "xl": "32px"
+            },
+            "fontFamily": {
+                "mono-ui": ["Geist"],
+                "headline-sm": ["Geist"],
+                "body-md": ["Inter"],
+                "body-lg": ["Inter"],
+                "label-md": ["Inter"],
+                "display": ["Geist"],
+                "body-sm": ["Inter"],
+                "headline-lg": ["Geist"],
+                "headline-md": ["Geist"],
+                "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center w-full px-lg h-16 z-50 fixed top-0 bg-background/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary cursor-pointer lg:hidden">menu</span>
+<h1 class="font-display text-headline-md font-bold text-primary">Lynqis</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary font-label-md px-md py-2 rounded-lg flex items-center gap-xs hover:bg-secondary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                Add integration
+            </button>
+<div class="p-2 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer relative">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+</div>
+</header>
+<!-- Side Navigation Drawer (Desktop) -->
+<aside class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md gap-base bg-surface-container-low border-r border-outline-variant w-72 pt-20">
+<nav class="flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="font-label-md">Meetings</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md">Action Items</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98]" href="#">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-label-md">Integrations</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-72 pt-24 px-md md:px-xl pb-24 min-h-screen relative">
+<!-- Atmospheric Background Element -->
+
+<div class="max-w-container-max mx-auto relative z-10">
+<header class="mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Integrations</h2>
+<p class="text-on-surface-variant max-w-2xl">Connect your favorite tools to streamline your workflow and synchronize data across your technical ecosystem.</p>
+</header>
+<!-- Integration Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Google Calendar -->
+<div class="integration-card p-lg rounded-lg flex flex-col justify-between h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container flex items-center justify-center">
+<img class="w-8 h-8" data-alt="A stylized professional logo of Google Calendar on a clean dark tech surface, using corporate blues and greens with a modern glassmorphism effect. High-end SaaS interface aesthetic, sharp edges, and subtle glowing outlines in a minimalist tech environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgQJttWTxxyFKuPCQRtmVRrHnGxQzcCKrms8wqPvaSVW6FOaKXErjpbmxLmNLPdeT3kR-kWsxx3Bpa_6385QeYogGgw6_fknkhNZSzuXo5RL69_AIe2odVAmeL_mWE6jvNcWTWr_kT2AuMcIbWlmbWEckkpzRmLfwPJ6PWwp9T_EoYoA41jjSjSJk_9nWojS5zLviyJF2DaZBuaxQgALP7zAkDL75c32xdLEtugm3SGHWAeO3il7RT"/>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full font-label-sm text-[11px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                                Connected
+                            </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Google Calendar</h3>
+<p class="font-body-sm text-on-surface-variant mb-md">Sync meetings and schedule automation triggers.</p>
+<div class="inline-flex items-center gap-xs bg-surface-container px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">work</span>
+<span class="font-label-sm text-on-surface-variant">lynqis.dev</span>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-variant/30 text-on-surface font-label-md rounded-lg hover:bg-surface-variant transition-colors border border-outline-variant">
+                        Manage Settings
+                    </button>
+</div>
+<!-- Zoom -->
+<div class="integration-card p-lg rounded-lg flex flex-col justify-between h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container flex items-center justify-center">
+<img class="w-8 h-8" data-alt="The Zoom communication platform logo presented as a sleek 3D icon in a dark high-tech workspace. The lighting is cold and professional with soft blue highlights, reflecting a premium minimalist SaaS aesthetic. High resolution, crisp details, and elegant shadow work." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVhCVd4p1TYoqEcpSt1c3kMjN1Sn_kd6rsxkmySe8wMg3H2vUiIbxuXEPpj6bmiXtbcyPKjc8eaQfp4rJeyea0IY09-8ChSA2CiknOzltF18Jn7WjGTCsSKdB56k-Y7d0B2HjsnFidqXhHkrw0_c7iSDpCJRonY0iCNlYbz3ObZlp5ROzlzwXBPrrgrRaYEfyA3BwuoK1iIY-Hwk-rNGZVlOlBaBskhGgT47m6FpOqARGEz20zqm8k"/>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full font-label-sm text-[11px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                                Connected
+                            </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Zoom</h3>
+<p class="font-body-sm text-on-surface-variant mb-md">Auto-record sessions and generate AI summaries.</p>
+<div class="inline-flex items-center gap-xs bg-surface-container px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">group</span>
+<span class="font-label-sm text-on-surface-variant">Product Team</span>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-variant/30 text-on-surface font-label-md rounded-lg hover:bg-surface-variant transition-colors border border-outline-variant">
+                        Manage Settings
+                    </button>
+</div>
+<!-- Notion -->
+<div class="integration-card p-lg rounded-lg flex flex-col justify-between h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container flex items-center justify-center">
+<img class="w-8 h-8" data-alt="A minimalist Notion application icon floating in a dark, high-contrast digital space. The style is sharp and architectural, using blacks, whites, and subtle grey gradients. Professional SaaS design with a focus on mathematical precision and technical authority." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG7N41IaEadygNwRv4gqLruVtCqv_YbPtFze0OY3NfZNU6aozkuiUG8HYO-tzUUqrCrz2pjrdAlJzAMUtIifG2CzIIqZXUzci5Vhpj4ACyFMwUm3qujTv4EAxZ5pMLh1kdMyqeWuKxXhAUETHjp-eyyRBzP6azXU7YEJegTgaXbALyvamNgKUxDWyBVASQjytcregefivmu_DnlgCoD78CZgx_Kzu2dSJCKbTqKiBaiL_5i780rey0"/>
+</div>
+<span class="bg-on-surface-variant/10 text-on-surface-variant px-3 py-1 rounded-full font-label-sm text-[11px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full"></span>
+                                Disconnected
+                            </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Notion</h3>
+<p class="font-body-sm text-on-surface-variant mb-md">Export documentation and database records.</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary font-label-md rounded-lg hover:bg-secondary-container transition-colors active:scale-95">
+                        Connect Notion
+                    </button>
+</div>
+<!-- Slack -->
+<div class="integration-card p-lg rounded-lg flex flex-col justify-between h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container flex items-center justify-center">
+<img class="w-8 h-8" data-alt="The Slack messaging app icon rendered with sophisticated metallic textures in a deep charcoal environment. Vibrant accent colors pop against the dark background. The lighting is cinematic, highlighting the precision-engineered look of modern enterprise software." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEM0Ae1ysTzYN-n1qCHwBSRsvJIqjaZwvjgoZ9uVqGQTZo6tn28biVJ3-AEcdMFo_XcYl1UIZHfewbCrJiMmkLrtMGqDQ9axMKG4gb0xHgD07ClX2frl1WlyrzBHQaxDR-zVrToQ_FSSSPWk6KpQPZAVZ8xZ5bOYzFzbfaJrH2CppLa_MuVT60G5DrkFw5qpvdjMYwLY0z9_4CRJQh1en1YiuNpCNaR3H_zH62Blp5joEgDmvHsFyI"/>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full font-label-sm text-[11px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                                Connected
+                            </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Slack</h3>
+<p class="font-body-sm text-on-surface-variant mb-md">Real-time alerts and channel broadcasting.</p>
+<div class="inline-flex items-center gap-xs bg-surface-container px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">tag</span>
+<span class="font-label-sm text-on-surface-variant">#engineering-ops</span>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-variant/30 text-on-surface font-label-md rounded-lg hover:bg-surface-variant transition-colors border border-outline-variant">
+                        Manage Settings
+                    </button>
+</div>
+<!-- Email -->
+<div class="integration-card p-lg rounded-lg flex flex-col justify-between h-[280px]">
+<div>
+<div class="flex justify-between items-start mb-md">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[32px]">mail</span>
+</div>
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full font-label-sm text-[11px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+                                Connected
+                            </span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Email (SMTP/IMAP)</h3>
+<p class="font-body-sm text-on-surface-variant mb-md">Automated notification delivery and ingest.</p>
+<div class="inline-flex items-center gap-xs bg-surface-container px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">alternate_email</span>
+<span class="font-label-sm text-on-surface-variant">admin@lynqis.io</span>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-variant/30 text-on-surface font-label-md rounded-lg hover:bg-surface-variant transition-colors border border-outline-variant">
+                        Manage Settings
+                    </button>
+</div>
+<!-- Add New Integration Placeholder -->
+<div class="border-2 border-dashed border-outline-variant p-lg rounded-lg flex flex-col items-center justify-center h-[280px] bg-surface-container-lowest/50 group cursor-pointer hover:border-primary/50 transition-all">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-md group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-[32px]">add_circle</span>
+</div>
+<p class="font-label-md text-on-surface-variant group-hover:text-on-surface transition-colors">Add Custom Integration</p>
+<p class="text-[12px] text-outline text-center mt-2 px-4">Webhooks, API keys, and enterprise connections.</p>
+</div>
+</div>
+<!-- Developer Tools Section -->
+<section class="mt-xxl border-t border-outline-variant pt-xl">
+<div class="glass-panel p-lg rounded-xl flex flex-col md:flex-row items-center justify-between gap-lg">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-xs">Advanced Developer API</h4>
+<p class="text-on-surface-variant font-body-sm">Build your own custom integrations using our robust GraphQL and REST APIs.</p>
+</div>
+<div class="flex gap-md shrink-0">
+<button class="px-md py-2 border border-outline-variant rounded-lg text-on-surface font-label-md hover:bg-surface-container-high transition-colors">View Docs</button>
+<button class="px-md py-2 bg-primary-container text-on-primary-container font-label-md rounded-lg hover:opacity-90 transition-all">Get API Key</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md shadow-xl border-t border-outline-variant/30">
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm-mobile text-[10px]">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="font-label-sm-mobile text-[10px]">Meetings</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-label-sm-mobile text-[10px]">Apps</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="font-label-sm-mobile text-[10px]">Actions</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm-mobile text-[10px]">Settings</span>
+</div>
+</nav>
+<script>
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.96)';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = '';
+            });
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = '';
+            });
+        });
+
+        // Simulating loading states or interactions
+        document.querySelectorAll('.integration-card button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const originalText = this.innerText;
+                if (this.classList.contains('bg-primary')) {
+                    this.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> Connecting...';
+                    this.disabled = true;
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+</body></html>

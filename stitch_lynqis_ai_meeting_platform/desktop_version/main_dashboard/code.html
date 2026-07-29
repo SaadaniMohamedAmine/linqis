@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#004395",
+                    "primary-fixed-dim": "#62df7d",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-primary": "#006e2d",
+                    "inverse-on-surface": "#313030",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-primary-fixed-variant": "#005320",
+                    "outline-variant": "#3e4a3d",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-highest": "#353534",
+                    "background": "#131313",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary": "#003914",
+                    "surface-container": "#201f1f",
+                    "secondary-fixed-dim": "#f7be1d",
+                    "error": "#ffb4ab",
+                    "on-surface-variant": "#bdcaba",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary-fixed": "#ffdf9a",
+                    "outline": "#879485",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "on-primary-container": "#003111",
+                    "surface-container": "#201f1f",
+                    "surface-bright": "#393939",
+                    "primary": "#62df7d",
+                    "surface-tint": "#62df7d",
+                    "on-secondary-fixed": "#251a00",
+                    "on-tertiary-container": "#00285d",
+                    "tertiary-fixed": "#d8e2ff",
+                    "on-background": "#e5e2e1",
+                    "inverse-surface": "#e5e2e1",
+                    "primary-fixed": "#7ffc97",
+                    "surface": "#131313",
+                    "on-primary-fixed": "#002109",
+                    "secondary": "#ffca45",
+                    "error-container": "#93000a",
+                    "tertiary": "#adc6ff",
+                    "on-secondary-fixed-variant": "#5a4300",
+                    "on-tertiary": "#002e6a",
+                    "on-error": "#690005",
+                    "tertiary-container": "#4d8eff",
+                    "surface-variant": "#353534",
+                    "on-secondary-container": "#5b4400",
+                    "primary-container": "#1ca64d",
+                    "on-surface": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "secondary-container": "#e4ae00",
+                    "on-secondary": "#3f2e00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "2xl": "48px",
+                    "base": "8px",
+                    "margin": "40px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "3xl": "64px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { background-color: #131313; color: #e5e2e1; overflow: hidden; }
+        .glass { backdrop-filter: blur(20px); background: rgba(20, 20, 20, 0.8); border: 1px solid #1F1F1F; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .waveform-bar { transition: height 0.2s ease; }
+        .active-dot { box-shadow: 0 0 8px #62df7d; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1F1F1F; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2A2A2A; }
+    </style>
+</head>
+<body class="flex flex-col h-screen font-body-md">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant docked full-width top-0 h-[64px] flex items-center shrink-0 z-50">
+<div class="flex justify-between items-center w-full px-lg max-w-[1440px] mx-auto">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Lynqis</span>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 font-body-md text-body-md cursor-pointer active:opacity-80">Dashboard</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-md text-body-md cursor-pointer active:opacity-80">Meetings</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-md text-body-md cursor-pointer active:opacity-80">Action Items</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-body-md text-body-md cursor-pointer active:opacity-80">Integrations</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined p-base text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined p-base text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">settings</button>
+<div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a tech executive with a neutral expression, high-end studio lighting, minimalist dark background, sharp focus on facial features, embodying the expert and data-driven personality of the Lynqis brand with deep blacks and subtle green accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD9nMg1r9_VY5g413ges5b6x8FYIawgTZ6u9wW2usVqRrlcACSMHLrZl8JYH-NFBcBS9gegloBTI1dEpoB9AAWttDUlVg7K1U1bXhNoLjNcIdKUvOJoUnA7ZSL6-9wSJ0C6PCUnIoSV_U3FNUPEA-BtHOS3lzVvCVUikRCJf0c9xuiGPekx60dcsuyHUyALrHa8f_TOuBk3F3vVZpgKhIlQpRB83hGJjYWo_bqtz6V4WbXOipgejum"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 overflow-hidden">
+<!-- SideNavBar (Left Column: Meeting List) -->
+<aside class="bg-background dark:bg-background border-r border-outline-variant dark:border-outline-variant docked left-0 h-full w-[280px] shrink-0 flex flex-col p-md gap-base overflow-y-auto">
+<div class="flex flex-col gap-xs mb-md">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Meeting List</h2>
+<span class="material-symbols-outlined text-primary cursor-pointer">add_circle</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">AI-summarized sessions</p>
+</div>
+<button class="bg-primary text-on-primary py-sm px-md rounded-lg font-label-md flex items-center justify-center gap-sm mb-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined">video_call</span>
+                New Meeting
+            </button>
+<div class="space-y-sm">
+<!-- Active Meeting -->
+<div class="bg-surface-container dark:bg-surface-container-high text-primary dark:text-primary-fixed-dim rounded-lg p-md cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md">Q3 Product Strategy</span>
+</div>
+<p class="text-on-surface-variant text-[12px]">24 mins ago • Today</p>
+</div>
+<!-- Inactive Meetings -->
+<div class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low rounded-lg p-md cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-md">Weekly Sync: Engineering</span>
+</div>
+<p class="text-on-surface-variant/60 text-[12px]">Yesterday • 45m</p>
+</div>
+<div class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low rounded-lg p-md cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md">Design Review: Home</span>
+</div>
+<p class="text-on-surface-variant/60 text-[12px]">Oct 12 • 32m</p>
+</div>
+<div class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low rounded-lg p-md cursor-pointer active:scale-[0.98] transition-all">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md">Archived: Sprint 44</span>
+</div>
+<p class="text-on-surface-variant/60 text-[12px]">Oct 10 • 1h 12m</p>
+</div>
+</div>
+</aside>
+<!-- Center Column (Main Content Canvas) -->
+<section class="flex-1 flex flex-col bg-surface overflow-hidden relative">
+<!-- Tabs Header -->
+<div class="flex border-b border-outline-variant px-xl pt-md">
+<button class="tab-btn px-md py-sm border-b-2 border-primary text-primary font-label-md" data-tab="transcript" onclick="switchTab('transcript')">Transcript</button>
+<button class="tab-btn px-md py-sm border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md" data-tab="summary" onclick="switchTab('summary')">Summary</button>
+<button class="tab-btn px-md py-sm border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md" data-tab="actions" onclick="switchTab('actions')">Actions</button>
+<button class="tab-btn px-md py-sm border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md" data-tab="analysis" onclick="switchTab('analysis')">Analysis</button>
+</div>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto p-xl pb-32" id="main-canvas">
+<!-- TRANSCRIPT TAB CONTENT (Default) -->
+<div class="tab-content space-y-lg" id="tab-transcript">
+<div class="flex items-start gap-md">
+<div class="bg-surface-container-high px-sm py-xs rounded-full flex items-center gap-xs border border-outline-variant shrink-0 mt-1">
+<div class="w-5 h-5 rounded-full bg-blue-500 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract vibrant geometric avatar for a software developer, sharp edges, modern minimalist style, deep blue and electric cyan tones against a professional dark tech-inspired backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZbcHmsDGQR2U0fkMuSKpKTgjNCmDgKxgUXZdezIkzQStUApD4mE8qSHTHT7Rb1GjNvwk1pxC_ACNnk7BepDE7g49e69173BpnPS8T3u0pgCsAwrMF9mRB01ut0HoTvkZe9FVocWZSrg9G3UBj8beuq2DaYLIy8dpjETjr87w9RxtrUdluzNV2vJ1X8YZrVmycCIfikWxYH4dGELdupZ1KaSNtcCmCUwHmSnY3CmVtHF5jBGpJsmAM"/>
+</div>
+<span class="text-[12px] font-medium text-tertiary-fixed-dim">Sarah Chen</span>
+</div>
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm">
+<span class="text-[11px] text-on-surface-variant">00:04</span>
+<button class="material-symbols-outlined text-[18px] text-primary">play_arrow</button>
+</div>
+<p class="font-body-md text-on-surface">Alright everyone, let's look at the Q3 roadmap. We need to prioritize the AI summarization layer because user retention is dropping on the legacy dashboard.</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="bg-surface-container-high px-sm py-xs rounded-full flex items-center gap-xs border border-outline-variant shrink-0 mt-1">
+<div class="w-5 h-5 rounded-full bg-secondary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract vibrant geometric avatar for a designer, soft curves, modern minimalist style, bright amber and deep gold tones against a professional dark tech-inspired backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlNM2-59CeAAu5ElsGkZJ16hl-YWQSEV8LYDoSJ4HuO-OuapxvGxdCu3O7SxB67miv19yXryQvVuonkm3m8tzSDvVTh9YH9bDno9wJ5pmRoYLx9hP7QzYwoqbCmRIMJHHvMwcJjcimRGbM10IPfKwSnHDZZFEYYr6AA32KkLh9XaWaSlrn-J_Xm0P75h1Rt1NJdSSDLmN6GmxjXPTp-3QDaQ-W-E2ZDyqLPA_7YuGn0ymLJQ3tR7P8"/>
+</div>
+<span class="text-[12px] font-medium text-secondary-fixed-dim">Marcus J.</span>
+</div>
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm">
+<span class="text-[11px] text-on-surface-variant">00:12</span>
+<button class="material-symbols-outlined text-[18px] text-on-surface-variant">play_arrow</button>
+</div>
+<p class="font-body-md text-on-surface">I agree. The design team has a prototype ready. However, we're seeing some latency issues with the real-time transcription API. We might need to go with an asynchronous approach for the initial launch.</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="bg-surface-container-high px-sm py-xs rounded-full flex items-center gap-xs border border-outline-variant shrink-0 mt-1">
+<div class="w-5 h-5 rounded-full bg-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract vibrant geometric avatar for a project manager, structured lines, modern minimalist style, forest green and lime accents against a professional dark tech-inspired backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0WFXuCA58bcMznSHpPfj-GxyIETs4lgtsUAG0FB8EzqNBkAd1UGHnCv-knlgtVf6jVdlzbo0KtvqY7hju99NmBmRDvU5dQ2FOA0EspOVIS1kQCqHxhRvOKlOCqHdeA96cWdal7QC3SfCSiGHkTIsa8HRlNn_SxrYj0Bg7CF8BBvBGdwsnlIaSeFE5L2RK1ahUWdEazUNX9uCp-24lINXgyGdMOpwavxmpugV8gBeDvy1ZFKFtJVxC"/>
+</div>
+<span class="text-[12px] font-medium text-primary-fixed-dim">AI Assist</span>
+</div>
+<div class="flex flex-col gap-xs bg-surface-container-low p-md rounded-lg border-l-2 border-primary">
+<div class="flex items-center gap-sm">
+<span class="text-[11px] text-primary">00:28 • Insight</span>
+</div>
+<p class="font-body-md text-on-surface italic">Detected conflict: Marcus mentioned latency issues while Sarah suggested prioritizing AI layer. Suggest reviewing API throughput specs before finalizing sprint scope.</p>
+</div>
+</div>
+<!-- Repetitive blocks for scroll demonstration -->
+<div class="flex items-start gap-md opacity-60">
+<div class="bg-surface-container-high px-sm py-xs rounded-full flex items-center gap-xs border border-outline-variant shrink-0 mt-1">
+<div class="w-5 h-5 rounded-full bg-blue-500 overflow-hidden"></div>
+<span class="text-[12px] font-medium text-tertiary-fixed-dim">Sarah Chen</span>
+</div>
+<div class="flex flex-col gap-xs">
+<p class="font-body-md text-on-surface">That makes sense. Marcus, can you sync with the backend team by Thursday? We need to lock this down.</p>
+</div>
+</div>
+</div>
+<!-- SUMMARY TAB CONTENT (Hidden) -->
+<div class="tab-content hidden space-y-xl" id="tab-summary">
+<div class="bg-surface-container p-lg rounded-xl border border-outline-variant">
+<h3 class="font-headline-sm text-primary mb-md">Executive Summary</h3>
+<p class="font-body-lg text-on-surface leading-relaxed">The team discussed the Q3 product strategy, focusing on the integration of an AI-driven summarization layer to combat declining user retention. Key technical hurdles were identified regarding API latency, leading to a proposed shift from real-time to asynchronous processing for V1.</p>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="p-lg bg-surface-container-low rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-secondary-fixed-dim mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">topic</span>
+                                Key Topics
+                            </h4>
+<ul class="space-y-sm">
+<li class="flex items-center gap-md p-sm bg-background/50 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-body-sm">AI Summarization Integration</span>
+</li>
+<li class="flex items-center gap-md p-sm bg-background/50 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-body-sm">User Retention Analytics</span>
+</li>
+<li class="flex items-center gap-md p-sm bg-background/50 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-body-sm">API Latency Solutions</span>
+</li>
+</ul>
+</div>
+<div class="p-lg bg-surface-container-low rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-tertiary-fixed-dim mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                                Main Takeaways
+                            </h4>
+<div class="space-y-md">
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[20px]">check_circle</span>
+<p class="font-body-sm">Shift to async processing for the AI layer to ensure UX stability.</p>
+</div>
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[20px]">check_circle</span>
+<p class="font-body-sm">Prototype review scheduled for next Tuesday at 10 AM.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ACTIONS TAB CONTENT (Hidden) -->
+<div class="tab-content hidden space-y-lg" id="tab-actions">
+<div class="flex items-center gap-sm overflow-x-auto pb-xs">
+<button class="bg-primary text-on-primary px-md py-xs rounded-full text-[12px] font-medium">All Actions</button>
+<button class="bg-surface-container border border-outline-variant px-md py-xs rounded-full text-[12px] font-medium text-on-surface-variant hover:border-primary transition-all">Pending</button>
+<button class="bg-surface-container border border-outline-variant px-md py-xs rounded-full text-[12px] font-medium text-on-surface-variant hover:border-primary transition-all">Completed</button>
+<button class="bg-surface-container border border-outline-variant px-md py-xs rounded-full text-[12px] font-medium text-on-surface-variant hover:border-primary transition-all">High Priority</button>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-md bg-surface-container-low border border-outline-variant rounded-xl hover:border-outline transition-all cursor-pointer">
+<div class="flex items-center gap-md">
+<input class="w-5 h-5 rounded border-outline-variant bg-background text-primary focus:ring-primary focus:ring-offset-background" type="checkbox"/>
+<div>
+<p class="font-body-md text-on-surface">Review API throughput specifications</p>
+<p class="text-[12px] text-on-surface-variant">Due Oct 18 • Marcus J.</p>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="w-2 h-2 rounded-full bg-error active-dot"></div>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract geometric portrait of a software engineer, sharp masculine features in silhouette, deep amber and grey color palette, high contrast, minimalist tech-inspired aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4maeh9O_hmElSaoD0dL_C7dXuZbx5DMzN8gjc5PtsyfL7JWkf2ipwiy-J06dJ0JTomPhSaGP-dkYM0_LxC7UwBQ2PLgnOAe3ofvqNWHQs0RIRf_ybgMMfk6DegBJxrqVolPje8ibtttNYOoSlgKMoasQ6jvAaGreJJ_3b6eI6H_lEqZBKB6qz2iyOLhQsdTUDRGvNo8zZS1_0znRfWQBHqXDfKrm9IE6d8CuxejQ1MR2yQdlvNCSt"/>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-md bg-surface-container-low border border-outline-variant rounded-xl hover:border-outline transition-all cursor-pointer">
+<div class="flex items-center gap-md">
+<input class="w-5 h-5 rounded border-outline-variant bg-background text-primary focus:ring-primary focus:ring-offset-background" type="checkbox"/>
+<div>
+<p class="font-body-md text-on-surface">Update Design Prototype with async loading states</p>
+<p class="text-[12px] text-on-surface-variant">Due Oct 20 • Sarah Chen</p>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract geometric portrait of a female UI designer, soft circular forms, vibrant cyan and deep black tones, modern minimalist tech-inspired style with cinematic lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTzGQLIFzXIqRo3xYm_81atvV_LxK-XJIG6uIb5estM97x72p7aXh80xm3lkkOFYx8UsVTdPJPCv_-jmZvPy43r7o-ObOVULF0B0Letj3ICTCAhdq-EK1pQDjM4HNfzM_3-4CIL4WvQa9mv9rhS55zIAAjFsgZlNae-eOZvN8CGGZxwuLnzLwiUAesoCj8XQfzPjnkVHoMkclpSPrzElC9GqAi1yaNa95Hdy9kp6aSodYKBWQM21e7"/>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-md bg-surface-container-low border border-outline-variant rounded-xl hover:border-outline transition-all cursor-pointer opacity-50 grayscale">
+<div class="flex items-center gap-md">
+<input checked="" class="w-5 h-5 rounded border-outline-variant bg-background text-primary focus:ring-primary focus:ring-offset-background" type="checkbox"/>
+<div>
+<p class="font-body-md text-on-surface line-through">Schedule Q3 kickoff meeting</p>
+<p class="text-[12px] text-on-surface-variant">Completed Oct 14</p>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract geometric profile, corporate executive style, dark blue and deep charcoal grey tones, professional minimalist aesthetic, sharp lighting on angular features." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU55A_--y0oA8ZCawBsp7TI8Nx4SYtxzja3jjSgKWXDw_sBFArBvpIACLyWpOSP0k_fIxERksFPJiv7szo1mhApjR_YG7rSuL3mKc5BcYu4bJ40e2x8sPM2D8OIIZMPxmD9aNTEMqFEWgDDK1T_eynfPkfW2vuEbKC0svqQYHa5BF5VfRH4j6eUmW2_V9JvoG5iCw28piZTPpki_TItw7YA3STwkurDc9fbWuLukXrhklAE3XpskhY"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ANALYSIS TAB CONTENT (Hidden) -->
+<div class="tab-content hidden space-y-xl" id="tab-analysis">
+<div class="grid grid-cols-3 gap-lg">
+<div class="col-span-1 p-lg bg-surface-container rounded-xl border border-outline-variant flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 bg-gradient-to-br from-primary to-transparent"></div>
+<h4 class="font-label-md text-on-surface-variant mb-md">Quality Score</h4>
+<div class="text-display-lg font-headline-lg text-primary leading-none">7.5</div>
+<div class="text-[12px] text-on-surface-variant mt-xs">Above benchmark (+1.2)</div>
+<!-- Pulse Indicator -->
+<div class="mt-xl relative">
+<div class="w-3 h-3 bg-primary rounded-full animate-ping absolute inset-0 opacity-75"></div>
+<div class="w-3 h-3 bg-primary rounded-full relative z-10"></div>
+</div>
+</div>
+<div class="col-span-2 p-lg bg-surface-container rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-on-surface-variant mb-lg">Participation Distribution</h4>
+<div class="space-y-md">
+<div class="space-y-xs">
+<div class="flex justify-between text-[11px] font-medium">
+<span>Sarah Chen</span>
+<span>42%</span>
+</div>
+<div class="h-2 w-full bg-background rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 42%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between text-[11px] font-medium">
+<span>Marcus J.</span>
+<span>38%</span>
+</div>
+<div class="h-2 w-full bg-background rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 38%"></div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between text-[11px] font-medium">
+<span>AI Assistant</span>
+<span>20%</span>
+</div>
+<div class="h-2 w-full bg-background rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 20%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-lg bg-surface-container rounded-xl border border-outline-variant">
+<h4 class="font-label-md text-on-surface-variant mb-lg">Sentiment Timeline</h4>
+<div class="h-32 flex items-end gap-2 px-md">
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[30%] transition-all"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[45%] transition-all"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[60%] transition-all"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[20%] transition-all border-b-2 border-error/50"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[75%] transition-all border-b-2 border-primary/50"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[90%] transition-all border-b-2 border-primary"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[80%] transition-all"></div>
+<div class="flex-1 bg-surface-container-high hover:bg-primary/20 rounded-t h-[65%] transition-all"></div>
+</div>
+<div class="flex justify-between mt-sm text-[10px] text-on-surface-variant uppercase tracking-widest px-md">
+<span>00:00</span>
+<span>15:00</span>
+<span>30:00</span>
+<span>45:00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Waveform Player (Bottom Persistent) -->
+<div class="absolute bottom-0 left-0 right-0 h-24 glass border-t border-outline-variant px-xl flex items-center gap-xl z-30">
+<div class="flex items-center gap-md shrink-0">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-all">skip_previous</button>
+<button class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all" id="playToggle">
+<span class="material-symbols-outlined font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-all">skip_next</button>
+</div>
+<div class="flex-1 flex flex-col gap-xs">
+<div class="flex items-end gap-[3px] h-8" id="waveform-container">
+<!-- Generated by script -->
+</div>
+<div class="flex justify-between text-[11px] text-on-surface-variant">
+<span>04:12</span>
+<span>24:45</span>
+</div>
+</div>
+<div class="flex items-center gap-md shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant">volume_up</span>
+<div class="w-24 h-1 bg-outline-variant rounded-full overflow-hidden">
+<div class="w-[70%] h-full bg-on-surface"></div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all">speed</button>
+</div>
+</div>
+</section>
+<!-- Right Column (Quick Actions/Stats) -->
+<aside class="w-[320px] bg-background dark:bg-background border-l border-outline-variant dark:border-outline-variant p-md flex flex-col gap-lg overflow-y-auto hidden xl:flex">
+<div class="space-y-md">
+<h3 class="font-label-md text-on-surface-variant uppercase tracking-wider px-xs">Participants</h3>
+<div class="space-y-sm">
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-all cursor-pointer">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-blue-500 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract geometric avatar, blue and cyan tones, modern minimalist style, dark tech background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwLTmiWZ6XVdgKSejL77qrt9ywY8F-f6zh79IezE8fLZrouU3I4R3S-Qo5ptAHJuO4cxNJzlhvD_T6LfKElg4g2KACmh-Ow7vxyjmxgL6VkTucAaM2EaliuP11O-RTJ3IwSpWXbgRrEIIzFUdO4g0oo7piVaJ46AQ6DSeSvzmpfl9tv_XtnbK-ZKXhAL2qR1LshZxGOdhkZnXEoQyfRK0_m_HT3mOJxHU9kbJw4IjBD1r_4bIjOFr-"/>
+</div>
+<div>
+<p class="text-[13px] font-medium">Sarah Chen</p>
+<p class="text-[11px] text-primary">Organizer • Speaking</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">mic</span>
+</div>
+<div class="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg transition-all cursor-pointer">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Abstract geometric avatar, amber and gold tones, modern minimalist style, dark tech background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtR3PEaCWx9mbJSlvDWglvEziymSDjVvuUX4R_-SAl0TxbDpwW-9OYiF7MYyl360g2VEv6DsHI07sjt-f2GH79Ze6-SA00wZczWUC-ihBhta54YaF8rPh-RzcQhxOajzhiPFb_0KJnDrpl-QNpr4vi_9dF1_pFhCbtCCtVRN6IBHLQ_v1DDg27-QiIUtYrbCoWavWXfxTaxdQn8nKYryJAU-KO3n1uYPfXromvYrxd_gw3vY6sE80l"/>
+</div>
+<div>
+<p class="text-[13px] font-medium">Marcus J.</p>
+<p class="text-[11px] text-on-surface-variant">Engineering</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">mic_off</span>
+</div>
+</div>
+</div>
+<div class="space-y-md">
+<h3 class="font-label-md text-on-surface-variant uppercase tracking-wider px-xs">Next Steps</h3>
+<div class="p-lg bg-surface-container-low rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-primary text-[32px] mb-sm">auto_awesome</span>
+<p class="font-label-md mb-xs">AI Automation Ready</p>
+<p class="text-[12px] text-on-surface-variant mb-md">Lynqis can automatically create Jira tickets for the detected action items.</p>
+<button class="w-full py-sm bg-surface-container-highest text-on-surface rounded-lg text-label-md hover:bg-outline-variant transition-all">Process Items</button>
+</div>
+</div>
+<div class="mt-auto p-md bg-gradient-to-br from-primary/10 to-transparent rounded-xl border border-primary/20">
+<div class="flex items-center gap-sm mb-xs">
+<span class="material-symbols-outlined text-primary">verified</span>
+<span class="font-label-md text-primary">Insight Pro</span>
+</div>
+<p class="text-[12px] text-on-surface-variant">Your meeting analysis is 35% more detailed this month. Keep it up!</p>
+</div>
+</aside>
+</main>
+<script>
+        // Waveform Generation
+        const container = document.getElementById('waveform-container');
+        for(let i=0; i<80; i++) {
+            const bar = document.createElement('div');
+            const h = Math.floor(Math.random() * 24) + 4;
+            bar.className = 'waveform-bar flex-1 bg-on-surface-variant/30 rounded-full hover:bg-primary transition-all cursor-pointer';
+            bar.style.height = h + 'px';
+            container.appendChild(bar);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            // Show target content
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            // Update Tab Styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.dataset.tab === tabId) {
+                    btn.classList.add('border-primary', 'text-primary');
+                    btn.classList.remove('border-transparent', 'text-on-surface-variant');
+                } else {
+                    btn.classList.remove('border-primary', 'text-primary');
+                    btn.classList.add('border-transparent', 'text-on-surface-variant');
+                }
+            });
+        }
+
+        // Simple Play Toggle Interaction
+        const playBtn = document.getElementById('playToggle');
+        let isPlaying = false;
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playBtn.innerHTML = `<span class="material-symbols-outlined font-variation-settings: 'FILL' 1;">${isPlaying ? 'pause' : 'play_arrow'}</span>`;
+            
+            // Animation effect on bars
+            const bars = document.querySelectorAll('.waveform-bar');
+            if(isPlaying) {
+                bars.forEach(bar => {
+                    bar.style.animation = `pulse ${Math.random() * 0.5 + 0.5}s infinite ease-in-out`;
+                });
+            } else {
+                bars.forEach(bar => {
+                    bar.style.animation = 'none';
+                });
+            }
+        });
+
+        // Dynamic Waveform animation keyframes
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes pulse {
+                0%, 100% { height: 10px; opacity: 0.3; }
+                50% { height: 28px; opacity: 1; background-color: #62df7d; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pricing | Lynqis AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-morphism {
+      background: rgba(20, 20, 20, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid #2A2A2A;
+    }
+    .pricing-card-shadow {
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+    .toggle-knob {
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#004395",
+            "primary-fixed-dim": "#62df7d",
+            "surface-container-lowest": "#0e0e0e",
+            "inverse-primary": "#006e2d",
+            "inverse-on-surface": "#313030",
+            "on-tertiary-fixed": "#001a42",
+            "on-primary-fixed-variant": "#005320",
+            "outline-variant": "#3e4a3d",
+            "on-error-container": "#ffdad6",
+            "surface-container-highest": "#353534",
+            "background": "#131313",
+            "surface-container-high": "#2a2a2a",
+            "on-primary": "#003914",
+            "surface-container": "#201f1f",
+            "secondary-fixed-dim": "#f7be1d",
+            "error": "#ffb4ab",
+            "on-surface-variant": "#bdcaba",
+            "surface-container-low": "#1c1b1b",
+            "secondary-fixed": "#ffdf9a",
+            "outline": "#879485",
+            "tertiary-fixed-dim": "#adc6ff",
+            "on-primary-container": "#003111",
+            "surface-bright": "#393939",
+            "primary": "#62df7d",
+            "surface-tint": "#62df7d",
+            "on-secondary-fixed": "#251a00",
+            "on-tertiary-container": "#00285d",
+            "tertiary-fixed": "#d8e2ff",
+            "on-background": "#e5e2e1",
+            "inverse-surface": "#e5e2e1",
+            "primary-fixed": "#7ffc97",
+            "surface": "#131313",
+            "on-primary-fixed": "#002109",
+            "secondary": "#ffca45",
+            "error-container": "#93000a",
+            "tertiary": "#adc6ff",
+            "on-secondary-fixed-variant": "#5a4300",
+            "on-tertiary": "#002e6a",
+            "on-error": "#690005",
+            "tertiary-container": "#4d8eff",
+            "surface-variant": "#353534",
+            "on-secondary-container": "#5b4400",
+            "primary-container": "#1ca64d",
+            "on-surface": "#e5e2e1",
+            "surface-dim": "#131313",
+            "secondary-container": "#e4ae00",
+            "on-secondary": "#3f2e00"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "md": "16px",
+            "2xl": "48px",
+            "base": "8px",
+            "margin": "40px",
+            "lg": "24px",
+            "gutter": "24px",
+            "xs": "4px",
+            "xl": "32px",
+            "sm": "8px",
+            "3xl": "64px"
+          },
+          "fontFamily": {
+            "headline-lg": ["Geist"],
+            "body-sm": ["Inter"],
+            "headline-sm": ["Geist"],
+            "display-lg": ["Geist"],
+            "headline-md": ["Geist"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container font-body-md overflow-x-hidden">
+<!-- TopNavBar Navigation Shell -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex justify-between items-center w-full px-lg max-w-[1440px] mx-auto h-[64px]">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">Lynqis</span>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md" href="#">Meetings</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md" href="#">Action Items</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md" href="#">Integrations</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors material-symbols-outlined">notifications</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors material-symbols-outlined">settings</button>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female executive in her mid-30s with short dark hair, wearing a minimalist black blazer, set against a blurred high-tech corporate office background with cool blue and green tones. The lighting is soft and cinematic, emphasizing a modern professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLidS-KoKvqqUTp9fat4ReDHMaAE3sWdgvvjvaBavu-Bk4EQvlcIYhoOi6siRhV45WFBujmVFawrNrHo9lr4a4fLNUam6TSJBd8kcRt8HGhfM4qzPFbH7iWPiGUBm9208TjmxeJFGEiskARfCnpNxHD-0Yh_StCkbG6QLMRUkmlYv3hRVLjQfBvqDQb5MDLRKdZ3Fz6WQwmURrBCobaNif1ZrCeKrSX5BGCLYaVPhyi00m0s9IYatd"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-[128px] pb-3xl px-lg max-w-[1440px] mx-auto min-h-screen relative">
+<!-- Hero Section -->
+<section class="text-center mb-3xl">
+<h1 class="font-display-lg text-display-lg mb-md text-on-surface tracking-tighter">Simple pricing. Real value.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-xl">
+        High-fidelity AI meeting intelligence for individuals and teams who demand clarity without the fluff.
+      </p>
+<!-- Monthly/Yearly Toggle -->
+<div class="flex items-center justify-center gap-md mb-2xl">
+<span class="font-label-md text-label-md text-on-surface">Monthly</span>
+<button class="relative w-14 h-8 bg-surface-container rounded-full border border-outline-variant p-xs" id="billingToggle" onclick="toggleBilling()">
+<div class="toggle-knob w-6 h-6 bg-primary rounded-full shadow-md" id="toggleKnob"></div>
+</button>
+<div class="flex items-center gap-xs">
+<span class="font-label-md text-label-md text-on-surface">Yearly</span>
+<span class="bg-primary-container text-on-primary-container px-xs py-[2px] rounded text-[10px] font-bold uppercase tracking-wider">Save 20%</span>
+</div>
+</div>
+</section>
+<!-- Pricing Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-3xl">
+<!-- Free Plan -->
+<div class="bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg flex flex-col hover:border-[#2A2A2A] transition-colors pricing-card-shadow">
+<div class="mb-xl">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Free</h3>
+<p class="text-on-surface-variant font-body-sm">For individuals getting started.</p>
+</div>
+<div class="mb-xl">
+<div class="flex items-baseline gap-xs">
+<span class="font-display-lg text-display-lg text-on-surface">$0</span>
+<span class="text-on-surface-variant font-body-md">/mo</span>
+</div>
+</div>
+<ul class="flex-grow space-y-md mb-2xl">
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">5 Meetings / Month</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">AI Summaries (Standard)</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">30-day History</span>
+</li>
+<li class="flex items-center gap-sm opacity-50">
+<span class="material-symbols-outlined text-outline text-xl">block</span>
+<span class="font-body-md text-on-surface">CRM Integrations</span>
+</li>
+</ul>
+<button class="w-full py-md border border-[#1F1F1F] rounded-[6px] font-label-md text-label-md hover:bg-surface-container-low transition-all">Get Started</button>
+</div>
+<!-- Pro Plan (Most Popular) -->
+<div class="relative bg-[#141414] border-2 border-primary rounded-xl p-lg flex flex-col pricing-card-shadow transform scale-105 z-10 shadow-2xl shadow-primary/10">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-on-primary font-bold px-md py-1 rounded-full text-xs uppercase tracking-widest">Most Popular</div>
+<div class="mb-xl">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Pro</h3>
+<p class="text-on-surface-variant font-body-sm">Deep insights for power users.</p>
+</div>
+<div class="mb-xl">
+<div class="flex items-baseline gap-xs">
+<span class="font-display-lg text-display-lg text-on-surface billing-price" data-monthly="29" data-yearly="23">$29</span>
+<span class="text-on-surface-variant font-body-md">/mo</span>
+</div>
+</div>
+<ul class="flex-grow space-y-md mb-2xl">
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Unlimited Meetings</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Advanced AI Analytics</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Action Item Tracking</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Standard Integrations</span>
+</li>
+</ul>
+<button class="w-full py-md bg-primary text-on-primary rounded-[6px] font-label-md text-label-md font-bold hover:opacity-90 transition-all active:scale-[0.98]">Upgrade to Pro</button>
+</div>
+<!-- Team Plan -->
+<div class="bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg flex flex-col hover:border-[#2A2A2A] transition-colors pricing-card-shadow">
+<div class="mb-xl">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Team</h3>
+<p class="text-on-surface-variant font-body-sm">Scale efficiency across the org.</p>
+</div>
+<div class="mb-xl">
+<div class="flex items-baseline gap-xs">
+<span class="font-display-lg text-display-lg text-on-surface billing-price" data-monthly="79" data-yearly="63">$79</span>
+<span class="text-on-surface-variant font-body-md">/mo</span>
+</div>
+</div>
+<ul class="flex-grow space-y-md mb-2xl">
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Up to 10 Seats included</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Centralized Workspace</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">Custom AI Prompts</span>
+</li>
+<li class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[#16A34A] text-xl">check_circle</span>
+<span class="font-body-md text-on-surface">SSO &amp; Security</span>
+</li>
+</ul>
+<button class="w-full py-md border border-[#1F1F1F] rounded-[6px] font-label-md text-label-md hover:bg-surface-container-low transition-all">Contact Sales</button>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="max-w-3xl mx-auto">
+<h2 class="font-headline-lg text-headline-lg text-center mb-2xl text-on-surface">Frequently Asked Questions</h2>
+<div class="space-y-md">
+<details class="group glass-morphism rounded-lg overflow-hidden border border-[#1F1F1F]">
+<summary class="flex justify-between items-center p-lg cursor-pointer hover:bg-[#1A1A1A] transition-all">
+<span class="font-headline-sm text-headline-sm text-on-surface">How does Lynqis AI handle data security?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="p-lg pt-0 text-on-surface-variant font-body-md leading-relaxed">
+            Security is our top priority. All meeting transcriptions and data are encrypted at rest and in transit using enterprise-grade AES-256 encryption. We are SOC-2 Type II compliant and never train our public models on your private data.
+          </div>
+</details>
+<details class="group glass-morphism rounded-lg overflow-hidden border border-[#1F1F1F]">
+<summary class="flex justify-between items-center p-lg cursor-pointer hover:bg-[#1A1A1A] transition-all">
+<span class="font-headline-sm text-headline-sm text-on-surface">Can I cancel my subscription at any time?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="p-lg pt-0 text-on-surface-variant font-body-md leading-relaxed">
+            Yes, you can cancel your monthly or yearly plan at any point through your dashboard. You will maintain access to your plan's features until the end of the current billing cycle.
+          </div>
+</details>
+<details class="group glass-morphism rounded-lg overflow-hidden border border-[#1F1F1F]">
+<summary class="flex justify-between items-center p-lg cursor-pointer hover:bg-[#1A1A1A] transition-all">
+<span class="font-headline-sm text-headline-sm text-on-surface">Does Lynqis work with all video platforms?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="p-lg pt-0 text-on-surface-variant font-body-md leading-relaxed">
+            Lynqis seamlessly integrates with Zoom, Microsoft Teams, Google Meet, and Cisco Webex. You can also upload raw audio/video files directly for post-meeting analysis.
+          </div>
+</details>
+<details class="group glass-morphism rounded-lg overflow-hidden border border-[#1F1F1F]">
+<summary class="flex justify-between items-center p-lg cursor-pointer hover:bg-[#1A1A1A] transition-all">
+<span class="font-headline-sm text-headline-sm text-on-surface">Do you offer discounts for educational institutions?</span>
+<span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="p-lg pt-0 text-on-surface-variant font-body-md leading-relaxed">
+            We offer specialized pricing for non-profits and educational organizations. Please contact our support team with your organization's details to apply for a custom discount.
+          </div>
+</details>
+</div>
+</section>
+<!-- Visual Background Element -->
+<div class="absolute -z-10 top-0 left-1/2 -translate-x-1/2 w-full h-[600px] overflow-hidden opacity-20 pointer-events-none">
+
+</div>
+</main>
+<footer class="border-t border-outline-variant bg-surface mt-2xl">
+<div class="max-w-[1440px] mx-auto px-lg py-xl flex flex-col md:flex-row justify-between items-center gap-lg">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Lynqis</span>
+<span class="text-on-surface-variant font-body-sm">© 2024 Lynqis Intelligence Inc.</span>
+</div>
+<div class="flex gap-xl">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Support</a>
+</div>
+</div>
+</footer>
+<script>
+    let isYearly = false;
+    const toggleKnob = document.getElementById('toggleKnob');
+    const priceElements = document.querySelectorAll('.billing-price');
+
+    function toggleBilling() {
+      isYearly = !isYearly;
+      
+      // Update UI state
+      if (isYearly) {
+        toggleKnob.style.transform = 'translateX(24px)';
+        priceElements.forEach(el => {
+          el.textContent = '$' + el.dataset.yearly;
+        });
+      } else {
+        toggleKnob.style.transform = 'translateX(0px)';
+        priceElements.forEach(el => {
+          el.textContent = '$' + el.dataset.monthly;
+        });
+      }
+    }
+
+    // Micro-interaction: Smooth hover for cards
+    document.querySelectorAll('.bg-[#141414]').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.style.transform = card.classList.contains('scale-105') ? 'scale(1.06)' : 'scale(1.02)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = card.classList.contains('scale-105') ? 'scale(1.05)' : 'scale(1)';
+      });
+      card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease';
+    });
+  </script>
+</body></html>

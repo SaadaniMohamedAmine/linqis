@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis - Meeting List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #dce5d9;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #1F1F1F;
+        }
+        .bento-card {
+            background: #141414;
+            border: 1px solid #1F1F1F;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: rgba(250, 250, 250, 0.1);
+            background: #181818;
+        }
+        /* Hide scrollbar */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#002109",
+                      "on-error": "#690005",
+                      "tertiary-container": "#ff8b7c",
+                      "on-tertiary": "#60130d",
+                      "on-secondary": "#003914",
+                      "primary-container": "#22c55e",
+                      "background": "#0e150e",
+                      "on-secondary-fixed": "#002109",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#2f372e",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-high": "#242c24",
+                      "primary": "#4be277",
+                      "surface-variant": "#2f372e",
+                      "inverse-primary": "#006e2f",
+                      "surface-tint": "#4ae176",
+                      "surface": "#0e150e",
+                      "inverse-surface": "#dce5d9",
+                      "on-primary": "#003915",
+                      "surface-container-low": "#161d16",
+                      "tertiary-fixed": "#ffdad5",
+                      "primary-fixed": "#6bff8f",
+                      "secondary-fixed-dim": "#62df7d",
+                      "on-primary-container": "#004b1e",
+                      "on-tertiary-container": "#76231b",
+                      "on-surface-variant": "#bccbb9",
+                      "surface-bright": "#333b33",
+                      "surface-container-lowest": "#091009",
+                      "on-tertiary-fixed": "#410001",
+                      "primary-fixed-dim": "#4ae176",
+                      "on-surface": "#dce5d9",
+                      "inverse-on-surface": "#2a322a",
+                      "surface-dim": "#0e150e",
+                      "secondary-fixed": "#7ffc97",
+                      "tertiary-fixed-dim": "#ffb4a9",
+                      "outline-variant": "#3d4a3d",
+                      "outline": "#869585",
+                      "secondary-container": "#1ca64d",
+                      "on-primary-fixed-variant": "#005321",
+                      "secondary": "#62df7d",
+                      "surface-container": "#1a221a",
+                      "on-secondary-fixed-variant": "#005320",
+                      "on-secondary-container": "#003111",
+                      "tertiary": "#ffb5ab",
+                      "on-background": "#dce5d9",
+                      "on-tertiary-fixed-variant": "#7f2a21",
+                      "error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xxl": "48px",
+                      "base": "8px",
+                      "sm": "8px",
+                      "container-max": "1440px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "gutter": "24px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "mono-ui": ["Geist"],
+                      "headline-sm": ["Geist"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["Inter"],
+                      "display": ["Geist"],
+                      "body-sm": ["Inter"],
+                      "headline-lg": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-[#0A0A0A] overflow-hidden">
+<!-- NavigationDrawer (The Anchor) -->
+<nav class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md gap-base bg-surface-container-low border-r border-outline-variant w-72 z-50">
+<div class="px-md py-xl">
+<span class="font-display text-headline-md tracking-tight text-primary">Lynqis</span>
+</div>
+<div class="flex flex-col gap-xs flex-grow">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="font-label-md text-label-md">Meetings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Action Items</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-label-md text-label-md">Integrations</span>
+</a>
+</div>
+<div class="border-t border-outline-variant pt-md">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-lg h-16 z-40 fixed top-0 md:left-72 md:w-[calc(100%-288px)] bg-[#0A0A0A] border-b border-outline-variant/30">
+<div class="flex items-center gap-md">
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold">Meetings</h1>
+</div>
+<div class="flex items-center gap-lg">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="bg-[#141414] border border-[#1F1F1F] rounded-full pl-10 pr-4 py-1.5 text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Search meetings..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a technology executive, soft cinematic lighting, neutral gray background, sharp focus, minimalist aesthetic consistent with a high-end SaaS platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlX6Pg1FIxL9PCvq3CIExj2YqW8a6kKSLgHpWiXnrpWr4X-mNaGKFwWpTJZUrHMRLdBW5SCasmPB7JKoZIX99lx-jI76EOVCG_n8VA87_uWd3pXTlqSulbOGT-JVMsOzHOlYfB-rWdiqC_IJAKG1ehIlWmq3UCU0sXhumWpjxMjo1MfjgRHytiItVGLwNkj6dppLzoR16pwp5OlgbRNjWgQ98q_KKkISKha5MoN9KY61cQ626Inqcn"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="md:ml-72 pt-16 h-screen overflow-y-auto bg-[#0A0A0A] relative">
+<div class="p-lg max-w-7xl mx-auto w-full">
+<!-- Filter & Sort Bar -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md mb-xl">
+<div class="flex items-center gap-sm overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
+<button class="px-md py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap">All Meetings</button>
+<button class="px-md py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 transition-all font-label-md text-label-md whitespace-nowrap">Processing</button>
+<button class="px-md py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 transition-all font-label-md text-label-md whitespace-nowrap">Done</button>
+<button class="px-md py-1.5 rounded-full border border-outline-variant text-on-surface-variant hover:bg-surface-variant/30 transition-all font-label-md text-label-md whitespace-nowrap">Pinned</button>
+</div>
+<div class="flex items-center gap-md w-full sm:w-auto">
+<button class="flex items-center gap-xs px-md py-1.5 bg-[#141414] border border-[#1F1F1F] rounded-lg text-on-surface-variant hover:text-on-surface transition-all">
+<span class="font-label-md text-label-md">Sort by: Newest</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<button class="flex-grow sm:flex-grow-0 flex items-center justify-center gap-sm px-lg py-1.5 bg-primary text-on-primary rounded-lg font-bold hover:bg-primary/90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span class="font-label-md text-label-md">Upload</span>
+</button>
+</div>
+</div>
+<!-- Empty State (Conditional Rendering Simulation) -->
+<div class="hidden flex flex-col items-center justify-center py-xxl text-center" id="empty-state">
+<div class="w-64 h-64 mb-xl opacity-80">
+
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">No meetings yet</h3>
+<p class="text-on-surface-variant text-body-md max-w-sm mb-xl">Upload your first meeting recording to get automated transcripts, summaries, and action items.</p>
+<button class="px-xl py-md bg-primary text-on-primary rounded-xl font-bold flex items-center gap-md hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span class="font-label-md text-label-md">Upload Recording</span>
+</button>
+</div>
+<!-- Meeting List Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xxl:grid-cols-3 gap-lg" id="meeting-grid">
+<!-- Meeting Card 1 -->
+<div class="bento-card rounded-xl p-lg flex flex-col gap-md relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<span class="px-sm py-1 rounded bg-secondary-container/10 text-secondary text-label-sm font-mono-ui uppercase tracking-wider">Project Phoenix</span>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors cursor-pointer">Quarterly Product Alignment</h4>
+<div class="flex items-center gap-md mt-base text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 24, 2023</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-label-sm font-label-sm">45 min</span>
+</div>
+</div>
+</div>
+<div class="flex -space-x-2 mt-base overflow-hidden">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a woman in modern office setting, soft natural light, professional aesthetic, minimalist dark UI background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuByLI-m_-cd1yQtnkjiKdpJZIniAEiSjvoz-_pmIYYoOaveiiCgD4I8xiM8diSOBamTDliPyEad5gb44UNMuthZQiv1-gUheqYh147IngZi6mYwhDahFbbLeffKgwDy9hodVG_P_2VJ_01Ur-MDrkEa_Ap-8990mCTZHtF_nCpF7VLzO6QfAj_sgld2-WdEUZxEVnZgqtK-Y6pmCmlJNGjbfBy9e2sAR01igCNxz1ap7cqvhFJ0KaVt"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Portrait of a male software architect, sharp professional lighting, technical high-end SaaS style portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq_EkyYlg8DrrSd4ZS8V3nu4kn44CrjNQbEMtrOFfGGJoY9WfPxjP2zYOi5AaStd-drgzl95BErD04BuciGxfCsvoSvv1uJ4JnTkT1pNRgv1PMQa60oG8ISJsplMBWaL4ukXHjDoW-6dmjDGjNQRUiYi6ZbPjmAT6vNSKT2RUXUrYOysY8ct6zX7cOLMz99KNVeSITiwzaXDYfOTo_A9VNU7W97r7S3DbYw8oxTinYHpiN8tt_K-H5"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant flex items-center justify-center bg-surface-container text-label-sm font-bold">
+                            +3
+                        </div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-primary font-label-sm text-label-sm">Done</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs transition-colors">
+<span class="font-label-md text-label-md">View Report</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Meeting Card 2 -->
+<div class="bento-card rounded-xl p-lg flex flex-col gap-md relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<span class="px-sm py-1 rounded bg-tertiary-container/10 text-tertiary text-label-sm font-mono-ui uppercase tracking-wider">Internal Ops</span>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors cursor-pointer">Security Audit &amp; Compliance</h4>
+<div class="flex items-center gap-md mt-base text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 23, 2023</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-label-sm font-label-sm">1h 15m</span>
+</div>
+</div>
+</div>
+<div class="flex -space-x-2 mt-base overflow-hidden">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Portrait of a professional cybersecurity expert, serious expression, high-tech dark minimalist environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnhqUMIP15u2OdlXap2f04ZxRDL0iWBihG0h_Z0fuBLr22INlKWbfoGJIxumFUov3QeW-sjO3ZC-u4bIB7CnSYLU-L1iDfMyflsJTpDGT3Mv85Smih4_VRVDzu5zG0GVhGYUEAawnEELylJK10YQORlE_IY97XeMolkyywgQo1feBl0SeURkYY_YiqcCx-rCaryCOqudwMtiUqNwU6Rr2Eb121-pHWlEpkyEoE1xMxBIwF4EHUp1iv"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] flex items-center justify-center bg-surface-container text-label-sm font-bold">
+                            +8
+                        </div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-on-surface-variant/30"></span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">Processing...</span>
+</div>
+<div class="w-24 h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-2/3 h-full bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Meeting Card 3 -->
+<div class="bento-card rounded-xl p-lg flex flex-col gap-md relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<span class="px-sm py-1 rounded bg-secondary-container/10 text-secondary text-label-sm font-mono-ui uppercase tracking-wider">Design System</span>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors cursor-pointer">Component Library Review</h4>
+<div class="flex items-center gap-md mt-base text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 21, 2023</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-label-sm font-label-sm">30 min</span>
+</div>
+</div>
+</div>
+<div class="flex -space-x-2 mt-base overflow-hidden">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Modern digital designer portrait, creative minimalist look, vibrant accent lighting in a dark office space." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDbkr3OrbrrWruEX3BnCvgrRnHOtVwxG6Z1QGCdH4D2zuPHg3PS-XTXD_Ali9bnMQ9epqrVvUV977OTkHECNh3X75fBaZDygUOLFVB5UVSufhf5qYcs8PCIkm6ZEz5rpT-UN8JAKZp7a_N8JzrUuq-Iyz8cBi4wTsyiP98Ltb2zo9chx5X_lkeUPFnH8dNBYCkJZms5FlR2_Y8crJfxKzCEQkXgG7pBkYbbMWDqJAKrV9QzeosxRSu"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young creative professional woman, modern glasses, tech-focused aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqqGoUGgHqdLb6DzsiMgQciO0d8dOxdxYg9VnrIWOrD2nSHR2o2BJ7GRAvg5kiWsd3CEumyFmP8Fg5Yb73dAaIoVm6qHCZbfSwbMAl8xwSr8CofECn_Q-Fg4yyfyquATU_Ks8mqixXPYXWz4BukKMPx0WOJuwEx4PrrrJg1aCd-_Rn-H68XiHz9QEesGitiMtrP-5fOC7vweiZBN_P0gbx5lbCrf3B6_FauszSAWDha3aqsnLnxpbT"/>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-primary font-label-sm text-label-sm">Done</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs transition-colors">
+<span class="font-label-md text-label-md">View Report</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Meeting Card 4 -->
+<div class="bento-card rounded-xl p-lg flex flex-col gap-md relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<span class="px-sm py-1 rounded bg-secondary-container/10 text-secondary text-label-sm font-mono-ui uppercase tracking-wider">Project Phoenix</span>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors cursor-pointer">Frontend Infrastructure Sync</h4>
+<div class="flex items-center gap-md mt-base text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 20, 2023</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-label-sm font-label-sm">20 min</span>
+</div>
+</div>
+</div>
+<div class="flex -space-x-2 mt-base overflow-hidden">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Close up of a developer coding in a dark room with green ambient lighting, technical high-performance environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh7BitLzRhgWXncALG9UaXcmluPe7TeZZ0RFr_mWdchXd_nmXJaMrw4Z2gJjI9gZk8BFZQQF41U66jyJ5XC__Dq9vH9wcWmFJC5PTptjJL0-V1st0bO3pQrppkmNX5dmlOqZbQznPRtTDhjVejzSk8DeJWQxk1finHqPR0B4rwFz3RaQYSvdoP3dOQdtRzWtYrpp3rUMsvg-Pez-ymHxHz97WLIp0lig-tYEx_dqaLC8u5QTYlqxQQ"/>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-primary font-label-sm text-label-sm">Done</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs transition-colors">
+<span class="font-label-md text-label-md">View Report</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Meeting Card 5 -->
+<div class="bento-card rounded-xl p-lg flex flex-col gap-md relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<span class="px-sm py-1 rounded bg-primary-container/10 text-primary text-label-sm font-mono-ui uppercase tracking-wider">Sales Ops</span>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors cursor-pointer">Weekly Pipeline Review</h4>
+<div class="flex items-center gap-md mt-base text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 19, 2023</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-label-sm font-label-sm">50 min</span>
+</div>
+</div>
+</div>
+<div class="flex -space-x-2 mt-base overflow-hidden">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] flex items-center justify-center bg-surface-container text-label-sm font-bold">
+                            +12
+                        </div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-outline-variant/30">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-primary font-label-sm text-label-sm">Done</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs transition-colors">
+<span class="font-label-md text-label-md">View Report</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant/30 shadow-xl rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 p-2" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="font-label-sm text-[10px]">Meetings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="font-label-sm text-[10px]">Actions</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-sm text-[10px]">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-[10px]">Settings</span>
+</a>
+</nav>
+</main>
+<script>
+        // Micro-interaction: Filter toggle
+        const filterButtons = document.querySelectorAll('.flex.items-center.gap-sm button');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('border', 'border-outline-variant', 'text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary');
+                btn.classList.remove('border', 'border-outline-variant', 'text-on-surface-variant');
+            });
+        });
+
+        // Demo logic: Toggle Empty State (for display purposes)
+        // Set to true to see empty state
+        const showEmpty = false;
+        if (showEmpty) {
+            document.getElementById('meeting-grid').classList.add('hidden');
+            document.getElementById('empty-state').classList.remove('hidden');
+        }
+    </script>
+</body></html>

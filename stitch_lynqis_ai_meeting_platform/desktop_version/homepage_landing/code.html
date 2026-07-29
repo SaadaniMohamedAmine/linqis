@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Every meeting, decoded.</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist:wght@400;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #1F1F1F;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            overflow-x: hidden;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#004395",
+                    "primary-fixed-dim": "#62df7d",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-primary": "#006e2d",
+                    "inverse-on-surface": "#313030",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-primary-fixed-variant": "#005320",
+                    "outline-variant": "#3e4a3d",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-highest": "#353534",
+                    "background": "#0A0A0A",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary": "#003914",
+                    "surface-container": "#201f1f",
+                    "secondary-fixed-dim": "#f7be1d",
+                    "error": "#ffb4ab",
+                    "on-surface-variant": "#bdcaba",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary-fixed": "#ffdf9a",
+                    "outline": "#879485",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "on-primary-container": "#003111",
+                    "surface-bright": "#393939",
+                    "primary": "#16A34A",
+                    "surface-tint": "#62df7d",
+                    "on-secondary-fixed": "#251a00",
+                    "on-tertiary-container": "#00285d",
+                    "tertiary-fixed": "#d8e2ff",
+                    "on-background": "#e5e2e1",
+                    "inverse-surface": "#e5e2e1",
+                    "primary-fixed": "#7ffc97",
+                    "surface": "#131313",
+                    "on-primary-fixed": "#002109",
+                    "secondary": "#ffca45",
+                    "error-container": "#93000a",
+                    "tertiary": "#adc6ff",
+                    "on-secondary-fixed-variant": "#5a4300",
+                    "on-tertiary": "#002e6a",
+                    "on-error": "#690005",
+                    "tertiary-container": "#4d8eff",
+                    "surface-variant": "#353534",
+                    "on-secondary-container": "#5b4400",
+                    "primary-container": "#1ca64d",
+                    "on-surface": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "secondary-container": "#e4ae00",
+                    "on-secondary": "#3f2e00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "2xl": "48px",
+                    "base": "8px",
+                    "margin": "40px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "3xl": "64px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "body-sm": ["Inter"],
+                    "headline-sm": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-body-md text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant h-[64px]">
+<div class="flex justify-between items-center w-full px-lg max-w-[1440px] mx-auto h-full">
+<div class="flex items-center gap-base cursor-pointer">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">Lynqis</span>
+</div>
+<nav class="hidden md:flex items-center gap-xl">
+<a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 transition-colors" href="#">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Meetings</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Action Items</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Integrations</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional close-up portrait of a modern tech professional with soft ambient lighting against a neutral dark grey studio background. The style is sharp, corporate yet approachable, matching the high-fidelity dark minimalism of the design system with deep shadows and clean highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC63vD1XjXUOWAarLMoaY_cCggPjD5ucE5f1FNOv47qt4fHvfElKOoR6myYNBHkrIiu2ErIyGggSQD_zxH5YXq3LfyWrylnFQXgCMKSnSu5i8jbpxA0TLT5W1JNZ2rgliF4x7DixBKZAL7tGi7z_lqer_KWeXgywXESGhJ60YM8j2h42RJzyaHrl8NBsjVz9rsQkbdAVHcYwGujioHFhzeguvdjs2DOWwi5MzWdBrrrhjybKnulmtER"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-[64px]">
+<!-- Hero Section -->
+<section class="relative min-h-[870px] flex items-center px-lg max-w-[1440px] mx-auto overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter w-full">
+<!-- Hero Left -->
+<div class="md:col-span-6 flex flex-col justify-center py-2xl z-10">
+<div class="inline-flex items-center gap-sm bg-surface-container-high px-md py-xs rounded-full border border-outline-variant mb-xl w-fit">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-sm font-label-sm text-primary-fixed-dim">NEW: AI Summary V2.0</span>
+</div>
+<h1 class="font-headline-lg text-[64px] leading-[1.1] font-extrabold tracking-tighter mb-lg text-on-surface">
+                        Every meeting, <span class="text-primary">decoded.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mb-2xl">
+                        Lynqis transforms chaotic conversations into structured action items. Use AI-driven intelligence to capture every insight, automatically.
+                    </p>
+<div class="flex items-center gap-md">
+<button class="bg-primary hover:bg-primary/90 text-on-primary font-label-md px-xl py-md rounded-lg transition-all active:scale-[0.98] shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                            Start free
+                        </button>
+<button class="border border-outline-variant hover:border-outline text-on-surface font-label-md px-xl py-md rounded-lg transition-all active:scale-[0.98]">
+                            See how it works
+                        </button>
+</div>
+</div>
+<!-- Hero Right (Floating Dashboard) -->
+<div class="md:col-span-6 relative flex items-center justify-center pt-xl md:pt-0">
+<!-- Dashboard Mockup Component -->
+<div class="glass-card p-lg rounded-xl w-full max-w-[580px] shadow-2xl animate-float relative z-10">
+<div class="flex items-center justify-between mb-lg border-b border-outline-variant pb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="font-label-md text-on-surface">Meeting Analysis: Q3 Strategy</span>
+</div>
+<span class="text-label-sm text-on-surface-variant">04:32 / 18:45</span>
+</div>
+<!-- Waveform visualization -->
+<div class="h-20 flex items-end gap-[3px] mb-lg px-xs">
+<div class="flex-1 bg-primary/20 h-[30%] rounded-full"></div>
+<div class="flex-1 bg-primary/40 h-[60%] rounded-full"></div>
+<div class="flex-1 bg-primary h-[80%] rounded-full"></div>
+<div class="flex-1 bg-primary h-[50%] rounded-full"></div>
+<div class="flex-1 bg-primary/60 h-[90%] rounded-full"></div>
+<div class="flex-1 bg-primary h-[100%] rounded-full"></div>
+<div class="flex-1 bg-primary/40 h-[70%] rounded-full"></div>
+<div class="flex-1 bg-primary/80 h-[40%] rounded-full"></div>
+<div class="flex-1 bg-primary h-[60%] rounded-full"></div>
+<div class="flex-1 bg-primary/30 h-[20%] rounded-full"></div>
+<div class="flex-1 bg-primary h-[70%] rounded-full"></div>
+<div class="flex-1 bg-primary/10 h-[30%] rounded-full"></div>
+</div>
+<!-- Action Items Preview -->
+<div class="space-y-md">
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div class="flex-1">
+<p class="text-label-md text-on-surface">Finalize Q4 roadmap by Friday</p>
+<p class="text-label-sm text-on-surface-variant">Assigned to Sarah K.</p>
+</div>
+<span class="bg-surface-container-high px-sm py-xs rounded text-[10px] text-tertiary">URGENT</span>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant flex items-center gap-md opacity-60">
+<span class="material-symbols-outlined text-on-surface-variant">circle</span>
+<div class="flex-1">
+<p class="text-label-md text-on-surface">Schedule sync with dev team</p>
+<p class="text-label-sm text-on-surface-variant">Pending... (AI Tag: Ops)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative blur -->
+<div class="absolute -top-10 -right-10 w-64 h-64 bg-primary/10 blur-[100px] rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-3xl bg-surface-container-lowest">
+<div class="max-w-[1440px] mx-auto px-lg">
+<div class="mb-3xl text-center">
+<h2 class="font-headline-lg text-headline-lg mb-md">Superpowered by Intelligence</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">Focused on speed, privacy, and actionable outcomes for high-performance teams.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Feature 1 -->
+<div class="glass-card p-lg rounded-xl hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center mb-lg border border-outline-variant group-hover:border-primary/30 transition-colors">
+<span class="material-symbols-outlined text-primary">bolt</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-base">Instant Transcription</h3>
+<p class="text-on-surface-variant font-body-sm">Proprietary neural engines convert speech to text with 99.4% accuracy in real-time, handling 40+ languages natively.</p>
+</div>
+<!-- Feature 2 -->
+<div class="glass-card p-lg rounded-xl hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center mb-lg border border-outline-variant group-hover:border-primary/30 transition-colors">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-base">AI Summary</h3>
+<p class="text-on-surface-variant font-body-sm">Get concise executive summaries and bulleted action items generated by a custom GPT model trained on business contexts.</p>
+</div>
+<!-- Feature 3 -->
+<div class="glass-card p-lg rounded-xl hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center mb-lg border border-outline-variant group-hover:border-primary/30 transition-colors">
+<span class="material-symbols-outlined text-primary">ios_share</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-base">Export Anywhere</h3>
+<p class="text-on-surface-variant font-body-sm">One-click integrations with Notion, Slack, Jira, and GitHub. Sync your meeting insights directly to your workspace.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Steps Section (Process) -->
+<section class="py-3xl border-t border-outline-variant">
+<div class="max-w-[1440px] mx-auto px-lg">
+<div class="flex flex-col md:flex-row items-center gap-3xl">
+<div class="flex-1">
+<h2 class="font-headline-lg text-headline-lg mb-xl">From voice to value in seconds.</h2>
+<div class="space-y-xl">
+<div class="flex gap-lg">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold">1</div>
+<div class="w-px h-16 bg-outline-variant"></div>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-xs">Upload</h4>
+<p class="text-on-surface-variant font-body-sm">Record live or drag and drop any video or audio file. We support all major formats including MP4, MP3, and WAV.</p>
+</div>
+</div>
+<div class="flex gap-lg">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container border border-outline text-on-surface flex items-center justify-center font-bold">2</div>
+<div class="w-px h-16 bg-outline-variant"></div>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-xs">Process</h4>
+<p class="text-on-surface-variant font-body-sm">Our AI engine analyzes the transcript, identifies speakers, and extracts key decisions using semantic understanding.</p>
+</div>
+</div>
+<div class="flex gap-lg">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container border border-outline text-on-surface flex items-center justify-center font-bold">3</div>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-xs">Export</h4>
+<p class="text-on-surface-variant font-body-sm">Review your dashboard and push the results to your favorite tools. Your knowledge base grows with every meeting.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 w-full">
+<div class="aspect-video bg-surface-container rounded-2xl overflow-hidden border border-outline-variant relative">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist 3D rendering of a software interface showing a list of meeting cards being processed. The aesthetic features soft glassmorphism, glowing green accents representing successful processing, and a dark monochromatic environment. The composition is dynamic, showing a workflow from left to right." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKLqWtD4o1gmzU-Ihivk66F73gO1IZ4uQH0DCRqfoLpe5yctAaDAVE1zHmosLexKTG6Lr4Y8vVzIAXi94A6H9zA1Dect_-8yFPZx96iRGHjqKtzehHmW6CkvBtAwpsyDEL0KvMWPKEqPgSN7OVtYaljEZPkZ5420MLXV6Fpyqn1_sIM8nsHnDscNXTHf5Re4uAdkyp1Y7qQqt-vGDsRhFoxxQ0MTrvFxjXskQ0iBKT6wK-C5CEY_Cv"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent flex items-end p-lg">
+<div class="flex items-center gap-md">
+<div class="bg-primary/20 p-base rounded-full">
+<span class="material-symbols-outlined text-primary text-[32px]">play_circle</span>
+</div>
+<div>
+<p class="font-label-md">Watch product demo</p>
+<p class="text-label-sm text-on-surface-variant">2:14 min</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA / Footer Wrap -->
+<section class="py-3xl bg-primary/5">
+<div class="max-w-[1440px] mx-auto px-lg text-center">
+<h2 class="font-display-lg text-display-lg mb-lg">Ready to stop taking notes?</h2>
+<p class="text-body-lg text-on-surface-variant mb-2xl max-w-xl mx-auto">Join 50,000+ teams who use Lynqis to stay aligned without the manual effort.</p>
+<div class="flex justify-center items-center gap-md">
+<button class="bg-primary hover:bg-primary/90 text-on-primary font-label-md px-3xl py-md rounded-lg transition-all">Start your free trial</button>
+<button class="bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-label-md px-3xl py-md rounded-lg transition-all">Contact Sales</button>
+</div>
+</div>
+</section>
+</main>
+<footer class="border-t border-outline-variant py-xl bg-background">
+<div class="max-w-[1440px] mx-auto px-lg">
+<div class="flex flex-col md:flex-row justify-between items-center gap-xl">
+<div class="flex items-center gap-base">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Lynqis</span>
+<span class="text-label-sm text-on-surface-variant">© 2024 Lynqis AI Inc.</span>
+</div>
+<div class="flex items-center gap-xl text-label-md text-on-surface-variant">
+<a class="hover:text-primary transition-colors flex items-center gap-xs" href="#">
+                        GitHub
+                        <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-md">
+<span class="w-8 h-8 rounded bg-surface-container flex items-center justify-center border border-outline-variant cursor-pointer hover:border-primary/50">
+<svg class="w-4 h-4 fill-on-surface-variant" viewbox="0 0 24 24"><path d="M22.162 5.656c-0.824 0.366-1.711 0.614-2.641 0.724 0.95-0.567 1.677-1.469 2.021-2.546-0.887 0.527-1.87 0.909-2.918 1.115-0.837-0.892-2.031-1.45-3.351-1.45-2.536 0-4.591 2.056-4.591 4.591 0 0.359 0.040 0.71 0.119 1.048-3.815-0.191-7.2-2.020-9.465-4.798-0.395 0.677-0.621 1.464-0.621 2.308 0 1.593 0.81 2.998 2.042 3.822-0.752-0.024-1.46-0.23-2.078-0.573-0.001 0.019-0.001 0.038-0.001 0.058 0 2.225 1.583 4.081 3.682 4.504-0.385 0.105-0.79 0.161-1.209 0.161-0.296 0-0.584-0.029-0.865-0.082 0.584 1.825 2.281 3.153 4.292 3.191-1.572 1.232-3.553 1.966-5.705 1.966-0.371 0-0.736-0.022-1.096-0.065 2.035 1.304 4.45 2.066 7.045 2.066 8.455 0 13.078-7.003 13.078-13.079 0-0.199-0.004-0.398-0.013-0.596 0.898-0.648 1.677-1.456 2.292-2.381z"></path></svg>
+</span>
+<span class="w-8 h-8 rounded bg-surface-container flex items-center justify-center border border-outline-variant cursor-pointer hover:border-primary/50">
+<svg class="w-4 h-4 fill-on-surface-variant" viewbox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"></path></svg>
+</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Simple scroll reveal interaction
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+                observer.observe(section);
+            });
+        });
+    </script>
+</body></html>

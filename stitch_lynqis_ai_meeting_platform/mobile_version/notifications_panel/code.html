@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis - Notifications</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002109",
+                    "on-error": "#690005",
+                    "tertiary-container": "#ff8b7c",
+                    "on-tertiary": "#60130d",
+                    "on-secondary": "#003914",
+                    "primary-container": "#22c55e",
+                    "background": "#0e150e",
+                    "on-secondary-fixed": "#002109",
+                    "error": "#ffb4ab",
+                    "surface-container-highest": "#2f372e",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-high": "#242c24",
+                    "primary": "#4be277",
+                    "surface-variant": "#2f372e",
+                    "inverse-primary": "#006e2f",
+                    "surface-tint": "#4ae176",
+                    "surface": "#0e150e",
+                    "inverse-surface": "#dce5d9",
+                    "on-primary": "#003915",
+                    "surface-container-low": "#161d16",
+                    "tertiary-fixed": "#ffdad5",
+                    "primary-fixed": "#6bff8f",
+                    "secondary-fixed-dim": "#62df7d",
+                    "on-primary-container": "#004b1e",
+                    "on-tertiary-container": "#76231b",
+                    "on-surface-variant": "#bccbb9",
+                    "surface-bright": "#333b33",
+                    "surface-container-lowest": "#091009",
+                    "on-tertiary-fixed": "#410001",
+                    "primary-fixed-dim": "#4ae176",
+                    "on-surface": "#dce5d9",
+                    "inverse-on-surface": "#2a322a",
+                    "surface-dim": "#0e150e",
+                    "secondary-fixed": "#7ffc97",
+                    "tertiary-fixed-dim": "#ffb4a9",
+                    "outline-variant": "#3d4a3d",
+                    "outline": "#869585",
+                    "secondary-container": "#1ca64d",
+                    "on-primary-fixed-variant": "#005321",
+                    "secondary": "#62df7d",
+                    "surface-container": "#1a221a",
+                    "on-secondary-fixed-variant": "#005320",
+                    "on-secondary-container": "#003111",
+                    "tertiary": "#ffb5ab",
+                    "on-background": "#dce5d9",
+                    "on-tertiary-fixed-variant": "#7f2a21",
+                    "error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xxl": "48px",
+                    "base": "8px",
+                    "sm": "8px",
+                    "container-max": "1440px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "mono-ui": ["Geist"],
+                    "headline-sm": ["Geist"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display": ["Geist"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .notification-panel {
+            background-color: #141414;
+            border-left: 1px solid #1F1F1F;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .notification-item {
+            border-bottom: 1px solid #1F1F1F;
+            transition: background-color 0.2s ease;
+        }
+
+        .glass-overlay {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.8);
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Main Navigation (TopAppBar from Shared Components) -->
+<header class="bg-background text-primary flex justify-between items-center w-full px-lg h-16 z-50 fixed top-0 border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined cursor-pointer" data-icon="menu">menu</span>
+<h1 class="font-display text-headline-md font-bold text-primary">Lynqis</h1>
+</div>
+<div class="flex items-center gap-md">
+<button class="relative p-2 hover:bg-surface-container-high transition-colors rounded-full text-primary" onclick="togglePanel()">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2.5 h-2.5 bg-primary-container rounded-full border-2 border-background"></span>
+</button>
+</div>
+</header>
+<!-- Navigation Drawer (Desktop) -->
+<aside class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md gap-base bg-surface-container-low border-r border-outline-variant w-72 pt-20">
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-md p-md hover:bg-surface-variant/50 transition-all duration-200 text-on-surface-variant hover:text-on-surface rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md hover:bg-surface-variant/50 transition-all duration-200 text-on-surface-variant hover:text-on-surface rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="video_library">video_library</span>
+<span class="font-label-md text-label-md">Meetings</span>
+</a>
+<a class="flex items-center gap-md p-md bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span class="font-label-md text-label-md">Action Items</span>
+</a>
+<a class="flex items-center gap-md p-md hover:bg-surface-variant/50 transition-all duration-200 text-on-surface-variant hover:text-on-surface rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="extension">extension</span>
+<span class="font-label-md text-label-md">Integrations</span>
+</a>
+<a class="flex items-center gap-md p-md hover:bg-surface-variant/50 transition-all duration-200 text-on-surface-variant hover:text-on-surface rounded-lg mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Canvas Area -->
+<main class="md:ml-72 pt-24 px-md md:px-xl min-h-screen">
+<div class="max-w-6xl mx-auto">
+<header class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Action Center</h2>
+<p class="text-on-surface-variant font-body-md">Monitor your meeting automations and system status.</p>
+</header>
+<!-- Bento Grid Dashboard Simulation -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Activity Shader Card -->
+<div class="md:col-span-2 relative overflow-hidden rounded-xl border border-outline-variant bg-[#141414] h-64 p-lg group">
+
+<div class="relative z-10">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-label-sm border border-primary/20">Live Sync</span>
+<h3 class="mt-4 font-headline-md text-headline-md text-on-surface">Data Throughput</h3>
+<p class="text-on-surface-variant max-w-sm">System nodes are operating at optimal capacity with zero latency detected.</p>
+</div>
+</div>
+<!-- Status Card -->
+<div class="rounded-xl border border-outline-variant bg-[#141414] p-lg">
+<div class="flex justify-between items-center mb-md">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+<span class="font-mono-ui text-mono-ui text-on-surface-variant">NODE_01</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">All Systems Nominal</h3>
+<p class="text-on-surface-variant text-body-sm">Last global health check completed 4m ago.</p>
+<div class="mt-lg h-1 bg-outline-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full animate-pulse"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- NOTIFICATIONS PANEL (Slide-in) -->
+<div class="fixed inset-0 z-[60] pointer-events-none transition-opacity duration-300 opacity-0 bg-black/40 backdrop-blur-sm" id="notification-overlay"></div>
+<div class="notification-panel fixed top-0 right-0 h-screen w-full md:w-[420px] z-[70] translate-x-full flex flex-col shadow-2xl" id="notification-panel">
+<!-- Panel Header -->
+<div class="px-xl py-lg flex justify-between items-center border-b border-[#1F1F1F]">
+<div class="flex items-center gap-base">
+<button class="md:hidden p-2 text-on-surface-variant hover:text-on-surface" onclick="togglePanel()">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Notifications</h2>
+</div>
+<button class="text-primary font-label-md text-label-md px-3 py-1.5 hover:bg-primary/10 rounded-lg transition-colors border border-transparent hover:border-primary/20">
+                Mark all read
+            </button>
+</div>
+<!-- Notification List -->
+<div class="flex-1 overflow-y-auto no-scrollbar py-2">
+<!-- Unread Item -->
+<div class="notification-item flex gap-lg p-xl hover:bg-surface-container-high/40 cursor-pointer group relative">
+<div class="absolute top-1/2 -translate-y-1/2 left-2 w-1 h-8 bg-primary rounded-full"></div>
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Meeting Processing Complete</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2m ago</span>
+</div>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                        The Q4 Strategy Sync recording has been successfully transcribed and analyzed. Action items are ready for review.
+                    </p>
+</div>
+</div>
+<!-- Read Item -->
+<div class="notification-item flex gap-lg p-xl hover:bg-surface-container-high/40 cursor-pointer group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-surface-variant/30 flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="file_export">file_export</span>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-label-md text-on-surface">Export Successful</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1h ago</span>
+</div>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                        Inventory_Report_Oct.csv is ready for download in your reports folder.
+                    </p>
+</div>
+</div>
+<!-- Read Item -->
+<div class="notification-item flex gap-lg p-xl hover:bg-surface-container-high/40 cursor-pointer group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary" data-icon="task_alt">task_alt</span>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-label-md text-on-surface">New Action Item</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">3h ago</span>
+</div>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                        Sarah J. assigned you a new task: "Update API Documentation for V2 Endpoints".
+                    </p>
+</div>
+</div>
+<!-- Read Item -->
+<div class="notification-item flex gap-lg p-xl hover:bg-surface-container-high/40 cursor-pointer group">
+<div class="flex-shrink-0 mt-1">
+<div class="w-10 h-10 rounded-full bg-surface-variant/30 flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="person_add">person_add</span>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-label-md text-on-surface">New Team Member</h4>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Yesterday</span>
+</div>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                        James Wilson has joined the workspace via the engineering invite link.
+                    </p>
+</div>
+</div>
+<!-- Empty State (Hidden by default) -->
+<div class="hidden flex flex-col items-center justify-center h-full text-center px-xl" id="empty-state">
+<div class="w-16 h-16 bg-surface-variant/20 rounded-full flex items-center justify-center mb-lg border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant scale-150" data-icon="notifications_off">notifications_off</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">No notifications</h3>
+<p class="text-on-surface-variant text-body-sm mt-xs">We'll alert you when there's an update to your workspace or tasks.</p>
+</div>
+</div>
+<!-- Panel Footer -->
+<div class="p-lg border-t border-[#1F1F1F]">
+<button class="w-full py-md bg-[#1F1F1F] text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-variant/50 transition-all border border-outline-variant">
+                View notification settings
+            </button>
+</div>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant/30 shadow-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+<span class="font-label-sm text-label-sm">Meetings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+<span class="font-label-sm text-label-sm">Actions</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-label-sm text-label-sm">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+</nav>
+<script>
+        const panel = document.getElementById('notification-panel');
+        const overlay = document.getElementById('notification-overlay');
+        let isOpen = false;
+
+        function togglePanel() {
+            isOpen = !isOpen;
+            if (isOpen) {
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+            } else {
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+            }
+        }
+
+        overlay.addEventListener('click', togglePanel);
+
+        // Micro-interaction for hover border
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.borderColor = '#FAFAFA20';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.borderColor = '#1F1F1F';
+            });
+        });
+    </script>
+</body></html>

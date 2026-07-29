@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Upload &amp; Processing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002109",
+                    "on-error": "#690005",
+                    "tertiary-container": "#ff8b7c",
+                    "on-tertiary": "#60130d",
+                    "on-secondary": "#003914",
+                    "primary-container": "#22c55e",
+                    "background": "#0e150e",
+                    "on-secondary-fixed": "#002109",
+                    "error": "#ffb4ab",
+                    "surface-container-highest": "#2f372e",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-high": "#242c24",
+                    "primary": "#4be277",
+                    "surface-variant": "#2f372e",
+                    "inverse-primary": "#006e2f",
+                    "surface-tint": "#4ae176",
+                    "surface": "#0e150e",
+                    "inverse-surface": "#dce5d9",
+                    "on-primary": "#003915",
+                    "surface-container-low": "#161d16",
+                    "tertiary-fixed": "#ffdad5",
+                    "primary-fixed": "#6bff8f",
+                    "secondary-fixed-dim": "#62df7d",
+                    "on-primary-container": "#004b1e",
+                    "on-tertiary-container": "#76231b",
+                    "on-surface-variant": "#bccbb9",
+                    "surface-bright": "#333b33",
+                    "surface-container-lowest": "#091009",
+                    "on-tertiary-fixed": "#410001",
+                    "primary-fixed-dim": "#4ae176",
+                    "on-surface": "#dce5d9",
+                    "inverse-on-surface": "#2a322a",
+                    "surface-dim": "#0e150e",
+                    "secondary-fixed": "#7ffc97",
+                    "tertiary-fixed-dim": "#ffb4a9",
+                    "outline-variant": "#3d4a3d",
+                    "outline": "#869585",
+                    "secondary-container": "#1ca64d",
+                    "on-primary-fixed-variant": "#005321",
+                    "secondary": "#62df7d",
+                    "surface-container": "#1a221a",
+                    "on-secondary-fixed-variant": "#005320",
+                    "on-secondary-container": "#003111",
+                    "tertiary": "#ffb5ab",
+                    "on-background": "#dce5d9",
+                    "on-tertiary-fixed-variant": "#7f2a21",
+                    "error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xxl": "48px",
+                    "base": "8px",
+                    "sm": "8px",
+                    "container-max": "1440px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "mono-ui": ["Geist"],
+                    "headline-sm": ["Geist"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "display": ["Geist"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #0e150e; color: #dce5d9; -webkit-font-smoothing: antialiased; }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #1F1F1F;
+        }
+        .step-active {
+            color: #4be277;
+        }
+        .spinner {
+            animation: rotate 2s linear infinite;
+        }
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .dashed-border {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%231F1F1F' stroke-width='4' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="overflow-hidden">
+<!-- Top Navigation Anchor -->
+<header class="flex justify-between items-center w-full px-lg h-16 z-50 bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant fixed top-0">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">menu</span>
+<h1 class="font-display text-headline-md font-bold text-primary dark:text-primary">Lynqis</h1>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A close-up professional portrait of a tech executive in a high-tech dark environment. Soft emerald rim lighting highlights the silhouette against a deep black background. The style is sharp, corporate, and modern, reflecting a high-performance SaaS atmosphere with a premium minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqbRM1K5LCTAcUy9KlMopJ7L0jiaqRDDe0s5bMKXcMWabUrwI2I4LOFL3a7OAyBOGT8hRTIgcpHg31oGRd7K_eoq3TIPaWM6TYtkjhwscwo3qfQye_J9Va4HLLi66ESifrBuv5iww_0ma6j0jWUQ5E3VTKMbJe-J-fgFCaqp-MU-0ZkwJml85btpzLOq8wxG6G2G9wDsZJ8hUYvfuyucwS_MRYvjF2wmHYgZLmd51Qzj4aeztA-icu"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation Anchor (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col h-screen fixed left-0 top-0 p-md gap-base bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant w-72 pt-20">
+<nav class="flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="font-label-md text-label-md">Meetings</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98]" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="font-label-md text-label-md">Upload</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-label-md text-label-md">Integrations</span>
+</a>
+<a class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-72 pt-16 h-screen overflow-y-auto bg-background">
+<!-- Full Screen Upload Modal/Section -->
+<section class="min-h-full p-xl md:p-xxl flex flex-col gap-xl">
+<div class="flex flex-col gap-xs">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Knowledge Ingestion</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Upload meeting recordings, documents, or data streams for deep analysis.</p>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-lg">
+<!-- Left: Upload Zone & Formats -->
+<div class="xl:col-span-2 flex flex-col gap-lg">
+<!-- Drag & Drop Zone -->
+<div class="relative group cursor-pointer h-96 flex flex-col items-center justify-center rounded-xl dashed-border hover:bg-surface-container-low transition-colors duration-300" id="drop-zone">
+
+<div class="z-10 flex flex-col items-center text-center p-xl">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-md group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-4xl">cloud_upload</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Drag and drop assets</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Support for files up to 2GB in high-fidelity formats.</p>
+<button class="bg-primary hover:bg-primary/90 text-on-primary px-xl py-md rounded-lg font-bold transition-all active:scale-95">
+                                Select Files
+                            </button>
+</div>
+</div>
+<!-- Supported Formats -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<div class="p-md glass-panel rounded-lg flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-body-md">movie</span>
+<span class="font-label-sm text-label-sm">MP4, MOV</span>
+</div>
+<div class="p-md glass-panel rounded-lg flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-body-md">audio_file</span>
+<span class="font-label-sm text-label-sm">MP3, WAV</span>
+</div>
+<div class="p-md glass-panel rounded-lg flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-body-md">description</span>
+<span class="font-label-sm text-label-sm">PDF, DOCX</span>
+</div>
+<div class="p-md glass-panel rounded-lg flex items-center gap-base">
+<span class="material-symbols-outlined text-primary text-body-md">dataset</span>
+<span class="font-label-sm text-label-sm">JSON, CSV</span>
+</div>
+</div>
+</div>
+<!-- Right: Active State / Processing -->
+<div class="flex flex-col gap-lg">
+<div class="glass-panel rounded-xl p-lg flex flex-col gap-xl">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Active Process</span>
+<h4 class="font-headline-sm text-headline-sm text-on-surface truncate max-w-[200px]">Quarterly_Review.mp4</h4>
+</div>
+<span class="font-mono-ui text-mono-ui text-on-surface-variant">ETA: 4m 12s</span>
+</div>
+<!-- Progress Bar Container -->
+<div class="flex flex-col gap-md">
+<div class="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary progress-bar-fill" id="progress-fill" style="width: 65%;"></div>
+</div>
+<!-- Steps List -->
+<div class="flex flex-col gap-md">
+<div class="flex items-center justify-between text-primary">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Uploading</span>
+</div>
+<span class="font-label-sm text-label-sm">Complete</span>
+</div>
+<div class="flex items-center justify-between text-primary">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md text-label-md">Extracting</span>
+</div>
+<span class="font-label-sm text-label-sm">Complete</span>
+</div>
+<div class="flex items-center justify-between text-on-surface">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-lg spinner">progress_activity</span>
+<span class="font-label-md text-label-md font-bold">Transcribing</span>
+</div>
+<span class="font-label-sm text-label-sm animate-pulse">In Progress</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant opacity-50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-lg">circle</span>
+<span class="font-label-md text-label-md">Analyzing</span>
+</div>
+<span class="font-label-sm text-label-sm">Pending</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant opacity-50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-lg">circle</span>
+<span class="font-label-md text-label-md">Done</span>
+</div>
+<span class="font-label-sm text-label-sm">Pending</span>
+</div>
+</div>
+</div>
+<button class="w-full border border-error text-error py-md rounded-lg font-label-md hover:bg-error/10 transition-colors">
+                            Cancel Process
+                        </button>
+</div>
+<!-- Statistics Micro-Card -->
+<div class="glass-panel rounded-xl p-md flex items-center justify-between border-l-4 border-l-primary">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Storage Utilization</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">84.2 / 100 GB</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">info</span>
+</div>
+</div>
+</div>
+<!-- Recent Uploads List -->
+<div class="flex flex-col gap-lg mt-xl">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Recent Ingestions</h3>
+<button class="text-primary font-label-md hover:underline">View All History</button>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Upload Row -->
+<div class="glass-panel p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">video_file</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Weekly_Sprint_Retro_V2.mp4</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Yesterday at 14:20 • 450MB</span>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<div class="hidden md:flex flex-col items-end">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Processed</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</div>
+</div>
+<!-- Upload Row -->
+<div class="glass-panel p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Q3_Strategic_Goals.pdf</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Oct 24, 2023 • 2.4MB</span>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<div class="hidden md:flex flex-col items-end">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Processed</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</div>
+</div>
+<!-- Upload Row -->
+<div class="glass-panel p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">mic</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Client_Onboarding_Call.wav</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Oct 22, 2023 • 89MB</span>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<div class="hidden md:flex flex-col items-end">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm font-bold">Processed</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant/30 shadow-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="font-label-sm text-label-sm-mobile">Meetings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90" href="#">
+<span class="material-symbols-outlined">upload</span>
+<span class="font-label-sm text-label-sm-mobile">Upload</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-sm text-label-sm-mobile">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm-mobile">Settings</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for Drag and Drop
+        const dropZone = document.getElementById('drop-zone');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('bg-surface-container-high', 'border-primary');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('bg-surface-container-high', 'border-primary');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('bg-surface-container-high', 'border-primary');
+            alert('File drop detected. Processing pipeline starting...');
+        });
+
+        // Simple progress bar animation simulation
+        let progress = 65;
+        const progressFill = document.getElementById('progress-fill');
+        
+        setInterval(() => {
+            if (progress < 98) {
+                progress += 0.2;
+                progressFill.style.width = `${progress}%`;
+            }
+        }, 3000);
+    </script>
+</body></html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis - Account Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+        }
+        .font-headline { font-family: 'Geist', sans-serif; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#004395",
+                    "primary-fixed-dim": "#62df7d",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-primary": "#006e2d",
+                    "inverse-on-surface": "#313030",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-primary-fixed-variant": "#005320",
+                    "outline-variant": "#3e4a3d",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-highest": "#353534",
+                    "background": "#131313",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary": "#003914",
+                    "surface-container": "#201f1f",
+                    "secondary-fixed-dim": "#f7be1d",
+                    "error": "#ffb4ab",
+                    "on-surface-variant": "#bdcaba",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary-fixed": "#ffdf9a",
+                    "outline": "#879485",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "on-primary-container": "#003111",
+                    "surface-bright": "#393939",
+                    "primary": "#62df7d",
+                    "surface-tint": "#62df7d",
+                    "on-secondary-fixed": "#251a00",
+                    "on-tertiary-container": "#00285d",
+                    "tertiary-fixed": "#d8e2ff",
+                    "on-background": "#e5e2e1",
+                    "inverse-surface": "#e5e2e1",
+                    "primary-fixed": "#7ffc97",
+                    "surface": "#131313",
+                    "on-primary-fixed": "#002109",
+                    "secondary": "#ffca45",
+                    "error-container": "#93000a",
+                    "tertiary": "#adc6ff",
+                    "on-secondary-fixed-variant": "#5a4300",
+                    "on-tertiary": "#002e6a",
+                    "on-error": "#690005",
+                    "tertiary-container": "#4d8eff",
+                    "surface-variant": "#353534",
+                    "on-secondary-container": "#5b4400",
+                    "primary-container": "#1ca64d",
+                    "on-surface": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "secondary-container": "#e4ae00",
+                    "on-secondary": "#3f2e00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "2xl": "48px",
+                    "base": "8px",
+                    "margin": "40px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "3xl": "64px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "headline-sm": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant fixed top-0 left-0 right-0 h-[64px] z-50">
+<div class="flex justify-between items-center w-full px-lg max-w-[1440px] mx-auto h-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface cursor-pointer">Lynqis</span>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80">Dashboard</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80">Meetings</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80">Action Items</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors cursor-pointer active:opacity-80">Integrations</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs hover:bg-surface-container-low rounded-full transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-xs text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 rounded-full transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a young male professional named Alex Martin, with short dark hair and a confident expression. The lighting is soft and cinematic against a dark, minimalist charcoal background, reflecting a high-end AI tech environment. The image is crisp, modern, and monochromatic with subtle green light accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPiOUiTLVQmU4mDiRhMSxOxy6ul-rU092TNAwIRLsGah5xqVvFiV_4au7A0CuRP4IrOf021pzC3ckIqvj5XBQ1ghIrUea33PrYy8G5cKa6lskdu7iHiZNYnRRilcRLcWNKObLAmmenJTN0OyNyXv-Y82svnFphcl_WUL1fkIpCHeAymBRZQ5oGEzz2t-8JLOa7W-App6mjEbxA7yVh4HDmHZUOq-CVO3v0QAgyg4G0Thmw08HpdQhE"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-[64px] flex min-h-screen max-w-[1440px] mx-auto">
+<!-- SideNav (Settings Categories) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-[260px] p-md gap-base border-r border-outline-variant dark:border-outline-variant fixed">
+<div class="mb-lg px-md pt-md">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Settings</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manage your workspace</p>
+</div>
+<nav class="flex flex-col gap-xs">
+<button class="flex items-center gap-md px-md py-sm bg-surface-container dark:bg-surface-container-high text-primary dark:text-primary-fixed-dim rounded-lg cursor-pointer active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low rounded-lg cursor-pointer active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined">settings_suggest</span>
+<span class="font-label-md text-label-md">Preferences</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low rounded-lg cursor-pointer active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined">key</span>
+<span class="font-label-md text-label-md">API Keys</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low rounded-lg cursor-pointer active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-label-md">Billing</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-error hover:bg-error-container/10 rounded-lg cursor-pointer active:scale-[0.98] transition-all duration-200 mt-xl">
+<span class="material-symbols-outlined">report</span>
+<span class="font-label-md text-label-md">Danger Zone</span>
+</button>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<section class="flex-1 md:ml-[260px] p-xl lg:p-2xl overflow-y-auto">
+<div class="max-w-[800px] mx-auto space-y-3xl">
+<!-- Profile Section -->
+<section class="space-y-lg animate-fade-in" id="profile">
+<div>
+<h3 class="font-headline-lg text-headline-lg">Profile</h3>
+<p class="font-body-md text-on-surface-variant">Update your photo and personal details.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-lg rounded-xl space-y-xl">
+<div class="flex items-center gap-xl">
+<div class="relative group">
+<div class="w-24 h-24 rounded-full overflow-hidden border-2 border-primary ring-4 ring-background">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of Alex Martin, a clean-cut technology professional in his early 30s. The aesthetic is high-fidelity dark minimalism, featuring sharp focus, low-key lighting, and a palette of charcoal and muted forest green. Alex has a thoughtful, focused expression suitable for an expert AI platform setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzh1K41sYqJIyuqwDYFV3xyFxpSRVCA-mUXA8GbB9bLZIVURWzi6yidIr4C-uTZgJf-wpjWOxSRODUeZut3yf_WdK9F-pGlge-qS7WO-ME2jwv2x7VZnNzH0p5TEkUo7nynao-9GKcLME8VXwPR_YEyoXKrKlLkXRjf_Swh8dCSzSfLz9zvwY98XeBONlGBCPbLRt4iq5u4daKNVKVInZ8GFf-9dXkNXHVp7aWgNRjWdPPCOszhd7c"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-xs rounded-full shadow-lg hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm">Alex Martin</h4>
+<p class="font-body-sm text-on-surface-variant">Product Designer &amp; Meeting Lead</p>
+<div class="mt-md flex gap-sm">
+<button class="px-md py-xs bg-primary text-on-primary font-label-md rounded-lg hover:opacity-90 transition-opacity">Upload New</button>
+<button class="px-md py-xs border border-outline-variant text-on-surface-variant font-label-md rounded-lg hover:bg-surface-container transition-colors">Remove</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="font-label-sm text-on-surface-variant uppercase tracking-wider">Full Name</label>
+<input class="w-full bg-background border border-outline-variant rounded-lg px-md py-base font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="text" value="Alex Martin"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-sm text-on-surface-variant uppercase tracking-wider">Email Address</label>
+<input class="w-full bg-background border border-outline-variant rounded-lg px-md py-base font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="email" value="alex.martin@lynqis.ai"/>
+</div>
+</div>
+</div>
+</section>
+<!-- API Keys Section -->
+<section class="space-y-lg" id="api-keys">
+<div>
+<h3 class="font-headline-lg text-headline-lg">API Keys</h3>
+<p class="font-body-md text-on-surface-variant">Connect your own AI models for custom processing.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-lg rounded-xl space-y-md">
+<div class="flex items-center justify-between p-md bg-background border border-outline-variant rounded-lg">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 flex items-center justify-center bg-on-surface/5 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<div>
+<p class="font-label-md text-on-surface">OpenAI Key</p>
+<p class="font-body-sm text-on-surface-variant">sk-••••••••••••••••••••••••4jK2</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="p-xs hover:text-primary transition-colors"><span class="material-symbols-outlined">visibility</span></button>
+<button class="p-xs hover:text-primary transition-colors"><span class="material-symbols-outlined">content_copy</span></button>
+<button class="p-xs hover:text-error transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+<button class="w-full py-md border-2 border-dashed border-outline-variant rounded-lg text-on-surface-variant hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-md">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-md">Add New Secret Key</span>
+</button>
+</div>
+</section>
+<!-- Preferences Section -->
+<section class="space-y-lg" id="preferences">
+<div>
+<h3 class="font-headline-lg text-headline-lg">Preferences</h3>
+<p class="font-body-md text-on-surface-variant">Customize your workspace experience.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded-xl divide-y divide-outline-variant">
+<div class="p-lg flex items-center justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm">AI Summary Length</p>
+<p class="font-body-sm text-on-surface-variant">Choose how detailed your automatic summaries should be.</p>
+</div>
+<div class="flex bg-background p-xs rounded-lg border border-outline-variant">
+<button class="px-md py-xs font-label-md rounded-md bg-surface-container-high text-primary shadow-sm">Concise</button>
+<button class="px-md py-xs font-label-md rounded-md text-on-surface-variant hover:text-on-surface">Standard</button>
+<button class="px-md py-xs font-label-md rounded-md text-on-surface-variant hover:text-on-surface">Detailed</button>
+</div>
+</div>
+<div class="p-lg flex items-center justify-between">
+<div>
+<p class="font-headline-sm text-headline-sm">Email Notifications</p>
+<p class="font-body-sm text-on-surface-variant">Receive summaries directly in your inbox after meetings.</p>
+</div>
+<button class="w-12 h-6 bg-primary rounded-full relative transition-colors">
+<span class="absolute right-1 top-1 w-4 h-4 bg-on-primary rounded-full"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="space-y-lg" id="danger-zone">
+<div class="flex items-center gap-md text-error">
+<span class="material-symbols-outlined">warning</span>
+<h3 class="font-headline-lg text-headline-lg">Danger Zone</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Red border cards as requested -->
+<div class="border border-error/30 bg-error/5 p-lg rounded-xl space-y-md hover:border-error transition-colors group">
+<h4 class="font-headline-sm text-headline-sm text-error">Clear Data</h4>
+<p class="font-body-sm text-on-surface-variant">Remove all meeting transcripts and AI summaries from our servers. This action is irreversible.</p>
+<button class="w-full py-base bg-error/10 text-error border border-error/50 rounded-lg font-label-md hover:bg-error hover:text-on-error transition-all active:scale-[0.98]">Wipe All History</button>
+</div>
+<div class="border border-error/30 bg-error/5 p-lg rounded-xl space-y-md hover:border-error transition-colors group">
+<h4 class="font-headline-sm text-headline-sm text-error">Delete Account</h4>
+<p class="font-body-sm text-on-surface-variant">Permanently deactivate your Lynqis profile and forfeit any remaining subscription balance.</p>
+<button class="w-full py-base bg-error/10 text-error border border-error/50 rounded-lg font-label-md hover:bg-error hover:text-on-error transition-all active:scale-[0.98]">Delete Permanently</button>
+</div>
+</div>
+</section>
+<!-- Footer Action Bar -->
+<div class="flex items-center justify-end gap-md pt-xl border-t border-outline-variant">
+<button class="px-xl py-md text-on-surface-variant font-label-md hover:text-on-surface transition-colors">Discard Changes</button>
+<button class="px-xl py-md bg-primary text-on-primary font-label-md rounded-lg shadow-lg hover:shadow-primary/20 hover:scale-[1.02] transition-all">Save Changes</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('nav button, nav a').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Mock active state toggle
+                if(el.tagName === 'BUTTON') {
+                    document.querySelectorAll('nav button').forEach(b => {
+                        b.classList.remove('bg-surface-container', 'dark:bg-surface-container-high', 'text-primary', 'dark:text-primary-fixed-dim');
+                        b.classList.add('text-on-surface-variant', 'dark:text-on-surface-variant');
+                    });
+                    el.classList.add('bg-surface-container', 'dark:bg-surface-container-high', 'text-primary', 'dark:text-primary-fixed-dim');
+                    el.classList.remove('text-on-surface-variant', 'dark:text-on-surface-variant');
+                }
+            });
+        });
+
+        // Simple smooth scroll behavior for "sections" (mocking navigation)
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-4');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+            observer.observe(section);
+        });
+    </script>
+</body></html>

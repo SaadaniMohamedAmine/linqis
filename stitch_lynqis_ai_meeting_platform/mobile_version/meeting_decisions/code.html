@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Decisions</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #1F1F1F;
+        }
+        .decision-card:hover {
+            border-color: rgba(250, 250, 250, 0.1);
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+        }
+        .collapsible-content.active {
+            max-height: 1000px;
+            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+        }
+        body {
+            background-color: #0A0A0A;
+            color: #FAFAFA;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#002109",
+                      "on-error": "#690005",
+                      "tertiary-container": "#ff8b7c",
+                      "on-tertiary": "#60130d",
+                      "on-secondary": "#003914",
+                      "primary-container": "#22c55e",
+                      "background": "#0e150e",
+                      "on-secondary-fixed": "#002109",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#2f372e",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-high": "#242c24",
+                      "primary": "#4be277",
+                      "surface-variant": "#2f372e",
+                      "inverse-primary": "#006e2f",
+                      "surface-tint": "#4ae176",
+                      "surface": "#0e150e",
+                      "inverse-surface": "#dce5d9",
+                      "on-primary": "#003915",
+                      "surface-container-low": "#161d16",
+                      "tertiary-fixed": "#ffdad5",
+                      "primary-fixed": "#6bff8f",
+                      "secondary-fixed-dim": "#62df7d",
+                      "on-primary-container": "#004b1e",
+                      "on-tertiary-container": "#76231b",
+                      "on-surface-variant": "#bccbb9",
+                      "surface-bright": "#333b33",
+                      "surface-container-lowest": "#091009",
+                      "on-tertiary-fixed": "#410001",
+                      "primary-fixed-dim": "#4ae176",
+                      "on-surface": "#dce5d9",
+                      "inverse-on-surface": "#2a322a",
+                      "surface-dim": "#0e150e",
+                      "secondary-fixed": "#7ffc97",
+                      "tertiary-fixed-dim": "#ffb4a9",
+                      "outline-variant": "#3d4a3d",
+                      "outline": "#869585",
+                      "secondary-container": "#1ca64d",
+                      "on-primary-fixed-variant": "#005321",
+                      "secondary": "#62df7d",
+                      "surface-container": "#1a221a",
+                      "on-secondary-fixed-variant": "#005320",
+                      "on-secondary-container": "#003111",
+                      "tertiary": "#ffb5ab",
+                      "on-background": "#dce5d9",
+                      "on-tertiary-fixed-variant": "#7f2a21",
+                      "error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xxl": "48px",
+                      "base": "8px",
+                      "sm": "8px",
+                      "container-max": "1440px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "gutter": "24px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "mono-ui": ["Geist"],
+                      "headline-sm": ["Geist"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["Inter"],
+                      "display": ["Geist"],
+                      "body-sm": ["Inter"],
+                      "headline-lg": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="font-body-md text-on-surface selection:bg-primary/30">
+<!-- Top Navigation -->
+<header class="bg-background dark:bg-background text-primary dark:text-primary flex justify-between items-center w-full px-lg h-16 z-50 border-b border-outline-variant dark:border-outline-variant sticky top-0">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high p-xs rounded-lg transition-colors">menu</span>
+<h1 class="font-display text-headline-md font-bold text-primary dark:text-primary">Lynqis</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex gap-base items-center px-md py-xs bg-surface-container-low rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-label-md w-48 text-on-surface-variant" placeholder="Search decisions..." type="text"/>
+</div>
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high p-xs rounded-lg transition-colors">notifications</span>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xs">JD</div>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col h-screen sticky left-0 top-16 p-md gap-base bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant w-72">
+<nav class="flex flex-col gap-xs">
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">video_library</span>
+<span class="font-label-md text-label-md">Meetings</span>
+</a>
+<!-- Active Tab: Action Items / Decisions mapping -->
+<a class="flex items-center gap-md p-md bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-label-md text-label-md">Action Items</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">extension</span>
+<span class="font-label-md text-label-md">Integrations</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-md bg-surface-container-highest rounded-xl border border-outline-variant/30">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm">Workspace Usage</p>
+<div class="w-full bg-surface-container rounded-full h-1.5 mb-xs">
+<div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+<p class="font-label-sm text-label-sm text-primary">75% of 2GB used</p>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-md md:p-xl lg:px-xxl max-w-5xl mx-auto w-full">
+<header class="mb-xl flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Decisions</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Finalized strategy and operational commitments across your organization.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container-high border border-outline-variant px-md py-xs rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        Filter
+                    </button>
+<button class="bg-primary text-on-primary-container px-md py-xs rounded-lg font-label-md text-label-md hover:bg-primary-container transition-all flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">add</span>
+                        Log Decision
+                    </button>
+</div>
+</header>
+<!-- Decision Cards List -->
+<div class="space-y-md">
+<!-- Decision Card 1: Confirmed -->
+<div class="decision-card bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg transition-all duration-300">
+<div class="flex items-start justify-between mb-md gap-md">
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-[#FAFAFA] leading-tight mb-xs">Adopt React Server Components as the primary architecture for the V3 Dashboard.</h3>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-primary/10 text-primary px-xs py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Confirmed</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">• Oct 12, 2023 • 2:30 PM</span>
+</div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">AK</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-primary flex items-center justify-center text-[10px] font-bold text-on-primary-container">MS</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-low flex items-center justify-center text-[10px] font-bold">+4</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-[#1F1F1F]">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Proposer:</span>
+<span class="text-on-surface font-label-md text-label-md">Sarah Chen</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md text-label-md transition-colors" onclick="toggleContext('context-1')">
+                            Context 
+                            <span class="material-symbols-outlined transition-transform" id="icon-context-1">expand_more</span>
+</button>
+</div>
+<div class="collapsible-content" id="context-1">
+<div class="pt-md mt-md text-on-surface-variant font-body-sm text-body-sm leading-relaxed space-y-base bg-[#0A0A0A]/50 p-md rounded-lg">
+<p>This decision follows the architecture review session conducted on Oct 10th. RSC was chosen to minimize client-side bundle size and improve TTI for the data-intensive dashboard components.</p>
+<p><strong>Impact:</strong> Reduces main thread execution by ~40%. Requires migration of existing context providers to client components.</p>
+<p><strong>Stakeholders:</strong> Engineering (Engineering), Design (Consult), Product (Informed).</p>
+</div>
+</div>
+</div>
+<!-- Decision Card 2: Pending -->
+<div class="decision-card bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg transition-all duration-300">
+<div class="flex items-start justify-between mb-md gap-md">
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-[#FAFAFA] leading-tight mb-xs">Redirect 15% of the Q4 marketing budget to Developer Relations and Technical SEO.</h3>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-tertiary-container/10 text-tertiary px-xs py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Pending</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">• Oct 14, 2023 • 10:15 AM</span>
+</div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">ML</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-low flex items-center justify-center text-[10px] font-bold">JW</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-[#1F1F1F]">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Proposer:</span>
+<span class="text-on-surface font-label-md text-label-md">Marcus Thorne</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md text-label-md transition-colors" onclick="toggleContext('context-2')">
+                            Context 
+                            <span class="material-symbols-outlined transition-transform" id="icon-context-2">expand_more</span>
+</button>
+</div>
+<div class="collapsible-content" id="context-2">
+<div class="pt-md mt-md text-on-surface-variant font-body-sm text-body-sm leading-relaxed space-y-base bg-[#0A0A0A]/50 p-md rounded-lg">
+<p>Analysis of Q3 lead generation shows that high-intent traffic is coming primarily from long-tail technical documentation rather than paid social ads.</p>
+<p><strong>Next Steps:</strong> Awaiting approval from the Finance Committee. Final review scheduled for Oct 18.</p>
+</div>
+</div>
+</div>
+<!-- Decision Card 3: Confirmed -->
+<div class="decision-card bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg transition-all duration-300">
+<div class="flex items-start justify-between mb-md gap-md">
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-[#FAFAFA] leading-tight mb-xs">Decommissioning of Legacy API v1 endpoints will commence on Jan 1, 2024.</h3>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-primary/10 text-primary px-xs py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Confirmed</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">• Oct 08, 2023 • 4:45 PM</span>
+</div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">TC</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-primary flex items-center justify-center text-[10px] font-bold text-on-primary-container text-on-primary-container">RB</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-low flex items-center justify-center text-[10px] font-bold">+8</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-[#1F1F1F]">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Proposer:</span>
+<span class="text-on-surface font-label-md text-label-md">Engineering Lead</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md text-label-md transition-colors" onclick="toggleContext('context-3')">
+                            Context 
+                            <span class="material-symbols-outlined transition-transform" id="icon-context-3">expand_more</span>
+</button>
+</div>
+<div class="collapsible-content" id="context-3">
+<div class="pt-md mt-md text-on-surface-variant font-body-sm text-body-sm leading-relaxed space-y-base bg-[#0A0A0A]/50 p-md rounded-lg">
+<p>V1 has seen less than 5% traffic for the last 6 months. Maintenance overhead is no longer justifiable.</p>
+<p><strong>Timeline:</strong> Warning banners added Oct 1st. Email campaign starts Nov 1st. Hard cutoff Jan 1st.</p>
+</div>
+</div>
+</div>
+<!-- Decision Card 4: Confirmed -->
+<div class="decision-card bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg transition-all duration-300">
+<div class="flex items-start justify-between mb-md gap-md">
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-[#FAFAFA] leading-tight mb-xs">Standardize on 4-day working weeks for the experimental R&amp;D unit.</h3>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-primary/10 text-primary px-xs py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Confirmed</span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">• Oct 02, 2023 • 9:00 AM</span>
+</div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">HR</div>
+<div class="w-8 h-8 rounded-full border-2 border-[#141414] bg-primary flex items-center justify-center text-[10px] font-bold text-on-primary-container">CEO</div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-[#1F1F1F]">
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Proposer:</span>
+<span class="text-on-surface font-label-md text-label-md">Operations</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary flex items-center gap-xs font-label-md text-label-md transition-colors" onclick="toggleContext('context-4')">
+                            Context 
+                            <span class="material-symbols-outlined transition-transform" id="icon-context-4">expand_more</span>
+</button>
+</div>
+<div class="collapsible-content" id="context-4">
+<div class="pt-md mt-md text-on-surface-variant font-body-sm text-body-sm leading-relaxed space-y-base bg-[#0A0A0A]/50 p-md rounded-lg">
+<p>Pilot program results showed 15% increase in creative output and significant reduction in employee burnout reports.</p>
+<p><strong>Scope:</strong> Limited to the 'Blue Sky' R&amp;D team for now. Quarterly review scheduled for Dec 15.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 backdrop-blur-md border-t border-outline-variant/30 shadow-xl rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">Meetings</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-all" href="#">
+<span class="material-symbols-outlined">task_alt</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">Actions</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm-mobile text-label-sm-mobile">Settings</span>
+</a>
+</nav>
+<script>
+        function toggleContext(id) {
+            const element = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            
+            if (element.classList.contains('active')) {
+                element.classList.remove('active');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                element.classList.add('active');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        // Interaction micro-animations
+        document.querySelectorAll('.decision-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.995)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

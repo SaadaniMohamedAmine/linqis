@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis - Export Summary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid #1F1F1F;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1F1F1F;
+            border-radius: 10px;
+        }
+
+        .option-card:hover {
+            border-color: #4be277;
+            background: rgba(75, 226, 119, 0.05);
+        }
+
+        .option-card input:checked + label {
+            border-color: #4be277;
+            background: rgba(75, 226, 119, 0.1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002109",
+                        "on-error": "#690005",
+                        "tertiary-container": "#ff8b7c",
+                        "on-tertiary": "#60130d",
+                        "on-secondary": "#003914",
+                        "primary-container": "#22c55e",
+                        "background": "#0e150e",
+                        "on-secondary-fixed": "#002109",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#2f372e",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#242c24",
+                        "primary": "#4be277",
+                        "surface-variant": "#2f372e",
+                        "inverse-primary": "#006e2f",
+                        "surface-tint": "#4ae176",
+                        "surface": "#0e150e",
+                        "inverse-surface": "#dce5d9",
+                        "on-primary": "#003915",
+                        "surface-container-low": "#161d16",
+                        "tertiary-fixed": "#ffdad5",
+                        "primary-fixed": "#6bff8f",
+                        "secondary-fixed-dim": "#62df7d",
+                        "on-primary-container": "#004b1e",
+                        "on-tertiary-container": "#76231b",
+                        "on-surface-variant": "#bccbb9",
+                        "surface-bright": "#333b33",
+                        "surface-container-lowest": "#091009",
+                        "on-tertiary-fixed": "#410001",
+                        "primary-fixed-dim": "#4ae176",
+                        "on-surface": "#dce5d9",
+                        "inverse-on-surface": "#2a322a",
+                        "surface-dim": "#0e150e",
+                        "secondary-fixed": "#7ffc97",
+                        "tertiary-fixed-dim": "#ffb4a9",
+                        "outline-variant": "#3d4a3d",
+                        "outline": "#869585",
+                        "secondary-container": "#1ca64d",
+                        "on-primary-fixed-variant": "#005321",
+                        "secondary": "#62df7d",
+                        "surface-container": "#1a221a",
+                        "on-secondary-fixed-variant": "#005320",
+                        "on-secondary-container": "#003111",
+                        "tertiary": "#ffb5ab",
+                        "on-background": "#dce5d9",
+                        "on-tertiary-fixed-variant": "#7f2a21",
+                        "error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xxl": "48px",
+                        "base": "8px",
+                        "sm": "8px",
+                        "container-max": "1440px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "mono-ui": ["Geist"],
+                        "headline-sm": ["Geist"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display": ["Geist"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-ui": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-[#0A0A0A] font-body-md text-on-surface min-h-screen flex items-center justify-center overflow-hidden">
+<!-- Background Decoration -->
+
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-[#0A0A0A]/60 backdrop-blur-sm z-40"></div>
+<!-- Export Modal -->
+<div class="relative z-50 w-full max-w-[360px] mx-4">
+<div class="glass-panel rounded-lg shadow-2xl flex flex-col overflow-hidden">
+<!-- Header -->
+<div class="px-lg py-md border-b border-outline-variant flex items-center justify-between">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Export summary to...</h2>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors" onclick="console.log('Close')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Content -->
+<div class="p-lg space-y-md custom-scrollbar overflow-y-auto max-h-[530px]">
+<!-- Notion Option -->
+<div class="relative group">
+<input checked="" class="hidden peer" id="target_notion" name="export_target" type="radio"/>
+<label class="option-card flex items-start gap-md p-md rounded-lg border border-outline-variant cursor-pointer transition-all duration-200 block peer-checked:border-primary peer-checked:bg-primary/5" for="target_notion">
+<span class="material-symbols-outlined text-primary mt-1">description</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Notion</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Send to Workspace</p>
+<div class="mt-base">
+<select class="w-full bg-surface-container-low border border-outline-variant rounded px-sm py-1 text-label-sm focus:border-primary focus:ring-0 outline-none">
+<option>Marketing / Q3 Reports</option>
+<option>Development / Syncs</option>
+<option>Personal / Drafts</option>
+</select>
+</div>
+</div>
+</label>
+</div>
+<!-- Slack Option -->
+<div class="relative group">
+<input class="hidden peer" id="target_slack" name="export_target" type="radio"/>
+<label class="option-card flex items-start gap-md p-md rounded-lg border border-outline-variant cursor-pointer transition-all duration-200 block peer-checked:border-primary peer-checked:bg-primary/5" for="target_slack">
+<span class="material-symbols-outlined text-primary mt-1">chat</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Slack</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Post to channel</p>
+<div class="mt-base">
+<select class="w-full bg-surface-container-low border border-outline-variant rounded px-sm py-1 text-label-sm focus:border-primary focus:ring-0 outline-none">
+<option>#general</option>
+<option>#internal-ops</option>
+<option>#project-lynqis</option>
+</select>
+</div>
+</div>
+</label>
+</div>
+<!-- Email Option -->
+<div class="relative group">
+<input class="hidden peer" id="target_email" name="export_target" type="radio"/>
+<label class="option-card flex items-start gap-md p-md rounded-lg border border-outline-variant cursor-pointer transition-all duration-200 block peer-checked:border-primary peer-checked:bg-primary/5" for="target_email">
+<span class="material-symbols-outlined text-primary mt-1">mail</span>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Email</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Send as PDF attachment</p>
+<div class="mt-base">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded px-sm py-1 text-label-sm focus:border-primary focus:ring-0 outline-none" placeholder="recipient@lynqis.ai" type="email"/>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Footer -->
+<div class="px-lg py-lg bg-surface-container-low flex flex-col gap-base border-t border-outline-variant">
+<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md py-md rounded transition-all active:scale-95">
+                    Export Now
+                </button>
+<button class="w-full bg-transparent border border-outline-variant hover:border-on-surface-variant text-on-surface-variant font-label-md text-label-md py-md rounded transition-all">
+                    Cancel
+                </button>
+</div>
+</div>
+<!-- Contextual Footer Info -->
+<p class="mt-md text-center text-on-surface-variant/40 font-label-sm text-[10px] uppercase tracking-widest">
+            Secured by Lynqis Protocol
+        </p>
+</div>
+<!-- Interactions Script -->
+<script>
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Micro-interaction sound or haptic feedback placeholder
+                console.log('Target selected');
+            });
+        });
+
+        // Simple button active state visual
+        const primaryBtn = document.querySelector('button.bg-primary');
+        primaryBtn.addEventListener('mousedown', () => {
+            primaryBtn.classList.add('opacity-80', 'scale-95');
+        });
+        primaryBtn.addEventListener('mouseup', () => {
+            primaryBtn.classList.remove('opacity-80', 'scale-95');
+        });
+    </script>
+</body></html>

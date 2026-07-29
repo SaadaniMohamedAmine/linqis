@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-tertiary-fixed-variant": "#004395",
+                  "primary-fixed-dim": "#62df7d",
+                  "surface-container-lowest": "#0e0e0e",
+                  "inverse-primary": "#006e2d",
+                  "inverse-on-surface": "#313030",
+                  "on-tertiary-fixed": "#001a42",
+                  "on-primary-fixed-variant": "#005320",
+                  "outline-variant": "#3e4a3d",
+                  "on-error-container": "#ffdad6",
+                  "surface-container-highest": "#353534",
+                  "background": "#131313",
+                  "surface-container-high": "#2a2a2a",
+                  "on-primary": "#003914",
+                  "surface-container": "#201f1f",
+                  "secondary-fixed-dim": "#f7be1d",
+                  "error": "#ffb4ab",
+                  "on-surface-variant": "#bdcaba",
+                  "surface-container-low": "#1c1b1b",
+                  "secondary-fixed": "#ffdf9a",
+                  "outline": "#879485",
+                  "tertiary-fixed-dim": "#adc6ff",
+                  "on-primary-container": "#003111",
+                  "surface-bright": "#393939",
+                  "primary": "#62df7d",
+                  "surface-tint": "#62df7d",
+                  "on-secondary-fixed": "#251a00",
+                  "on-tertiary-container": "#00285d",
+                  "tertiary-fixed": "#d8e2ff",
+                  "on-background": "#e5e2e1",
+                  "inverse-surface": "#e5e2e1",
+                  "primary-fixed": "#7ffc97",
+                  "surface": "#131313",
+                  "on-primary-fixed": "#002109",
+                  "secondary": "#ffca45",
+                  "error-container": "#93000a",
+                  "tertiary": "#adc6ff",
+                  "on-secondary-fixed-variant": "#5a4300",
+                  "on-tertiary": "#002e6a",
+                  "on-error": "#690005",
+                  "tertiary-container": "#4d8eff",
+                  "surface-variant": "#353534",
+                  "on-secondary-container": "#5b4400",
+                  "primary-container": "#1ca64d",
+                  "on-surface": "#e5e2e1",
+                  "surface-dim": "#131313",
+                  "secondary-container": "#e4ae00",
+                  "on-secondary": "#3f2e00"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "0.75rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "md": "16px",
+                  "2xl": "48px",
+                  "base": "8px",
+                  "margin": "40px",
+                  "lg": "24px",
+                  "gutter": "24px",
+                  "xs": "4px",
+                  "xl": "32px",
+                  "sm": "8px",
+                  "3xl": "64px"
+          },
+          "fontFamily": {
+                  "headline-lg": ["Geist"],
+                  "body-sm": ["Inter"],
+                  "headline-sm": ["Geist"],
+                  "display-lg": ["Geist"],
+                  "headline-md": ["Geist"],
+                  "body-lg": ["Inter"],
+                  "body-md": ["Inter"],
+                  "label-md": ["Inter"],
+                  "label-sm": ["Inter"]
+          },
+          "fontSize": {
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                  "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                  "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                  "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0A0A0A;
+      color: #e5e2e1;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-overlay {
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1F1F1F;
+      border-radius: 10px;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .input-glow:focus {
+      box-shadow: 0 0 0 2px rgba(98, 223, 125, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-background overflow-hidden h-screen">
+<!-- Main Background Content (Locked & Dimmed) -->
+<div class="fixed inset-0 z-0 flex flex-col pointer-events-none opacity-40">
+<!-- TopNavBar Shell -->
+<header class="bg-background border-b border-outline-variant h-[64px] w-full px-lg flex justify-between items-center max-w-[1440px] mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-on-surface">Lynqis</div>
+<nav class="hidden md:flex gap-lg">
+<span class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1">Dashboard</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Meetings</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Action Items</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Integrations</span>
+</nav>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a professional modern user in a sleek minimalist office setting, soft dramatic lighting with deep shadows, high-fidelity digital photography, monochromatic base with subtle green accents, expert and data-driven aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBidS7v6CQazW_E4I8oIAQrCF_IKYWT7FDV7hcCnud4Xud8TKulJw7XjkuH5jWuE2NfEue3tG3KDg-S6EaNA97E535GqXsCbfwCcc13djItKv6va8_hd7sfmV_N_2DOJIZZ_flje-u2oBLTEDzIK3jiALDhRJa4g7NX-Oe21PKd51HNOvM7pMo9LBBy91X60RzScd9RghFDGirmCALuV33sAgJNZRrUsILdDIpXC-SuhoNVt7JVt18r"/>
+</div>
+</div>
+</header>
+<main class="flex flex-1 w-full max-w-[1440px] mx-auto overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="w-[260px] border-r border-outline-variant p-md flex flex-col gap-base bg-background">
+<div class="flex items-center gap-sm mb-md">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">dashboard</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface leading-tight">Meeting List</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">AI-summarized sessions</div>
+</div>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md py-base px-md rounded-lg mb-base flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">add</span> New Meeting
+        </button>
+<div class="flex flex-col gap-xs">
+<div class="flex items-center gap-sm p-sm rounded-lg bg-surface-container-high text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-md text-label-md">Recent Meetings</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Shared with Me</span>
+</div>
+<div class="flex items-center gap-sm p-sm rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">archive</span>
+<span class="font-label-md text-label-md">Archived</span>
+</div>
+</div>
+</aside>
+<!-- Content Canvas -->
+<section class="flex-1 p-lg overflow-y-auto custom-scrollbar">
+<div class="grid grid-cols-12 gap-gutter">
+<div class="col-span-8 bg-surface-container-low border border-outline-variant rounded-xl p-lg h-96"></div>
+<div class="col-span-4 bg-surface-container-low border border-outline-variant rounded-xl p-lg h-96"></div>
+<div class="col-span-12 bg-surface-container-low border border-outline-variant rounded-xl p-lg h-64"></div>
+</div>
+</section>
+</main>
+</div>
+<!-- Export Modal Overlay -->
+<div class="fixed inset-0 z-50 glass-overlay flex items-center justify-center p-md">
+<!-- Centered 380px Modal Card -->
+<div class="w-full max-w-[380px] bg-surface-container-highest border border-[#2A2A2A] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden">
+<!-- Modal Header -->
+<div class="p-lg border-b border-outline-variant flex justify-between items-start">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Export Meeting</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Choose your destination and target workspace.</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-lg flex flex-col gap-lg">
+<!-- Notion Option -->
+<div class="flex flex-col gap-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant bg-surface-container focus:ring-0 focus:ring-offset-0" name="export-target" type="radio"/>
+<div class="flex items-center gap-xs flex-1">
+<span class="material-symbols-outlined text-on-surface">description</span>
+<span class="font-label-md text-label-md text-on-surface">Notion</span>
+</div>
+<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-surface-container-low text-on-surface-variant border border-outline-variant">CONNECTED</span>
+</label>
+<!-- Notion Target Picker -->
+<div class="ml-8">
+<div class="relative">
+<select class="w-full bg-background border border-outline-variant rounded-lg py-base px-md font-body-sm text-body-sm text-on-surface outline-none appearance-none input-glow cursor-pointer">
+<option>Q4 Planning Documents</option>
+<option>Engineering Wiki</option>
+<option>Product Roadmap</option>
+<option>New Page...</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Slack Option -->
+<div class="flex flex-col gap-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline-variant bg-surface-container focus:ring-0 focus:ring-offset-0" name="export-target" type="radio"/>
+<div class="flex items-center gap-xs flex-1">
+<span class="material-symbols-outlined text-on-surface">chat_bubble</span>
+<span class="font-label-md text-label-md text-on-surface">Slack</span>
+</div>
+</label>
+<!-- Slack Target Picker -->
+<div class="ml-8">
+<div class="relative">
+<select class="w-full bg-background border border-outline-variant rounded-lg py-base px-md font-body-sm text-body-sm text-on-surface outline-none appearance-none input-glow cursor-pointer disabled:opacity-50" disabled="">
+<option>#general</option>
+<option>#product-updates</option>
+<option>#meeting-summaries</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant opacity-50">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Email Option -->
+<div class="flex flex-col gap-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline-variant bg-surface-container focus:ring-0 focus:ring-offset-0" name="export-target" type="radio"/>
+<div class="flex items-center gap-xs flex-1">
+<span class="material-symbols-outlined text-on-surface">mail</span>
+<span class="font-label-md text-label-md text-on-surface">Email Recap</span>
+</div>
+</label>
+<!-- Email Input -->
+<div class="ml-8">
+<input class="w-full bg-background border border-outline-variant rounded-lg py-base px-md font-body-sm text-body-sm text-on-surface outline-none input-glow disabled:opacity-50" disabled="" placeholder="Enter recipient email..." type="email"/>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="p-lg bg-surface-container-low border-t border-outline-variant flex gap-md">
+<button class="flex-1 border border-outline-variant text-on-surface font-label-md text-label-md py-md rounded-lg hover:bg-surface-container transition-all active:scale-[0.98]">
+          Cancel
+        </button>
+<button class="flex-1 bg-primary text-on-primary font-label-md text-label-md py-md rounded-lg hover:opacity-90 transition-all active:scale-[0.98] shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+          Export Now
+        </button>
+</div>
+</div>
+</div>
+<script>
+    // Simple micro-interaction for radio buttons
+    const radios = document.querySelectorAll('input[type="radio"]');
+    radios.forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        // Find all sibling pickers and disable them
+        const allPickers = document.querySelectorAll('select, input[type="email"]');
+        allPickers.forEach(p => {
+          p.disabled = true;
+          p.parentElement.classList.add('opacity-50');
+        });
+
+        // Enable the picker belonging to this radio's parent's sibling
+        const currentPickerContainer = radio.closest('.flex-col').querySelector('.ml-8');
+        const currentPicker = currentPickerContainer.querySelector('select, input[type="email"]');
+        if (currentPicker) {
+          currentPicker.disabled = false;
+          currentPickerContainer.classList.remove('opacity-50');
+        }
+      });
+    });
+
+    // Initial state check for opacity
+    document.querySelectorAll('.flex-col').forEach(container => {
+      const radio = container.querySelector('input[type="radio"]');
+      const pickerContainer = container.querySelector('.ml-8');
+      if (radio && pickerContainer && !radio.checked) {
+        pickerContainer.classList.add('opacity-50');
+      }
+    });
+  </script>
+</body></html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lynqis | Notifications Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid #2A2A2A;
+        }
+        .notification-item:hover {
+            background-color: #1A1A1A;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<!-- Tailwind Config Injection -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#004395",
+                    "primary-fixed-dim": "#62df7d",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-primary": "#006e2d",
+                    "inverse-on-surface": "#313030",
+                    "on-tertiary-fixed": "#001a42",
+                    "on-primary-fixed-variant": "#005320",
+                    "outline-variant": "#3e4a3d",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-highest": "#353534",
+                    "background": "#131313",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary": "#003914",
+                    "surface-container": "#201f1f",
+                    "secondary-fixed-dim": "#f7be1d",
+                    "error": "#ffb4ab",
+                    "on-surface-variant": "#bdcaba",
+                    "surface-container-low": "#1c1b1b",
+                    "secondary-fixed": "#ffdf9a",
+                    "outline": "#879485",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "on-primary-container": "#003111",
+                    "surface-bright": "#393939",
+                    "primary": "#62df7d",
+                    "surface-tint": "#62df7d",
+                    "on-secondary-fixed": "#251a00",
+                    "on-tertiary-container": "#00285d",
+                    "tertiary-fixed": "#d8e2ff",
+                    "on-background": "#e5e2e1",
+                    "inverse-surface": "#e5e2e1",
+                    "primary-fixed": "#7ffc97",
+                    "surface": "#131313",
+                    "on-primary-fixed": "#002109",
+                    "secondary": "#ffca45",
+                    "error-container": "#93000a",
+                    "tertiary": "#adc6ff",
+                    "on-secondary-fixed-variant": "#5a4300",
+                    "on-tertiary": "#002e6a",
+                    "on-error": "#690005",
+                    "tertiary-container": "#4d8eff",
+                    "surface-variant": "#353534",
+                    "on-secondary-container": "#5b4400",
+                    "primary-container": "#1ca64d",
+                    "on-surface": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "secondary-container": "#e4ae00",
+                    "on-secondary": "#3f2e00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "2xl": "48px",
+                    "base": "8px",
+                    "margin": "40px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "3xl": "64px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "headline-sm": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen overflow-hidden selection:bg-primary selection:text-on-primary">
+<!-- Main Navigation (TopNavBar) -->
+<header class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant docked full-width top-0 h-[64px] fixed z-40">
+<div class="flex justify-between items-center w-full px-lg max-w-[1440px] mx-auto h-full">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-on-surface dark:text-on-surface">Lynqis</span>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-body-md text-body-md cursor-pointer active:opacity-80 text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1">Dashboard</a>
+<a class="font-body-md text-body-md cursor-pointer active:opacity-80 text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">Meetings</a>
+<a class="font-body-md text-body-md cursor-pointer active:opacity-80 text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">Action Items</a>
+<a class="font-body-md text-body-md cursor-pointer active:opacity-80 text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors">Integrations</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative cursor-pointer active:opacity-80 p-2 text-primary">
+<span class="material-symbols-outlined" data-icon="notifications" style="font-variation-settings: 'FILL' 1;">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<div class="cursor-pointer active:opacity-80 p-2 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Professional studio portrait of a technology executive with soft cinematic lighting. The individual is wearing a dark, minimal blazer against a muted charcoal background. The image has a crisp, high-fidelity aesthetic with deep shadows and sharp focus, reflecting a professional AI-driven corporate environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM1KJHKCOp_wmyKPsXEmq_l0qjElqyPfZQsFLcMaXE99CfxPEgemHr_oR9frL7oNTiKofzN5x1sniGCvx1MfIstV98tpbZUSAV0NCnmrUzFSNAg0O-2JL4hvSrF1CWfEsgfV6iWbJ4DqRiMGpQHg0aCz_NoV5qSSi0ZUNUK2gdYkbDD0DjyhvEMGvC7D6hLVe08QV46guAE51ninx8TQtwIfAfHuOG1wv-SpSR75NT1gf0y04o4VBR"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-[64px] h-screen flex relative">
+<!-- Side Navigation (SideNavBar) -->
+<aside class="bg-background dark:bg-background border-r border-outline-variant dark:border-outline-variant docked left-0 h-full w-[260px] hidden md:flex flex-col p-md gap-base">
+<div class="mb-lg px-2">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined" data-icon="add" style="font-size: 20px;">add</span>
+                    New Meeting
+                </button>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-md px-3 py-2 bg-surface-container dark:bg-surface-container-high text-primary dark:text-primary-fixed-dim rounded-lg cursor-pointer active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</div>
+<div class="flex items-center gap-md px-3 py-2 text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low cursor-pointer active:scale-[0.98] transition-all duration-200 rounded-lg">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-label-md text-label-md">Recent Meetings</span>
+</div>
+<div class="flex items-center gap-md px-3 py-2 text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low cursor-pointer active:scale-[0.98] transition-all duration-200 rounded-lg">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Shared with Me</span>
+</div>
+<div class="flex items-center gap-md px-3 py-2 text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-low cursor-pointer active:scale-[0.98] transition-all duration-200 rounded-lg">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-label-md text-label-md">Archived</span>
+</div>
+</div>
+<div class="mt-auto p-4 bg-surface-container-low rounded-xl border border-outline-variant">
+<p class="text-on-surface font-label-md text-label-md font-bold mb-1">Meeting List</p>
+<p class="text-on-surface-variant font-body-sm text-body-sm mb-3">AI-summarized sessions</p>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-background bg-primary-container text-[10px] flex items-center justify-center">JD</div>
+<div class="w-6 h-6 rounded-full border border-background bg-secondary-container text-[10px] flex items-center justify-center">AS</div>
+<div class="w-6 h-6 rounded-full border border-background bg-tertiary-container text-[10px] flex items-center justify-center">ML</div>
+</div>
+</div>
+</aside>
+<!-- Background Content (Bento Grid Dashboard) -->
+<section class="flex-1 overflow-y-auto p-gutter bg-background relative scrollbar-hide">
+<div class="max-w-[1000px] mx-auto grid grid-cols-12 gap-gutter">
+<!-- Header Section -->
+<div class="col-span-12 mb-lg">
+<h1 class="font-headline-lg text-headline-lg text-on-background">Dashboard Overview</h1>
+<p class="text-on-surface-variant font-body-md text-body-md mt-1">Real-time analysis of your organizational efficiency.</p>
+</div>
+<!-- Main Bento Grid Items -->
+<div class="col-span-8 bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg h-[400px] relative overflow-hidden group">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-base">
+<h3 class="font-headline-sm text-headline-sm">Product Sync Insights</h3>
+<span class="bg-[#16A34A] text-on-primary px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">High Priority</span>
+</div>
+<p class="text-on-surface-variant text-body-sm max-w-md">The AI has identified 12 actionable items from the last 3 meetings regarding the Q4 roadmap. Critical conflicts detected in API endpoints documentation.</p>
+</div>
+<!-- Abstract Background Graphic -->
+<div class="absolute inset-0 opacity-20 pointer-events-none transition-transform duration-700 group-hover:scale-105">
+
+</div>
+</div>
+<div class="col-span-4 bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg flex flex-col justify-between">
+<div>
+<h3 class="font-label-md text-label-md text-primary font-bold mb-base">Efficiency Score</h3>
+<div class="text-[64px] font-bold leading-none tracking-tighter text-on-background">94%</div>
+<p class="text-on-surface-variant text-body-sm mt-md">+5.2% from last week</p>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[94%] shadow-[0_0_10px_#62df7d]"></div>
+</div>
+</div>
+<div class="col-span-4 bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-lg">Action Items</h3>
+<ul class="space-y-md">
+<li class="flex items-start gap-md">
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle">check_circle</span>
+<span class="text-body-sm">Update PRD for mobile</span>
+</li>
+<li class="flex items-start gap-md opacity-50">
+<span class="material-symbols-outlined" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+<span class="text-body-sm line-through">Finalize budget sheet</span>
+</li>
+</ul>
+</div>
+<div class="col-span-8 bg-[#141414] border border-[#1F1F1F] rounded-xl p-lg">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-headline-sm">Upcoming Meetings</h3>
+<button class="text-primary font-label-sm text-label-sm hover:underline">View Calendar</button>
+</div>
+<div class="space-y-md">
+<div class="flex items-center gap-lg p-md bg-[#1A1A1A] rounded-lg border border-[#1F1F1F]">
+<div class="bg-surface-container-high p-2 rounded text-center min-w-[50px]">
+<span class="block text-xs uppercase font-bold text-on-surface-variant">Oct</span>
+<span class="block text-xl font-bold">14</span>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md font-bold">Design Critique: Dark Minimalist UI</h4>
+<p class="text-xs text-on-surface-variant">10:00 AM — 11:00 AM</p>
+</div>
+<button class="bg-[#16A34A] text-on-primary px-3 py-1.5 rounded text-xs font-bold">JOIN</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- NOTIFICATIONS PANEL (Slide-in) -->
+<div class="fixed inset-y-0 right-0 w-full md:w-[400px] z-50 glass-effect flex flex-col shadow-2xl transition-transform duration-300 translate-x-0" id="notificationsPanel">
+<!-- Panel Header -->
+<div class="p-lg flex items-center justify-between border-b border-outline-variant">
+<div class="flex items-center gap-base">
+<h2 class="font-headline-sm text-headline-sm text-on-background">Notifications</h2>
+<span class="bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded-full font-bold">3</span>
+</div>
+<button class="text-primary font-label-sm text-label-sm hover:opacity-80 transition-opacity" onclick="markAllRead()">Mark all read</button>
+</div>
+<!-- Notification List -->
+<div class="flex-1 overflow-y-auto scrollbar-hide py-md">
+<!-- Unread Items -->
+<div class="px-md mb-md">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-md mb-base">Unread</p>
+<!-- Item 1 -->
+<div class="notification-item p-md rounded-xl cursor-pointer transition-all flex gap-md relative">
+<div class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full"></div>
+<div class="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim shrink-0">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="flex-1 pr-6">
+<p class="font-label-md text-label-md font-bold leading-tight">Meeting processed</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs line-clamp-2">"Q4 Strategy Sync" is ready. AI has extracted 4 high-priority action items.</p>
+<p class="text-[10px] text-on-surface-variant mt-base">2 mins ago</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="notification-item p-md rounded-xl cursor-pointer transition-all flex gap-md relative">
+<div class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full"></div>
+<div class="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center text-secondary-fixed-dim shrink-0">
+<span class="material-symbols-outlined" data-icon="assignment_late">assignment_late</span>
+</div>
+<div class="flex-1 pr-6">
+<p class="font-label-md text-label-md font-bold leading-tight">Action items detected</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs line-clamp-2">A deadline for "PRD Completion" was discussed in your last meeting.</p>
+<p class="text-[10px] text-on-surface-variant mt-base">45 mins ago</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="notification-item p-md rounded-xl cursor-pointer transition-all flex gap-md relative">
+<div class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary rounded-full"></div>
+<div class="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center text-tertiary-fixed-dim shrink-0">
+<span class="material-symbols-outlined" data-icon="group_add">group_add</span>
+</div>
+<div class="flex-1 pr-6">
+<p class="font-label-md text-label-md font-bold leading-tight">Team Access Granted</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs line-clamp-2">Sarah Miller invited you to the "Product Development" workspace.</p>
+<p class="text-[10px] text-on-surface-variant mt-base">1 hour ago</p>
+</div>
+</div>
+</div>
+<!-- Earlier Items -->
+<div class="px-md">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-md mb-base">Earlier Today</p>
+<!-- Item 4 -->
+<div class="notification-item p-md rounded-xl cursor-pointer transition-all flex gap-md opacity-80 grayscale-[0.5]">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined" data-icon="cloud_done">cloud_done</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md font-bold leading-tight">Integration Sync Successful</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Notion database updated with 15 new meeting records.</p>
+<p class="text-[10px] text-on-surface-variant mt-base">4 hours ago</p>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="notification-item p-md rounded-xl cursor-pointer transition-all flex gap-md opacity-80 grayscale-[0.5]">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md font-bold leading-tight">Weekly Digest Ready</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Your AI productivity analysis for Oct 7 - Oct 13 is available.</p>
+<p class="text-[10px] text-on-surface-variant mt-base">8 hours ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel Footer -->
+<div class="p-lg border-t border-outline-variant bg-surface-container-low">
+<button class="w-full bg-surface-container-high text-on-surface py-3 rounded-lg flex items-center justify-center gap-2 font-label-md text-label-md hover:bg-surface-variant transition-colors" onclick="togglePanel()">
+                    Close Panel
+                </button>
+</div>
+</div>
+</main>
+<!-- Micro-interactions Script -->
+<script>
+        function togglePanel() {
+            const panel = document.getElementById('notificationsPanel');
+            if (panel.classList.contains('translate-x-0')) {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+            } else {
+                panel.classList.remove('translate-x-full');
+                panel.classList.add('translate-x-0');
+            }
+        }
+
+        function markAllRead() {
+            const dots = document.querySelectorAll('.notification-item .bg-primary');
+            dots.forEach(dot => {
+                dot.style.opacity = '0';
+                dot.style.transform = 'scale(0)';
+            });
+            
+            const badges = document.querySelectorAll('.bg-primary.text-on-primary.text-\\[10px\\]');
+            badges.forEach(badge => {
+                badge.innerText = '0';
+                badge.style.opacity = '0.5';
+            });
+        }
+
+        // Add visual click effect to items
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('mousedown', () => {
+                item.style.transform = 'scale(0.98)';
+            });
+            item.addEventListener('mouseup', () => {
+                item.style.transform = 'scale(1)';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>
