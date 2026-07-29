@@ -3,6 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { router as meetingRouter } from "./routes/meetings";
+import { router as queueRouter } from "./routes/queue";
+import { worker } from "./queue/worker";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -18,6 +20,10 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/meetings", meetingRouter);
+app.use("/api/queue", queueRouter);
+
+// Start worker
+worker.on("ready", () => console.log("Worker ready"));
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
