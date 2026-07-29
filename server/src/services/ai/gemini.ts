@@ -1,17 +1,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-export async function generateSummary(transcript: string): Promise<string> {
-  const prompt = `Generate a concise executive summary (max 150 words) of this meeting transcript:
+export async function generateExecutiveSummary(transcript: string): Promise<string> {
+  const prompt = `Generate a concise executive summary (max 150 words) of this meeting transcript. Focus on key outcomes, main discussions, and overall direction.
 
-${transcript}`;
+Meeting transcript:
+${transcript}
+
+Summary:`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
-  return response.text();
+  return response.text().trim();
 }
 
 export async function extractDecisions(transcript: string) {
@@ -20,7 +22,7 @@ export async function extractDecisions(transcript: string) {
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON, no markdown.`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
@@ -34,7 +36,7 @@ export async function extractActionItems(transcript: string) {
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON, no markdown.`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
@@ -48,7 +50,7 @@ export async function detectDisagreements(transcript: string) {
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON.`;
+Return ONLY valid JSON, no markdown.`;
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
