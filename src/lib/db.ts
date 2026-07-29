@@ -1,15 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const pool = new Pool({
+const adapter = new PrismaNeon({
   connectionString: process.env.DATABASE_URL!,
 });
-const adapter = new PrismaNeon(pool);
 
 export const prisma =
   globalForPrisma.prisma ??
