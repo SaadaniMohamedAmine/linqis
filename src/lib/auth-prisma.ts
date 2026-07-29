@@ -1,7 +1,10 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -12,15 +15,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/signin",
   },
   callbacks: {
-    session: ({ session, token }) => {
-      session.user.id = token.sub!;
+    session: ({ session, user }) => {
+      session.user.id = user.id;
       return session;
-    },
-    jwt: ({ token, user }) => {
-      if (user) {
-        token.sub = user.id;
-      }
-      return token;
     },
   },
 });
