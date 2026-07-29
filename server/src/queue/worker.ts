@@ -1,44 +1,30 @@
 import { Worker, Job } from "bullmq";
 import { redis } from "./config";
+import { processMeeting } from "../services/meeting";
 
 interface MeetingJob {
   meetingId: string;
-  audioUrl: string;
+  transcript: string;
 }
 
 export const worker = new Worker<MeetingJob>(
   "meeting-processing",
   async (job: Job<MeetingJob>) => {
-    const { meetingId, audioUrl } = job.data;
+    const { meetingId, transcript } = job.data;
 
     job.progress(10);
-    console.log(`Processing meeting ${meetingId}: ${audioUrl}`);
+    console.log(`Processing meeting ${meetingId}`);
 
-    // Step 1: Extract audio (FFmpeg)
     job.progress(25);
-    console.log(`Step 1: Extracting audio from ${audioUrl}`);
+    console.log("Generating summary...");
 
-    // Step 2: Chunk if > 25MB
-    job.progress(40);
-    console.log("Step 2: Chunking audio file");
+    job.progress(50);
+    const result = await processMeeting(meetingId, transcript);
 
-    // Step 3: Transcribe (Whisper)
-    job.progress(60);
-    console.log("Step 3: Transcribing with Whisper API");
-
-    // Step 4: Analyze (Gemini/Groq)
-    job.progress(80);
-    console.log("Step 4: Analyzing with AI");
-
-    // Step 5: Save results
     job.progress(100);
     console.log(`Meeting ${meetingId} processed successfully`);
 
-    return {
-      status: "completed",
-      meetingId,
-      processedAt: new Date().toISOString(),
-    };
+    return result;
   },
   {
     connection: redis,
