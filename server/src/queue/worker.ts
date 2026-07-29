@@ -1,6 +1,6 @@
 import { Worker, Job } from "bullmq";
 import { redis } from "./config";
-import { transcribeWithTimestamps } from "../services/transcription";
+import { transcribeWithTimestamps, diarizeSpeakers, reassembleTranscript, mergeTranscripts } from "../services/transcription";
 import { ai } from "../services/ai";
 import { getPrisma } from "../db";
 
@@ -21,19 +21,24 @@ export const worker = new Worker<MeetingJob>(
 
     // Transcribe audio (chunk by chunk or full file)
     const audioFiles = chunks && chunks.length > 0 ? chunks : [audioPath];
-    let fullTranscript = "";
     let allSegments: any[] = [];
 
     for (let i = 0; i < audioFiles.length; i++) {
       const segments = await transcribeWithTimestamps(audioFiles[i]);
-      allSegments = [...allSegments, ...segments];
-      fullTranscript += segments.map((s) => s.content).join(" ");
-      job.progress(10 + (i / audioFiles.length) * 40);
+      allSegments.push(segments);
+      job.progress(10 + (i / audioFiles.length) * 30);
     }
+
+    // Merge and diarize
+    const merged = mergeTranscripts(allSegments);
+    const diarized = await diarizeSpeakers(merged);
+
+    // Reassemble with corrected timestamps
+    const fullTranscript = reassembleTranscript(diarized);
 
     // Save transcripts
     await prisma.transcript.createMany({
-      data: allSegments.map((seg) => ({
+      data: diarized.map((seg) => ({
         meetingId,
         content: seg.content,
         speaker: seg.speaker,
@@ -41,19 +46,31 @@ export const worker = new Worker<MeetingJob>(
       })),
     });
 
-    job.progress(55);
+    job.progress(45);
     console.log(`Analyzing meeting ${meetingId}`);
 
-    // AI analysis
-    const [summary, decisions, actionItems, disagreements, mood] = await Promise.all([
-      ai.generateSummary(fullTranscript),
-      ai.extractDecisions(fullTranscript),
-      ai.extractActionItems(fullTranscript),
-      ai.detectDisagreements(fullTranscript),
-      ai.detectMood(fullTranscript),
-    ]);
+    // Extract decisions
+    const decisions = await ai.extractDecisions(fullTranscript);
 
-    job.progress(80);
+    job.progress(60);
+
+    // Extract action items
+    const actionItems = await ai.extractActionItems(fullTranscript);
+
+    job.progress(75);
+
+    // Detect disagreements
+    const disagreements = await ai.detectDisagreements(fullTranscript);
+
+    job.progress(85);
+
+    // Detect mood
+    const mood = await ai.detectMood(fullTranscript);
+
+    // Generate summary
+    const summary = await ai.generateExecutiveSummary(fullTranscript);
+
+    job.progress(95);
 
     // Update meeting
     await prisma.meeting.update({
@@ -62,7 +79,6 @@ export const worker = new Worker<MeetingJob>(
         status: "DONE",
         summary,
         mood,
-        duration: allSegments.length > 0 ? Math.ceil(allSegments[allSegments.length - 1].timestamp.split(":").reduce((acc: number, t: string, i: number, arr: string[]) => acc + parseInt(t) * Math.pow(60, arr.length - 1 - i), 0) / 60) : 0,
         decisions: {
           create: decisions.map((d: any) => ({
             statement: d.statement,
@@ -88,9 +104,10 @@ export const worker = new Worker<MeetingJob>(
     return {
       meetingId,
       transcriptLength: fullTranscript.length,
-      segments: allSegments.length,
+      segments: diarized.length,
       decisions: decisions.length,
       actionItems: actionItems.length,
+      mood,
     };
   },
   {
