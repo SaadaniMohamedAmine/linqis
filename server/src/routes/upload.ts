@@ -1,0 +1,89 @@
+import { Router } from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../services/media";
+import { meetingQueue } from "../queue/config";
+import { getPrisma } from "../db";
+
+const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: UPLOAD_DIR,
+  filename: (_req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
+  fileFilter: (_req, file, cb) => {
+    const allowed = [".mp3", ".mp4", ".wav", ".m4a", ".mov", ".webm"];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(ext)) cb(null, true);
+    else cb(new Error("Invalid file format"));
+  },
+});
+
+export const router = Router();
+
+router.post("/", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const { userId } = req.body;
+    const filePath = req.file.path;
+    const isVideo = req.file.mimetype.startsWith("video");
+
+    // Create meeting record
+    const prisma = getPrisma();
+    const meeting = await prisma.meeting.create({
+      data: {
+        title: req.file.originalname,
+        userId: userId || "anonymous",
+        audioUrl: `/uploads/${req.file.filename}`,
+        status: "PROCESSING",
+      },
+    });
+
+    // Extract audio if video
+    let audioPath = filePath;
+    if (isVideo) {
+      audioPath = await extractAudio(filePath);
+    }
+
+    // Check if chunking is needed
+    const shouldChunk = await needsChunking(audioPath);
+    const duration = await getAudioDuration(audioPath);
+
+    let chunks = [];
+    if (shouldChunk) {
+      chunks = await chunkAudio(audioPath, duration);
+    }
+
+    // Add to queue
+    const job = await meetingQueue.add("process-meeting", {
+      meetingId: meeting.id,
+      audioPath,
+      chunks: chunks.map((c) => c.path),
+      duration,
+    });
+
+    res.json({
+      meetingId: meeting.id,
+      jobId: job.id,
+      duration,
+      chunked: shouldChunk,
+      chunkCount: chunks.length,
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ error: "Upload failed" });
+  }
+});
