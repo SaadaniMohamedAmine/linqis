@@ -6,6 +6,7 @@ import { router as meetingRouter } from "./routes/meetings";
 import { router as queueRouter } from "./routes/queue";
 import { router as uploadRouter } from "./routes/upload";
 import { router as exportRouter } from "./routes/exports";
+import { router as integrationRouter } from "./routes/integrations";
 import { worker } from "./queue/worker";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/meetings", meetingRouter);
 app.use("/api/queue", queueRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/export", exportRouter);
+app.use("/api/integrations", integrationRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));
