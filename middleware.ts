@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export async function middleware(request: Request) {
-  const session = await auth();
+  const session = await auth(request);
   const { pathname } = request.nextUrl;
 
   // If user is logged in and tries to access sign-in or sign-up, redirect to dashboard
@@ -19,5 +19,5 @@ export async function middleware(request: Request) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/sign-in", "/sign-up"],
+  matcher: ["/dashboard", "/dashboard/:path*", "/sign-in", "/sign-up"],
 };
