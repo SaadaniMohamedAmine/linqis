@@ -6,27 +6,7 @@ import { Badge } from "@/components/ui/badge";
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background text-text-primary">
-      {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
-        <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
-          <Link href="/" className="text-xl font-bold text-success">Lynqis</Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-text-secondary hover:text-success transition-colors">Dashboard</Link>
-            <Link href="/meetings" className="text-text-secondary hover:text-success transition-colors">Meetings</Link>
-            <Link href="/pricing" className="text-success border-b-2 border-success pb-1">Pricing</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/sign-in">
-              <Button variant="ghost" size="sm">Sign In</Button>
-            </Link>
-            <Link href="/sign-up">
-              <Button variant="primary" size="sm">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="pt-32 pb-24 px-6 max-w-[1440px] mx-auto min-h-screen">
+      <main className="pt-12 pb-24 px-6 max-w-[1440px] mx-auto min-h-screen">
         {/* Hero */}
         <section className="text-center mb-24">
           <h1 className="text-5xl font-semibold mb-4 tracking-tighter">Simple pricing. Real value.</h1>
@@ -182,21 +162,6 @@ export default function PricingPage() {
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border bg-surface mt-24">
-        <div className="max-w-[1440px] mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-4">
-            <span className="text-lg font-bold text-success">Lynqis</span>
-            <span className="text-sm text-text-secondary">© 2024 Lynqis Intelligence Inc.</span>
-          </div>
-          <div className="flex gap-6">
-            <Link href="#" className="text-text-secondary hover:text-success transition-colors text-sm">Privacy Policy</Link>
-            <Link href="#" className="text-text-secondary hover:text-success transition-colors text-sm">Terms of Service</Link>
-            <Link href="#" className="text-text-secondary hover:text-success transition-colors text-sm">Support</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

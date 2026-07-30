@@ -24,6 +24,10 @@
   --font-inter: "Inter", sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   border-color: var(--color-border);
 }
