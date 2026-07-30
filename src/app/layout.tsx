@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Inter } from "next/font/google";
+import { Inter, Geist } from "next/font/google";
 import "./globals.css";
+import { TransitionLoader } from "@/components/transition-loader";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
 export const metadata: Metadata = {
-  title: "Lynqis",
+  title: "Lynqis - AI Meeting Intelligence",
   description: "Every meeting, decoded.",
 };
 
@@ -16,8 +17,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geist.variable} ${inter.variable} antialiased bg-background text-text-primary`}>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} ${geist.variable} antialiased`}>
+        <TransitionLoader />
         {children}
       </body>
     </html>
