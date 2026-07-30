@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PageLoader } from "@/components/page-loader";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
+      <PageLoader />
       {/* TopNavBar */}
       <header className="bg-background border-b border-border h-16 fixed top-0 left-0 right-0 z-50 flex items-center px-6">
         <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto">
