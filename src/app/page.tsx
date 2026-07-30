@@ -9,7 +9,7 @@ export default function Home() {
       {/* Navbar */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
         <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
-          <Link href="/" className="text-xl font-bold tracking-tight">
+          <Link href="/" className="text-xl font-bold tracking-tight text-success">
             Lynqis
           </Link>
           <nav className="hidden md:flex items-center gap-8">
@@ -201,7 +201,7 @@ export default function Home() {
         <div className="max-w-[1440px] mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold">Lynqis</span>
+              <span className="text-xl font-bold text-success">Lynqis</span>
               <span className="text-xs text-text-secondary">© 2024 Lynqis AI Inc.</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-text-secondary">

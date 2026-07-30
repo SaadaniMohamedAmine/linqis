@@ -17,7 +17,7 @@ export default function SignUpPage() {
           <div className="w-8 h-8 bg-success rounded-lg flex items-center justify-center">
             <span className="text-white text-sm">🔗</span>
           </div>
-          <span className="text-xl font-bold tracking-tight">Lynqis</span>
+          <span className="text-xl font-bold tracking-tight text-success">Lynqis</span>
         </div>
 
         {/* Auth Card */}

@@ -9,7 +9,7 @@ export default function PricingPage() {
       {/* Navbar */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
         <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
-          <Link href="/" className="text-xl font-bold">Lynqis</Link>
+          <Link href="/" className="text-xl font-bold text-success">Lynqis</Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/dashboard" className="text-text-secondary hover:text-success transition-colors">Dashboard</Link>
             <Link href="/meetings" className="text-text-secondary hover:text-success transition-colors">Meetings</Link>
@@ -187,7 +187,7 @@ export default function PricingPage() {
       <footer className="border-t border-border bg-surface mt-24">
         <div className="max-w-[1440px] mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
-            <span className="text-lg font-bold">Lynqis</span>
+            <span className="text-lg font-bold text-success">Lynqis</span>
             <span className="text-sm text-text-secondary">© 2024 Lynqis Intelligence Inc.</span>
           </div>
           <div className="flex gap-6">

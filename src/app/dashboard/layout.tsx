@@ -8,7 +8,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <header className="bg-background border-b border-border h-16 fixed top-0 left-0 right-0 z-50 flex items-center px-6">
         <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto">
           <div className="flex items-center gap-8">
-            <Link href="/" className="text-xl font-bold tracking-tight">Lynqis</Link>
+            <Link href="/" className="text-xl font-bold tracking-tight text-success">Lynqis</Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/dashboard" className="text-success border-b-2 border-success pb-1 font-medium">Dashboard</Link>
               <Link href="/dashboard/meetings" className="text-text-secondary hover:text-success transition-colors">Meetings</Link>
