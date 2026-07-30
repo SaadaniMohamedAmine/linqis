@@ -2,8 +2,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
+  if (session) redirect("/dashboard");
+
   return (
     <div className="min-h-screen bg-background text-text-primary">
       <main className="pt-12 pb-24 px-6 max-w-[1440px] mx-auto min-h-screen">
@@ -57,7 +62,9 @@ export default function PricingPage() {
                 <span>CRM Integrations</span>
               </li>
             </ul>
-            <Button variant="secondary" className="w-full">Get Started</Button>
+            <Link href="/sign-up">
+              <Button variant="secondary" className="w-full">Get Started</Button>
+            </Link>
           </Card>
 
           {/* Pro */}
@@ -91,7 +98,9 @@ export default function PricingPage() {
                 <span>Standard Integrations</span>
               </li>
             </ul>
-            <Button variant="primary" className="w-full font-bold">Upgrade to Pro</Button>
+            <Link href="/sign-up">
+              <Button variant="primary" className="w-full font-bold">Upgrade to Pro</Button>
+            </Link>
           </Card>
 
           {/* Team */}
@@ -124,7 +133,9 @@ export default function PricingPage() {
                 <span>SSO & Security</span>
               </li>
             </ul>
-            <Button variant="secondary" className="w-full">Contact Sales</Button>
+            <Link href="/sign-up">
+              <Button variant="secondary" className="w-full">Contact Sales</Button>
+            </Link>
           </Card>
         </section>
 
