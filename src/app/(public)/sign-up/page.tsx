@@ -47,16 +47,8 @@ export default function SignUpPage() {
       </div>
 
       <main className="relative z-10 w-full flex flex-col items-center justify-center p-4">
-        {/* Branding */}
-        <div className="mb-8 flex items-center gap-2">
-          <div className="w-8 h-8 bg-success rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm">🔗</span>
-          </div>
-          <span className="text-xl font-bold tracking-tight text-success">Lynqis</span>
-        </div>
-
         {/* Auth Card */}
-        <div className="w-full max-w-[420px] bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
+        <div className="w-1/3 bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
           <header className="mb-8 text-center">
             <h1 className="text-xl font-semibold mb-1">Create your account</h1>
             <p className="text-text-secondary">Elevate your meetings with AI intelligence.</p>

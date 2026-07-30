@@ -43,15 +43,6 @@ export default function SignInPage() {
       </div>
 
       <main className="z-10 w-full max-w-[420px] px-4">
-        {/* Brand */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 bg-success/20 rounded-lg flex items-center justify-center mb-4 border border-success/20">
-            <span className="text-2xl">🔗</span>
-          </div>
-          <h1 className="text-xl font-semibold tracking-tight text-success">Lynqis</h1>
-          <p className="text-sm text-text-secondary mt-1">AI-driven meeting intelligence</p>
-        </div>
-
         {/* Auth Card */}
         <div className="bg-surface/80 backdrop-blur-md rounded-xl p-6 flex flex-col gap-6 shadow-lg border border-border">
           <div className="flex flex-col gap-1">
