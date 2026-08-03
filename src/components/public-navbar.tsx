@@ -8,7 +8,7 @@ export function PublicNavbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
       <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
         <Link href="/" className="text-xl font-bold tracking-tight text-success">
-          Lynqis
+          Linqis
         </Link>
         
         <nav className="hidden md:flex items-center gap-8">

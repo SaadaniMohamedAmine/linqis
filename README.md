@@ -1,4 +1,4 @@
-# Lynqis
+# Linqis
 
 Every meeting, decoded.
 

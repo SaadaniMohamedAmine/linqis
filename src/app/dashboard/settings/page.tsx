@@ -71,7 +71,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs text-text-secondary uppercase tracking-wider">Email Address</label>
-                  <Input defaultValue="alex.martin@lynqis.ai" type="email" />
+                  <Input defaultValue="alex.martin@linqis.ai" type="email" />
                 </div>
               </div>
             </Card>
@@ -151,7 +151,7 @@ export default function SettingsPage() {
               </Card>
               <Card className="border-danger/30 bg-danger/5 p-6 space-y-4 hover:border-danger transition-colors">
                 <h4 className="text-lg font-semibold text-danger">Delete Account</h4>
-                <p className="text-sm text-text-secondary">Permanently deactivate your Lynqis profile and forfeit any remaining subscription balance.</p>
+                <p className="text-sm text-text-secondary">Permanently deactivate your Linqis profile and forfeit any remaining subscription balance.</p>
                 <Button variant="danger" className="w-full">Delete Permanently</Button>
               </Card>
             </div>

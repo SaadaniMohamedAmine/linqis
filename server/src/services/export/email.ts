@@ -24,7 +24,7 @@ export async function exportToEmail(data: EmailExport): Promise<void> {
   const html = `
     <div style="font-family: Inter, sans-serif; max-width: 600px; margin: 0 auto;">
       <h1 style="color: #0A0A0A; font-size: 24px;">${data.title}</h1>
-      <p style="color: #666; font-size: 14px;">Lynqis • ${new Date().toLocaleDateString()}</p>
+      <p style="color: #666; font-size: 14px;">Linqis • ${new Date().toLocaleDateString()}</p>
       
       <div style="background: #141414; border: 1px solid #1F1F1F; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h2 style="color: #FAFAFA; font-size: 18px; margin: 0 0 12px 0;">Executive Summary</h2>
@@ -59,7 +59,7 @@ export async function exportToEmail(data: EmailExport): Promise<void> {
   `;
 
   await transporter.sendMail({
-    from: `"Lynqis" <${process.env.SMTP_FROM || "noreply@lynqis.app"}>`,
+    from: `"Linqis" <${process.env.SMTP_FROM || "noreply@linqis.app"}>`,
     to: data.to,
     subject: `Meeting Summary: ${data.title}`,
     html,
