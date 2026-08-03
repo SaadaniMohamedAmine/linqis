@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { PublicNavbar } from "@/components/public-navbar";
+import { PublicFooter } from "@/components/public-footer";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-background text-text-primary flex flex-col relative overflow-hidden">
+      <PublicNavbar />
+      
       {/* Noise Overlay */}
       <div className="fixed inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: "url('data:image/svg+xml,...')" }} />
       
@@ -12,7 +16,7 @@ export default function NotFound() {
         <div className="w-full h-24 bg-gradient-to-b from-transparent via-success/5 to-transparent opacity-10 animate-scanline" />
       </div>
 
-      <main className="relative z-10 flex-grow flex items-center justify-center px-6">
+      <main className="relative z-10 flex-grow flex items-center justify-center px-6 pt-16">
         <div className="max-w-[1440px] w-full flex flex-col items-center text-center">
           {/* 404 Display */}
           <div className="relative mb-12 group">
@@ -57,14 +61,7 @@ export default function NotFound() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 px-10 py-4 flex justify-between items-center text-text-muted/50">
-        <div className="text-xs">© 2024 Lynqis AI Systems</div>
-        <div className="flex gap-6 text-xs">
-          <Link href="#" className="hover:text-text-primary transition-colors">Support</Link>
-          <Link href="#" className="hover:text-text-primary transition-colors">Status</Link>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

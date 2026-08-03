@@ -2,31 +2,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
+  if (session) redirect("/dashboard");
+
   return (
     <div className="min-h-screen bg-background text-text-primary">
-      {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
-        <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
-          <Link href="/" className="text-xl font-bold">Lynqis</Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-text-secondary hover:text-success transition-colors">Dashboard</Link>
-            <Link href="/meetings" className="text-text-secondary hover:text-success transition-colors">Meetings</Link>
-            <Link href="/pricing" className="text-success border-b-2 border-success pb-1">Pricing</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/sign-in">
-              <Button variant="ghost" size="sm">Sign In</Button>
-            </Link>
-            <Link href="/sign-up">
-              <Button variant="primary" size="sm">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="pt-32 pb-24 px-6 max-w-[1440px] mx-auto min-h-screen">
+      <main className="pt-12 pb-24 px-6 max-w-[1440px] mx-auto min-h-screen">
         {/* Hero */}
         <section className="text-center mb-24">
           <h1 className="text-5xl font-semibold mb-4 tracking-tighter">Simple pricing. Real value.</h1>
@@ -77,7 +62,9 @@ export default function PricingPage() {
                 <span>CRM Integrations</span>
               </li>
             </ul>
-            <Button variant="secondary" className="w-full">Get Started</Button>
+            <Link href="/sign-up">
+              <Button variant="secondary" className="w-full">Get Started</Button>
+            </Link>
           </Card>
 
           {/* Pro */}
@@ -111,7 +98,9 @@ export default function PricingPage() {
                 <span>Standard Integrations</span>
               </li>
             </ul>
-            <Button variant="primary" className="w-full font-bold">Upgrade to Pro</Button>
+            <Link href="/sign-up">
+              <Button variant="primary" className="w-full font-bold">Upgrade to Pro</Button>
+            </Link>
           </Card>
 
           {/* Team */}
@@ -144,7 +133,9 @@ export default function PricingPage() {
                 <span>SSO & Security</span>
               </li>
             </ul>
-            <Button variant="secondary" className="w-full">Contact Sales</Button>
+            <Link href="/sign-up">
+              <Button variant="secondary" className="w-full">Contact Sales</Button>
+            </Link>
           </Card>
         </section>
 
@@ -182,21 +173,6 @@ export default function PricingPage() {
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border bg-surface mt-24">
-        <div className="max-w-[1440px] mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-4">
-            <span className="text-lg font-bold">Lynqis</span>
-            <span className="text-sm text-text-secondary">© 2024 Lynqis Intelligence Inc.</span>
-          </div>
-          <div className="flex gap-6">
-            <Link href="#" className="text-text-secondary hover:text-success transition-colors text-sm">Privacy Policy</Link>
-            <Link href="#" className="text-text-secondary hover:text-success transition-colors text-sm">Terms of Service</Link>
-            <Link href="#" className="text-text-secondary hover:text-success transition-colors text-sm">Support</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

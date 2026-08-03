@@ -1,3 +1,5 @@
-export { GET, POST } from "@/lib/auth-prisma";
+import { handlers } from "@/lib/auth";
+
+export const { GET, POST } = handlers;
 
 export const dynamic = "force-dynamic";

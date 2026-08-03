@@ -24,6 +24,10 @@
   --font-inter: "Inter", sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   border-color: var(--color-border);
 }
@@ -67,4 +71,29 @@ body {
 
 details > summary::-webkit-details-marker {
   display: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-success);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-success) transparent;
 }
