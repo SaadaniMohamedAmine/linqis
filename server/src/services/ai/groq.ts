@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { generateJsonWithRetry } from "./json-utils";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
@@ -14,7 +15,9 @@ async function chat(prompt: string): Promise<string> {
   return response.choices[0]?.message?.content || "";
 }
 
-export async function generateSummary(transcript: string): Promise<string> {
+// Named to match gemini.ts so `ai.generateExecutiveSummary(...)` works
+// regardless of which provider AI_PROVIDER selects (see services/ai/index.ts).
+export async function generateExecutiveSummary(transcript: string): Promise<string> {
   const prompt = `Generate a concise executive summary (max 150 words) of this meeting transcript:
 
 ${transcript}`;
@@ -23,42 +26,42 @@ ${transcript}`;
 }
 
 export async function extractDecisions(transcript: string) {
-  const prompt = `Extract all decisions made in this meeting. Return a JSON array of objects with: statement, status (confirmed/pending), timestamp, proposer.
+  return generateJsonWithRetry(
+    (correctionHint) => `Extract all decisions made in this meeting. Return a JSON array of objects with: statement, status (confirmed/pending), timestamp, proposer.
 
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON.`;
-
-  const text = await chat(prompt);
-  const cleaned = text.replace(/```json\n?|\n?```/g, "").trim();
-  return JSON.parse(cleaned);
+Return ONLY valid JSON.${correctionHint ? `\n\n${correctionHint}` : ""}`,
+    chat,
+    "groq.extractDecisions"
+  );
 }
 
 export async function extractActionItems(transcript: string) {
-  const prompt = `Extract all action items from this meeting. Return a JSON array of objects with: task, owner, deadline (ISO date or null), priority (high/medium/low).
+  return generateJsonWithRetry(
+    (correctionHint) => `Extract all action items from this meeting. Return a JSON array of objects with: task, owner, deadline (ISO date or null), priority (high/medium/low).
 
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON.`;
-
-  const text = await chat(prompt);
-  const cleaned = text.replace(/```json\n?|\n?```/g, "").trim();
-  return JSON.parse(cleaned);
+Return ONLY valid JSON.${correctionHint ? `\n\n${correctionHint}` : ""}`,
+    chat,
+    "groq.extractActionItems"
+  );
 }
 
 export async function detectDisagreements(transcript: string) {
-  const prompt = `Identify topics where there was disagreement or tension in this meeting. Return a JSON array of objects with: topic, quote (relevant snippet), severity (low/medium/high).
+  return generateJsonWithRetry(
+    (correctionHint) => `Identify topics where there was disagreement or tension in this meeting. Return a JSON array of objects with: topic, quote (relevant snippet), severity (low/medium/high).
 
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON.`;
-
-  const text = await chat(prompt);
-  const cleaned = text.replace(/```json\n?|\n?```/g, "").trim();
-  return JSON.parse(cleaned);
+Return ONLY valid JSON.${correctionHint ? `\n\n${correctionHint}` : ""}`,
+    chat,
+    "groq.detectDisagreements"
+  );
 }
 
 export async function detectMood(transcript: string): Promise<"POSITIVE" | "NEUTRAL" | "TENSE"> {

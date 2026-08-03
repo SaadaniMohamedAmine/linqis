@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateJsonWithRetry } from "./json-utils";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -9,6 +10,12 @@ export interface MoodAnalysis {
   mood: MeetingMood;
   confidence: number;
   indicators: string[];
+}
+
+async function complete(prompt: string): Promise<string> {
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text().trim();
 }
 
 export async function detectMood(transcript: string): Promise<MeetingMood> {
@@ -23,16 +30,15 @@ Return ONLY one word: POSITIVE, NEUTRAL, or TENSE.
 Meeting transcript:
 ${transcript}`;
 
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const mood = response.text().trim().toUpperCase();
+  const mood = (await complete(prompt)).toUpperCase();
   if (mood.includes("TENSE")) return "TENSE";
   if (mood.includes("POSITIVE")) return "POSITIVE";
   return "NEUTRAL";
 }
 
 export async function detectMoodWithAnalysis(transcript: string): Promise<MoodAnalysis> {
-  const prompt = `Analyze the overall mood of this meeting. Return a JSON object with:
+  return generateJsonWithRetry(
+    (correctionHint) => `Analyze the overall mood of this meeting. Return a JSON object with:
 - mood: "POSITIVE", "NEUTRAL", or "TENSE"
 - confidence: 0-1 number
 - indicators: array of short phrases that support the mood assessment
@@ -40,10 +46,8 @@ export async function detectMoodWithAnalysis(transcript: string): Promise<MoodAn
 Meeting transcript:
 ${transcript}
 
-Return ONLY valid JSON, no markdown.`;
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text().replace(/```json\n?|\n?```/g, "").trim();
-  return JSON.parse(text);
+Return ONLY valid JSON, no markdown.${correctionHint ? `\n\n${correctionHint}` : ""}`,
+    complete,
+    "mood.detectMoodWithAnalysis"
+  );
 }
