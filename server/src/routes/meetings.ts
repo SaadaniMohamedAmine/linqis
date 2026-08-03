@@ -9,6 +9,7 @@ router.get("/", async (_req, res) => {
     const meetings = await prisma.meeting.findMany({
       orderBy: { createdAt: "desc" },
       include: {
+        participants: true,
         _count: {
           select: {
             actionItems: true,
@@ -19,6 +20,7 @@ router.get("/", async (_req, res) => {
     });
     res.json(meetings);
   } catch (error) {
+    console.error("Failed to fetch meetings:", error);
     res.status(500).json({ error: "Failed to fetch meetings" });
   }
 });
@@ -33,6 +35,7 @@ router.get("/:id", async (req, res) => {
         transcripts: { orderBy: { timestamp: "asc" } },
         actionItems: true,
         decisions: true,
+        disagreements: true,
         exports: true,
       },
     });
@@ -41,6 +44,7 @@ router.get("/:id", async (req, res) => {
     }
     res.json(meeting);
   } catch (error) {
+    console.error("Failed to fetch meeting:", error);
     res.status(500).json({ error: "Failed to fetch meeting" });
   }
 });
@@ -59,6 +63,7 @@ router.post("/", async (req, res) => {
     });
     res.status(201).json(meeting);
   } catch (error) {
+    console.error("Failed to create meeting:", error);
     res.status(500).json({ error: "Failed to create meeting" });
   }
 });
@@ -69,6 +74,7 @@ router.delete("/:id", async (req, res) => {
     await prisma.meeting.delete({ where: { id: req.params.id } });
     res.json({ message: "Meeting deleted" });
   } catch (error) {
+    console.error("Failed to delete meeting:", error);
     res.status(500).json({ error: "Failed to delete meeting" });
   }
 });

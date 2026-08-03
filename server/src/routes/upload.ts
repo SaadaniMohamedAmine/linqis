@@ -60,6 +60,11 @@ router.post("/", upload.single("file"), async (req, res) => {
     const shouldChunk = await needsChunking(audioPath);
     const duration = await getAudioDuration(audioPath);
 
+    await prisma.meeting.update({
+      where: { id: meeting.id },
+      data: { duration: Math.round(duration) },
+    });
+
     let chunks = [];
     if (shouldChunk) {
       chunks = await chunkAudio(audioPath, duration);

@@ -67,6 +67,11 @@ router.post("/zoom/import", async (req, res) => {
     const shouldChunk = await needsChunking(audioPath);
     const chunks = shouldChunk ? await chunkAudio(audioPath, duration) : [];
 
+    await prisma.meeting.update({
+      where: { id: meeting.id },
+      data: { duration: Math.round(duration) },
+    });
+
     const job = await meetingQueue.add("process-meeting", {
       meetingId: meeting.id,
       audioPath,
