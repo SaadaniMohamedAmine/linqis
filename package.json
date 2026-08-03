@@ -1,5 +1,5 @@
 {
-  "name": "lynqis",
+  "name": "linqis",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,9 @@
     "start": "next start",
     "start:server": "node server/dist/index.js",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:server": "npm run test --prefix server",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

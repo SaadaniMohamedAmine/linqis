@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
 export const metadata: Metadata = {
-  title: "Lynqis - AI Meeting Intelligence",
+  title: "Linqis - AI Meeting Intelligence",
   description: "Every meeting, decoded.",
 };
 

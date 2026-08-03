@@ -84,6 +84,14 @@ export const worker = new Worker<MeetingJob>(
             priority: a.priority?.toUpperCase() || "MEDIUM",
           })),
         },
+        disagreements: {
+          create: disagreements.map((d: any) => ({
+            topic: d.topic,
+            quote: d.quote,
+            severity: d.severity?.toUpperCase() || "MEDIUM",
+            participants: Array.isArray(d.participants) ? d.participants : [],
+          })),
+        },
       },
     });
 
@@ -114,5 +122,17 @@ worker.on("failed", async (job, err) => {
   console.error(`Job ${job?.id} failed: ${err.message}`);
   if (job) {
     await publishError(job.id, err.message);
+
+    // Without this, a meeting whose processing job fails stays stuck in
+    // PROCESSING forever with no way for the UI to tell the user it failed.
+    try {
+      const prisma = getPrisma();
+      await prisma.meeting.update({
+        where: { id: job.data.meetingId },
+        data: { status: "FAILED" },
+      });
+    } catch (updateErr) {
+      console.error(`Failed to mark meeting ${job.data.meetingId} as FAILED:`, updateErr);
+    }
   }
 });

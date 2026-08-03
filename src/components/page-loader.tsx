@@ -37,7 +37,7 @@ export function PageLoader() {
         
         {/* App Name */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-success tracking-tight">Lynqis</h1>
+          <h1 className="text-3xl font-bold text-success tracking-tight">Linqis</h1>
           <p className="text-xs text-text-muted uppercase tracking-[0.2em] mt-2">
             AI Meeting Intelligence
           </p>

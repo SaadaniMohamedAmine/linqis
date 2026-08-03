@@ -6,8 +6,8 @@ export function PublicFooter() {
       <div className="max-w-[1440px] mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-success">Lynqis</span>
-            <span className="text-xs text-text-secondary">© 2026 Lynqis AI Inc.</span>
+            <span className="text-xl font-bold text-success">Linqis</span>
+            <span className="text-xs text-text-secondary">© 2026 Linqis AI Inc.</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-text-secondary">
             <Link href="#" className="hover:text-success transition-colors">GitHub</Link>

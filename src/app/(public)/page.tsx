@@ -39,7 +39,7 @@ export default function Home() {
               Every meeting, <span className="text-success">decoded.</span>
             </h1>
             <p className="text-lg text-text-secondary max-w-lg mb-12">
-              Lynqis transforms chaotic conversations into structured action items. Use AI-driven intelligence to capture every insight, automatically.
+              Linqis transforms chaotic conversations into structured action items. Use AI-driven intelligence to capture every insight, automatically.
             </p>
             <div className="flex items-center gap-4">
               <Link href="/sign-up">
@@ -224,7 +224,7 @@ export default function Home() {
           className="max-w-[1440px] mx-auto px-6 text-center"
         >
           <h2 className="text-5xl font-semibold mb-6">Ready to stop taking notes?</h2>
-          <p className="text-lg text-text-secondary mb-12 max-w-xl mx-auto">Join 50,000+ teams who use Lynqis to stay aligned without the manual effort.</p>
+          <p className="text-lg text-text-secondary mb-12 max-w-xl mx-auto">Join 50,000+ teams who use Linqis to stay aligned without the manual effort.</p>
           <div className="flex justify-center items-center gap-4">
             <Link href="/sign-up">
               <Button variant="primary" size="lg">Start your free trial</Button>

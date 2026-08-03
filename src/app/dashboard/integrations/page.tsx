@@ -154,7 +154,7 @@ export default function IntegrationsPage() {
             <Card className="lg:col-span-8 p-8 relative overflow-hidden group">
               <div className="relative z-10">
                 <h2 className="text-2xl font-semibold mb-4">Custom Webhooks</h2>
-                <p className="text-text-secondary mb-8 max-w-lg">Build your own workflows. Send Lynqis data to any endpoint using our high-performance REST API and secure webhooks.</p>
+                <p className="text-text-secondary mb-8 max-w-lg">Build your own workflows. Send Linqis data to any endpoint using our high-performance REST API and secure webhooks.</p>
                 <div className="flex gap-4">
                   <Button variant="primary">View Documentation</Button>
                   <Button variant="secondary">API Keys</Button>

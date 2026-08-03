@@ -67,7 +67,7 @@ export async function exportToSlack(data: SlackExport): Promise<void> {
       elements: [
         {
           type: "plain_text",
-          text: `Lynqis • ${new Date().toLocaleDateString()}`,
+          text: `Linqis • ${new Date().toLocaleDateString()}`,
         },
       ],
     },

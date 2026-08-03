@@ -104,6 +104,12 @@ enum ExportStatus {
   FAILED
 }
 
+enum DisagreementSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model Meeting {
   id       String        @id @default(cuid())
   title    String
@@ -117,11 +123,12 @@ model Meeting {
   summary  String?       @db.Text
   mood     MeetingMood?
 
-  participants Participant[]
-  transcripts  Transcript[]
-  decisions    Decision[]
-  actionItems  ActionItem[]
-  exports      Export[]
+  participants  Participant[]
+  transcripts   Transcript[]
+  decisions     Decision[]
+  actionItems   ActionItem[]
+  exports       Export[]
+  disagreements Disagreement[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,6 +195,19 @@ model Export {
   target    String
   status    ExportStatus   @default(PENDING)
   createdAt DateTime       @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model Disagreement {
+  id           String               @id @default(cuid())
+  meetingId    String
+  topic        String
+  quote        String               @db.Text
+  severity     DisagreementSeverity @default(MEDIUM)
+  participants String[]             @default([])
 
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 

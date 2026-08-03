@@ -145,7 +145,7 @@ export default async function PricingPage() {
           <div className="space-y-4">
             <details className="group bg-surface/80 backdrop-blur-md rounded-lg overflow-hidden border border-border">
               <summary className="flex justify-between items-center p-6 cursor-pointer hover:bg-surface transition-all">
-                <span className="text-lg font-semibold">How does Lynqis AI handle data security?</span>
+                <span className="text-lg font-semibold">How does Linqis AI handle data security?</span>
                 <span className="transition-transform group-open:rotate-180">▼</span>
               </summary>
               <div className="p-6 pt-0 text-text-secondary leading-relaxed">
@@ -163,11 +163,11 @@ export default async function PricingPage() {
             </details>
             <details className="group bg-surface/80 backdrop-blur-md rounded-lg overflow-hidden border border-border">
               <summary className="flex justify-between items-center p-6 cursor-pointer hover:bg-surface transition-all">
-                <span className="text-lg font-semibold">Does Lynqis work with all video platforms?</span>
+                <span className="text-lg font-semibold">Does Linqis work with all video platforms?</span>
                 <span className="transition-transform group-open:rotate-180">▼</span>
               </summary>
               <div className="p-6 pt-0 text-text-secondary leading-relaxed">
-                Lynqis seamlessly integrates with Zoom, Microsoft Teams, Google Meet, and Cisco Webex. You can also upload raw audio/video files directly for post-meeting analysis.
+                Linqis seamlessly integrates with Zoom, Microsoft Teams, Google Meet, and Cisco Webex. You can also upload raw audio/video files directly for post-meeting analysis.
               </div>
             </details>
           </div>
