@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Geist } from "next/font/google";
 import "./globals.css";
 import { TransitionLoader } from "@/components/transition-loader";
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${geist.variable} antialiased`}>
-        <TransitionLoader />
+        <Suspense fallback={null}>
+          <TransitionLoader />
+        </Suspense>
         {children}
       </body>
     </html>
