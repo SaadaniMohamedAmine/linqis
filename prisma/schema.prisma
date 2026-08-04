@@ -11,14 +11,17 @@ datasource db {
 // ============================================================
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String? // null for Google-only accounts
 
   summaryLength      SummaryLength @default(STANDARD)
   emailNotifications Boolean       @default(true)
+  notionApiKey       String?
+  notionDatabaseId   String?
 
   accounts      Account[]
   sessions      Session[]

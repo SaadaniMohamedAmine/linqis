@@ -34,8 +34,28 @@ export default function SignUpPage() {
     }
 
     setIsLoading(true);
-    // Redirect to Google for now as Credentials provider is not fully configured
-    await signIn("google", { callbackUrl: "/dashboard" });
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setError(body.error || "Could not create account.");
+      setIsLoading(false);
+      return;
+    }
+
+    const result = await signIn("credentials", { email, password, redirect: false });
+    setIsLoading(false);
+
+    if (result?.error) {
+      setError("Account created, but sign-in failed. Please sign in manually.");
+      router.push("/sign-in");
+      return;
+    }
+    router.push("/dashboard");
   };
 
   return (
