@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:server": "npm run test --prefix server",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "design-audit": "node scripts/design-audit.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
