@@ -13,6 +13,7 @@ import {
   resolveAudioUrl,
   renameMeeting,
   deleteMeeting,
+  toggleMeetingShare,
   ApiError,
   type MeetingDetail,
 } from "@/lib/api";
@@ -51,6 +52,9 @@ export default function MeetingDetailPage() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -124,6 +128,25 @@ export default function MeetingDetailPage() {
     router.push("/dashboard/meetings");
   };
 
+  const handleToggleShare = async () => {
+    if (!meeting) return;
+    setShareLoading(true);
+    try {
+      const result = await toggleMeetingShare(meeting.id, !meeting.isPublic);
+      setMeeting((prev) => (prev ? { ...prev, isPublic: result.isPublic, shareToken: result.shareToken } : prev));
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const handleCopyShareLink = async () => {
+    if (!meeting?.shareToken) return;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    await navigator.clipboard.writeText(`${siteUrl}/share/${meeting.shareToken}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -171,7 +194,41 @@ export default function MeetingDetailPage() {
           )}
           {meeting.status === "FAILED" && <p className="text-xs text-danger">Processing failed for this meeting.</p>}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative">
+          <Button variant="secondary" onClick={() => setShareOpen((o) => !o)}>Share</Button>
+          {shareOpen && (
+            <div className="absolute top-full right-0 mt-2 w-[320px] bg-surface-high border border-border rounded-xl shadow-lg p-4 z-20 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-text-primary">Public link</span>
+                <button
+                  onClick={handleToggleShare}
+                  disabled={shareLoading}
+                  className={`w-11 h-6 rounded-full relative transition-colors ${meeting.isPublic ? "bg-success" : "bg-border"}`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 bg-background rounded-full transition-all ${
+                      meeting.isPublic ? "right-1" : "left-1"
+                    }`}
+                  />
+                </button>
+              </div>
+              {meeting.isPublic && meeting.shareToken && (
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={`${process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "")}/share/${meeting.shareToken}`}
+                    className="text-xs h-9"
+                  />
+                  <Button variant="secondary" size="sm" onClick={handleCopyShareLink}>
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
+              )}
+              {!meeting.isPublic && (
+                <p className="text-xs text-text-secondary">Anyone with the link can view the summary, decisions and action items -- no login required.</p>
+              )}
+            </div>
+          )}
           <Button variant="secondary" data-tour="export-button" onClick={() => setExportModalOpen(true)}>Export</Button>
           <Button variant="danger" onClick={handleDelete}>Delete</Button>
         </div>

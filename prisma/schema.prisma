@@ -191,6 +191,9 @@ model Meeting {
   summary  String?       @db.Text
   mood     MeetingMood?
 
+  isPublic   Boolean @default(false)
+  shareToken String? @unique
+
   participants  Participant[]
   transcripts   Transcript[]
   decisions     Decision[]

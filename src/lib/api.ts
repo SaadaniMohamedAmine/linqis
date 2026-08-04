@@ -93,6 +93,10 @@ export function renameMeeting(id: string, title: string): Promise<void> {
   return request(`/api/meetings/${id}`, { method: "PATCH", body: JSON.stringify({ title }) });
 }
 
+export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPublic: boolean; shareToken: string | null }> {
+  return request(`/api/meetings/${id}/share`, { method: "PATCH", body: JSON.stringify({ enabled }) });
+}
+
 export function getActionItems(): Promise<ActionItemWithMeeting[]> {
   return request<ActionItemWithMeeting[]>("/api/action-items");
 }

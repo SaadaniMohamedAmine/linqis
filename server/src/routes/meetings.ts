@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { randomUUID } from "crypto";
 import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
 
@@ -82,6 +83,27 @@ router.patch("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
     res.json(meeting);
   } catch (error) {
     res.status(500).json({ error: "Failed to rename meeting" });
+  }
+});
+
+router.patch("/:id/share", async (req: AuthedRequest<{ id: string }>, res) => {
+  try {
+    const prisma = getPrisma();
+    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { userId: true, shareToken: true } });
+    if (!existing || existing.userId !== req.userId) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+
+    const { enabled } = req.body as { enabled: boolean };
+    const shareToken = enabled ? (existing.shareToken || randomUUID()) : existing.shareToken;
+
+    const meeting = await prisma.meeting.update({
+      where: { id: req.params.id },
+      data: { isPublic: enabled, shareToken },
+    });
+    res.json({ isPublic: meeting.isPublic, shareToken: meeting.shareToken });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update sharing" });
   }
 });
 
