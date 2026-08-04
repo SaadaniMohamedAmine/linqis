@@ -222,3 +222,16 @@ export function updateUser(
     body: JSON.stringify(data),
   });
 }
+
+export interface IntegrationStatus {
+  provider: string;
+  createdAt: string;
+}
+
+export function getIntegrationStatus(userId: string): Promise<IntegrationStatus[]> {
+  return request<IntegrationStatus[]>(`/api/integrations/status/${userId}`);
+}
+
+export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
+  return request<{ authUrl: string }>("/api/integrations/google-calendar/auth-url");
+}
