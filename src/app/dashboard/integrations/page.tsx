@@ -13,7 +13,7 @@ export default function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
 
   useEffect(() => {
-    if (session?.user?.id) getIntegrationStatus(session.user.id).then(setIntegrations);
+    if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
   }, [session?.user?.id]);
 
   const isConnected = (provider: string) => integrations.some((i) => i.provider === provider);

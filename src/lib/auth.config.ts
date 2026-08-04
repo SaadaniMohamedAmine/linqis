@@ -1,6 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 
+// Edge-safe on purpose: middleware.ts runs this config in the Edge runtime,
+// which has a strict bundle size limit. The Credentials provider (bcryptjs +
+// Prisma) lives only in auth.ts, which runs in the Node.js runtime -- adding
+// it here previously pushed the middleware bundle over Vercel's 1MB Edge
+// Function limit and broke every deploy.
 export const authConfig = {
   providers: [
     Google({

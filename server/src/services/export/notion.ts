@@ -1,7 +1,5 @@
 import { Client } from "@notionhq/client";
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY! });
-
 export interface NotionExport {
   meetingId: string;
   title: string;
@@ -11,10 +9,16 @@ export interface NotionExport {
   pageId?: string;
 }
 
-export async function exportToNotion(data: NotionExport): Promise<string> {
+export interface NotionCredentials {
+  apiKey: string;
+  databaseId: string;
+}
+
+export async function exportToNotion(data: NotionExport, credentials: NotionCredentials): Promise<string> {
+  const notion = new Client({ auth: credentials.apiKey });
   const response = await notion.pages.create({
     parent: {
-      database_id: process.env.NOTION_DATABASE_ID!,
+      database_id: credentials.databaseId,
     },
     properties: {
       Title: {

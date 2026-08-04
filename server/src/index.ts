@@ -5,13 +5,14 @@ import morgan from "morgan";
 import path from "path";
 import { router as meetingRouter } from "./routes/meetings";
 import { router as queueRouter } from "./routes/queue";
-import { router as uploadRouter } from "./routes/upload";
+import { router as uploadRouter, publicRouter as uploadProgressRouter } from "./routes/upload";
 import { router as exportRouter } from "./routes/exports";
 import { router as integrationRouter } from "./routes/integrations";
 import { router as actionItemRouter } from "./routes/action-items";
 import { router as userRouter } from "./routes/user";
 import { router as notificationRouter } from "./routes/notifications";
 import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
+import { requireAuth } from "./middleware/auth";
 import { worker } from "./queue/worker";
 
 const app = express();
@@ -35,14 +36,22 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", apiRateLimit);
 app.use("/api/upload", uploadRateLimit);
 
-app.use("/api/meetings", meetingRouter);
-app.use("/api/queue", queueRouter);
-app.use("/api/upload", uploadRouter);
-app.use("/api/export", exportRouter);
-app.use("/api/integrations", integrationRouter);
-app.use("/api/action-items", actionItemRouter);
-app.use("/api/users", userRouter);
-app.use("/api/notifications", notificationRouter);
+// EventSource can't send an Authorization header, so this stays public --
+// must be registered before the protected /api/upload mount below since
+// Express matches prefixes in registration order. See upload.ts for why
+// that's an accepted tradeoff.
+app.use("/api/upload/progress", uploadProgressRouter);
+
+// Routes protected by requireAuth -- req.userId is derived from the signed
+// bearer token, never trusted from the request body/params.
+app.use("/api/meetings", requireAuth, meetingRouter);
+app.use("/api/queue", requireAuth, queueRouter);
+app.use("/api/upload", requireAuth, uploadRouter);
+app.use("/api/export", requireAuth, exportRouter);
+app.use("/api/integrations", requireAuth, integrationRouter);
+app.use("/api/action-items", requireAuth, actionItemRouter);
+app.use("/api/users", requireAuth, userRouter);
+app.use("/api/notifications", requireAuth, notificationRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));

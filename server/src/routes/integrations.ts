@@ -6,6 +6,7 @@ import { getGoogleAuthUrl, getGoogleCalendarEvents, exchangeGoogleCode } from ".
 import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../services/media";
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
+import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
@@ -26,9 +27,9 @@ router.get("/zoom/recordings", async (req, res) => {
   }
 });
 
-router.post("/zoom/import", async (req, res) => {
+router.post("/zoom/import", async (req: AuthedRequest, res) => {
   try {
-    const { recordingId, downloadUrl, title, userId, isAudioOnly } = req.body;
+    const { recordingId, downloadUrl, title, isAudioOnly } = req.body;
 
     if (!downloadUrl) {
       return res.status(400).json({ error: "downloadUrl is required" });
@@ -50,7 +51,7 @@ router.post("/zoom/import", async (req, res) => {
     const meeting = await prisma.meeting.create({
       data: {
         title: title || `Zoom recording ${recordingId ?? ""}`.trim(),
-        userId: userId || "anonymous",
+        userId: req.userId!,
         audioUrl: `/uploads/${fileName}`,
         status: "PROCESSING",
       },
@@ -124,15 +125,16 @@ router.get("/google-calendar/events", async (req, res) => {
   }
 });
 
-router.post("/google-calendar/exchange", async (req, res) => {
+router.post("/google-calendar/exchange", async (req: AuthedRequest, res) => {
   try {
-    const { code, userId } = req.body;
-    if (!code || !userId) {
-      return res.status(400).json({ error: "code and userId are required" });
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ error: "code is required" });
     }
 
     const tokens = await exchangeGoogleCode(code);
     const prisma = getPrisma();
+    const userId = req.userId!;
 
     await prisma.integration.upsert({
       where: { userId_provider: { userId, provider: "google-calendar" } },
@@ -157,11 +159,11 @@ router.post("/google-calendar/exchange", async (req, res) => {
   }
 });
 
-router.get("/status/:userId", async (req, res) => {
+router.get("/status", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const integrations = await prisma.integration.findMany({
-      where: { userId: req.params.userId },
+      where: { userId: req.userId },
       select: { provider: true, createdAt: true },
     });
     res.json(integrations);

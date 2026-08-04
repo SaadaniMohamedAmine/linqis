@@ -1,15 +1,17 @@
 import { Router } from "express";
 import { getPrisma } from "../db";
+import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
-// Action items aggregated across all meetings, with the parent meeting title
-// so the Action Items Manager page can show "which meeting this came from"
-// without a second round-trip per row.
-router.get("/", async (_req, res) => {
+// Action items aggregated across all of the caller's meetings, with the
+// parent meeting title so the Action Items Manager page can show "which
+// meeting this came from" without a second round-trip per row.
+router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const actionItems = await prisma.actionItem.findMany({
+      where: { meeting: { userId: req.userId } },
       orderBy: [{ status: "asc" }, { deadline: "asc" }],
       include: {
         meeting: {
@@ -24,7 +26,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const { status } = req.body;
     if (status !== "TODO" && status !== "DONE") {
@@ -32,10 +34,15 @@ router.patch("/:id", async (req, res) => {
     }
 
     const prisma = getPrisma();
-    const actionItem = await prisma.actionItem.update({
+    const existing = await prisma.actionItem.findUnique({
       where: { id: req.params.id },
-      data: { status },
+      include: { meeting: { select: { userId: true } } },
     });
+    if (!existing || existing.meeting.userId !== req.userId) {
+      return res.status(404).json({ error: "Action item not found" });
+    }
+
+    const actionItem = await prisma.actionItem.update({ where: { id: req.params.id }, data: { status } });
     res.json(actionItem);
   } catch (error) {
     console.error("Failed to update action item:", error);

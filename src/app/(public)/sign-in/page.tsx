@@ -29,9 +29,14 @@ export default function SignInPage() {
     }
 
     setIsLoading(true);
-    // Since we only have Google configured, we redirect to Google for now
-    // or you can implement credentials provider later.
-    await signIn("google", { callbackUrl: "/dashboard" });
+    const result = await signIn("credentials", { email, password, redirect: false });
+    setIsLoading(false);
+
+    if (result?.error) {
+      setError("Invalid email or password.");
+      return;
+    }
+    router.push("/dashboard");
   };
 
   return (

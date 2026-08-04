@@ -95,10 +95,8 @@ export const worker = new Worker<MeetingJob>(
       },
     });
 
-    // Meetings aren't linked to a real authenticated userId until Phase 2, so
-    // the "anonymous" fallback used by the upload route has no matching User
-    // row and this insert would violate the FK constraint. Non-blocking so a
-    // missing user never fails an otherwise-successful processing job.
+    // Non-blocking: a notification failure should never fail an otherwise-
+    // successful processing job.
     try {
       const meetingRecord = await prisma.meeting.findUnique({ where: { id: meetingId }, select: { userId: true, title: true } });
       if (meetingRecord) {

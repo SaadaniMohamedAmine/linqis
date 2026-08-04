@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { getPrisma } from "../db";
+import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const meetings = await prisma.meeting.findMany({
+      where: { userId: req.userId },
       orderBy: { createdAt: "desc" },
       include: {
         participants: true,
@@ -25,7 +27,7 @@ router.get("/", async (_req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const prisma = getPrisma();
     const meeting = await prisma.meeting.findUnique({
@@ -39,7 +41,9 @@ router.get("/:id", async (req, res) => {
         exports: true,
       },
     });
-    if (!meeting) {
+    // 404 (not 403) whether the meeting doesn't exist or just isn't the
+    // caller's -- never reveal that an id belongs to someone else.
+    if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
     res.json(meeting);
@@ -49,17 +53,12 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
-    const { title, userId, audioUrl } = req.body;
+    const { title, audioUrl } = req.body;
     const meeting = await prisma.meeting.create({
-      data: {
-        title,
-        userId,
-        audioUrl,
-        status: "PROCESSING",
-      },
+      data: { title, userId: req.userId!, audioUrl, status: "PROCESSING" },
     });
     res.status(201).json(meeting);
   } catch (error) {
@@ -68,26 +67,31 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const { title } = req.body;
     if (!title || typeof title !== "string") {
       return res.status(400).json({ error: "title is required" });
     }
     const prisma = getPrisma();
-    const meeting = await prisma.meeting.update({
-      where: { id: req.params.id },
-      data: { title },
-    });
+    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { userId: true } });
+    if (!existing || existing.userId !== req.userId) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
+    const meeting = await prisma.meeting.update({ where: { id: req.params.id }, data: { title } });
     res.json(meeting);
   } catch (error) {
     res.status(500).json({ error: "Failed to rename meeting" });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const prisma = getPrisma();
+    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { userId: true } });
+    if (!existing || existing.userId !== req.userId) {
+      return res.status(404).json({ error: "Meeting not found" });
+    }
     await prisma.meeting.delete({ where: { id: req.params.id } });
     res.json({ message: "Meeting deleted" });
   } catch (error) {

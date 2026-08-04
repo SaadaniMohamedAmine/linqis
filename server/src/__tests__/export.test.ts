@@ -39,14 +39,16 @@ beforeEach(() => {
   sendMail.mockReset().mockResolvedValue(undefined);
 });
 
+const notionCredentials = { apiKey: "test-key", databaseId: "test-db" };
+
 describe("exportToNotion", () => {
   test("returns the created page id", async () => {
-    const pageId = await exportToNotion(baseData);
+    const pageId = await exportToNotion(baseData, notionCredentials);
     expect(pageId).toBe("notion-page-123");
   });
 
   test("sends the meeting title and decisions as to_do blocks with the right checked state", async () => {
-    await exportToNotion(baseData);
+    await exportToNotion(baseData, notionCredentials);
 
     const payload = notionCreate.mock.calls[0][0];
     expect(payload.properties.Title.title[0].text.content).toBe("Q3 Planning");
@@ -58,7 +60,7 @@ describe("exportToNotion", () => {
   });
 
   test("labels action items as unassigned when no owner is given", async () => {
-    await exportToNotion({ ...baseData, actionItems: [{ task: "Follow up" }] });
+    await exportToNotion({ ...baseData, actionItems: [{ task: "Follow up" }] }, notionCredentials);
 
     const payload = notionCreate.mock.calls[0][0];
     const actionBlock = payload.children.find((b: any) => b.type === "to_do" && b.to_do.rich_text[0].text.content.startsWith("Follow up"));
