@@ -11,6 +11,7 @@ import { router as integrationRouter } from "./routes/integrations";
 import { router as actionItemRouter } from "./routes/action-items";
 import { router as userRouter } from "./routes/user";
 import { router as notificationRouter } from "./routes/notifications";
+import { router as searchRouter } from "./routes/search";
 import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
 import { requireAuth } from "./middleware/auth";
 import { worker } from "./queue/worker";
@@ -52,6 +53,7 @@ app.use("/api/integrations", requireAuth, integrationRouter);
 app.use("/api/action-items", requireAuth, actionItemRouter);
 app.use("/api/users", requireAuth, userRouter);
 app.use("/api/notifications", requireAuth, notificationRouter);
+app.use("/api/search", requireAuth, searchRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));

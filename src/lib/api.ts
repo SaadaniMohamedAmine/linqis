@@ -292,3 +292,14 @@ export function getNotifications(): Promise<Notification[]> {
 export function markAllNotificationsRead(): Promise<void> {
   return request("/api/notifications/read-all", { method: "PATCH" });
 }
+
+export interface SearchResult {
+  id: string;
+  title: string;
+  snippet: string;
+  rank: number;
+}
+
+export function searchMeetings(query: string): Promise<SearchResult[]> {
+  return request<SearchResult[]>(`/api/search?q=${encodeURIComponent(query)}`);
+}

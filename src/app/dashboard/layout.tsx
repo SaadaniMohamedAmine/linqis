@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/page-loader";
 import { RecentMeetingsNav } from "@/components/recent-meetings-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { SearchBar } from "@/components/search-bar";
 import { ProductTour } from "@/components/product-tour";
 import { getMeetings, type MeetingListItem } from "@/lib/api";
 
@@ -36,6 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </nav>
           </div>
           <div className="flex items-center gap-4">
+            <SearchBar />
             <NotificationsBell />
             <Link href="/dashboard/upload" data-tour="upload-button">
               <Button variant="primary" size="sm">Upload</Button>
