@@ -69,6 +69,10 @@ export function deleteMeeting(id: string): Promise<void> {
   return request<void>(`/api/meetings/${id}`, { method: "DELETE" });
 }
 
+export function renameMeeting(id: string, title: string): Promise<void> {
+  return request(`/api/meetings/${id}`, { method: "PATCH", body: JSON.stringify({ title }) });
+}
+
 export function getActionItems(): Promise<ActionItemWithMeeting[]> {
   return request<ActionItemWithMeeting[]>("/api/action-items");
 }

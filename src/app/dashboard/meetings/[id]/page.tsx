@@ -1,15 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import ExportModal from "@/components/export-modal";
 import {
   getMeeting,
   updateActionItemStatus,
   resolveAudioUrl,
+  renameMeeting,
+  deleteMeeting,
   ApiError,
   type MeetingDetail,
 } from "@/lib/api";
@@ -38,6 +41,7 @@ function formatClock(seconds: number): string {
 
 export default function MeetingDetailPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const meetingId = params.id;
 
   const [meeting, setMeeting] = useState<MeetingDetail | null>(null);
@@ -45,6 +49,8 @@ export default function MeetingDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("transcript");
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [titleDraft, setTitleDraft] = useState("");
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -93,6 +99,31 @@ export default function MeetingDetailPage() {
     }
   };
 
+  const startEditingTitle = () => {
+    if (!meeting) return;
+    setTitleDraft(meeting.title);
+    setIsEditingTitle(true);
+  };
+
+  const commitTitleEdit = async () => {
+    setIsEditingTitle(false);
+    if (!meeting || !titleDraft.trim() || titleDraft === meeting.title) return;
+    const previousTitle = meeting.title;
+    setMeeting((prev) => (prev ? { ...prev, title: titleDraft } : prev));
+    try {
+      await renameMeeting(meeting.id, titleDraft);
+    } catch {
+      setMeeting((prev) => (prev ? { ...prev, title: previousTitle } : prev));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!meeting) return;
+    if (!confirm("Delete this meeting? This cannot be undone.")) return;
+    await deleteMeeting(meeting.id);
+    router.push("/dashboard/meetings");
+  };
+
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -115,13 +146,35 @@ export default function MeetingDetailPage() {
     <div className="flex flex-col h-full">
       <div className="px-6 pt-4 flex items-center justify-between border-b border-border">
         <div>
-          <h1 className="text-lg font-semibold text-text-primary">{meeting.title}</h1>
+          {isEditingTitle ? (
+            <Input
+              autoFocus
+              value={titleDraft}
+              onChange={(e) => setTitleDraft(e.target.value)}
+              onBlur={commitTitleEdit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitTitleEdit();
+                if (e.key === "Escape") setIsEditingTitle(false);
+              }}
+              className="h-8 text-lg font-semibold"
+            />
+          ) : (
+            <h1
+              className="text-lg font-semibold text-text-primary cursor-pointer hover:text-success transition-colors"
+              onClick={startEditingTitle}
+            >
+              {meeting.title}
+            </h1>
+          )}
           {meeting.status === "PROCESSING" && (
             <p className="text-xs text-warning">Still processing — this page will refresh automatically.</p>
           )}
           {meeting.status === "FAILED" && <p className="text-xs text-danger">Processing failed for this meeting.</p>}
         </div>
-        <Button variant="secondary" onClick={() => setExportModalOpen(true)}>Export</Button>
+        <div className="flex items-center gap-3">
+          <Button variant="secondary" onClick={() => setExportModalOpen(true)}>Export</Button>
+          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+        </div>
       </div>
 
       {/* Tabs Header */}
