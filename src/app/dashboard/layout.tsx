@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/page-loader";
 import { RecentMeetingsNav } from "@/components/recent-meetings-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { ProductTour } from "@/components/product-tour";
 import { getMeetings, type MeetingListItem } from "@/lib/api";
 
 // Meeting data changes on every upload; never serve a stale build-time snapshot.
@@ -30,13 +31,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <nav className="hidden md:flex items-center gap-6">
               <Link href="/dashboard" className="text-success border-b-2 border-success pb-1 font-medium">Dashboard</Link>
               <Link href="/dashboard/meetings" className="text-text-secondary hover:text-success transition-colors">Meetings</Link>
-              <Link href="/dashboard/action-items" className="text-text-secondary hover:text-success transition-colors">Action Items</Link>
+              <Link href="/dashboard/action-items" data-tour="action-items-nav" className="text-text-secondary hover:text-success transition-colors">Action Items</Link>
               <Link href="/dashboard/integrations" className="text-text-secondary hover:text-success transition-colors">Integrations</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
             <NotificationsBell />
-            <Link href="/dashboard/upload">
+            <Link href="/dashboard/upload" data-tour="upload-button">
               <Button variant="primary" size="sm">Upload</Button>
             </Link>
           </div>
@@ -45,7 +46,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
       <div className="flex pt-16 min-h-screen">
         {/* SideNavBar */}
-        <aside className="hidden md:flex flex-col w-[280px] border-r border-border p-4 gap-4 overflow-y-auto sticky top-16 h-[calc(100vh-64px)]">
+        <aside data-tour="meetings-nav" className="hidden md:flex flex-col w-[280px] border-r border-border p-4 gap-4 overflow-y-auto sticky top-16 h-[calc(100vh-64px)]">
           <div className="flex flex-col gap-1 mb-4">
             <h2 className="text-lg font-semibold">Meeting List</h2>
             <p className="text-sm text-text-secondary">AI-summarized sessions</p>
@@ -61,6 +62,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
           {children}
         </main>
       </div>
+
+      <ProductTour />
     </div>
   );
 }

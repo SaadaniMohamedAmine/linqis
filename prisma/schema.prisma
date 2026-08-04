@@ -23,6 +23,12 @@ model User {
   notionApiKey       String?
   notionDatabaseId   String?
 
+  onboardingCompleted Boolean @default(false)
+  tourCompleted       Boolean @default(false)
+  role                String?
+  teamSize            String?
+  primaryUseCase      String?
+
   accounts      Account[]
   sessions      Session[]
   integrations  Integration[]
