@@ -18,6 +18,9 @@ router.get("/me", async (req: AuthedRequest, res) => {
         emailNotifications: true,
         notionApiKey: true,
         notionDatabaseId: true,
+        plan: true,
+        subscriptionStatus: true,
+        currentPeriodEnd: true,
       },
     });
     if (!user) return res.status(404).json({ error: "User not found" });

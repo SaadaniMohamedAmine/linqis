@@ -29,6 +29,12 @@ model User {
   teamSize            String?
   primaryUseCase      String?
 
+  plan                 Plan      @default(FREE)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  subscriptionStatus   String? // "active" | "trialing" | "past_due" | "canceled" | null
+  currentPeriodEnd     DateTime?
+
   accounts      Account[]
   sessions      Session[]
   integrations  Integration[]
@@ -42,6 +48,11 @@ enum SummaryLength {
   CONCISE
   STANDARD
   DETAILED
+}
+
+enum Plan {
+  FREE
+  PRO
 }
 
 model Integration {

@@ -3,11 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { getPrisma } from "@/lib/db";
+import { FreeCardAction, ProCardAction } from "@/components/pricing-actions";
 
 export default async function PricingPage() {
   const session = await auth();
-  if (session) redirect("/dashboard");
+  let currentPlan: "FREE" | "PRO" | null = null;
+  if (session?.user?.id) {
+    const prisma = getPrisma();
+    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { plan: true } });
+    currentPlan = user?.plan ?? "FREE";
+  }
+  const isLoggedIn = !!session?.user?.id;
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
@@ -62,9 +69,7 @@ export default async function PricingPage() {
                 <span>CRM Integrations</span>
               </li>
             </ul>
-            <Link href="/sign-up">
-              <Button variant="secondary" className="w-full">Get Started</Button>
-            </Link>
+            <FreeCardAction isLoggedIn={isLoggedIn} currentPlan={currentPlan} />
           </Card>
 
           {/* Pro */}
@@ -98,9 +103,7 @@ export default async function PricingPage() {
                 <span>Standard Integrations</span>
               </li>
             </ul>
-            <Link href="/sign-up">
-              <Button variant="primary" className="w-full font-bold">Upgrade to Pro</Button>
-            </Link>
+            <ProCardAction isLoggedIn={isLoggedIn} currentPlan={currentPlan} />
           </Card>
 
           {/* Team */}

@@ -236,6 +236,9 @@ export interface UserProfile {
   emailNotifications: boolean;
   notionApiKey: string | null;
   notionDatabaseId: string | null;
+  plan: "FREE" | "PRO";
+  subscriptionStatus: string | null;
+  currentPeriodEnd: string | null;
 }
 
 export function getUser(): Promise<UserProfile> {

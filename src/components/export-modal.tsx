@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { exportToNotion, exportToSlack, exportToEmail, ApiError } from "@/lib/api";
 
@@ -19,12 +20,14 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [isPlanLimit, setIsPlanLimit] = useState(false);
 
   if (!isOpen) return null;
 
   const reset = () => {
     setStatus("idle");
     setError(null);
+    setIsPlanLimit(false);
   };
 
   const handleClose = () => {
@@ -35,6 +38,7 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
   const handleExport = async () => {
     setStatus("exporting");
     setError(null);
+    setIsPlanLimit(false);
     try {
       if (selectedTarget === "notion") {
         await exportToNotion(meetingId);
@@ -49,7 +53,12 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
       setTimeout(handleClose, 1200);
     } catch (err) {
       setStatus("error");
-      setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Export failed.");
+      if (err instanceof ApiError && err.status === 402) {
+        setIsPlanLimit(true);
+        setError(err.message); // the backend message already invites upgrading
+      } else {
+        setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Export failed.");
+      }
     }
   };
 
@@ -97,7 +106,14 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
             />
           )}
 
-          {status === "error" && <p className="text-sm text-danger">{error}</p>}
+          {status === "error" && (
+            <div className="text-sm text-danger">
+              <p>{error}</p>
+              {isPlanLimit && (
+                <Link href="/pricing" className="text-success hover:underline">Upgrade to Pro →</Link>
+              )}
+            </div>
+          )}
           {status === "success" && <p className="text-sm text-success">Exported successfully.</p>}
         </div>
 

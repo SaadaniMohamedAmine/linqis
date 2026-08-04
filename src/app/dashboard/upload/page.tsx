@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -18,7 +19,7 @@ type Stage =
   | { kind: "idle" }
   | { kind: "uploading"; percent: number }
   | { kind: "processing"; label: string; percent: number }
-  | { kind: "error"; message: string }
+  | { kind: "error"; message: string; isPlanLimit?: boolean }
   | { kind: "done" };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -99,7 +100,8 @@ export default function UploadPage() {
       });
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "Upload failed. Is the backend running?";
-      setStage({ kind: "error", message });
+      const isPlanLimit = err instanceof ApiError && err.status === 402;
+      setStage({ kind: "error", message, isPlanLimit });
     }
   }, [selectedFile, router]);
 
@@ -191,6 +193,9 @@ export default function UploadPage() {
             {stage.kind === "error" && (
               <div className="bg-danger-bg border border-danger/30 rounded-lg p-4">
                 <p className="text-sm text-danger">{stage.message}</p>
+                {stage.isPlanLimit && (
+                  <Link href="/pricing" className="text-sm text-success hover:underline">Upgrade to Pro →</Link>
+                )}
               </div>
             )}
 

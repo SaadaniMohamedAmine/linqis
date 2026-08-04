@@ -7,6 +7,7 @@ import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
 import { subscribeToProgress } from "../services/sse";
 import type { AuthedRequest } from "../middleware/auth";
+import { PLAN_LIMITS } from "../lib/plans";
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -54,6 +55,28 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
     const isVideo = req.file.mimetype.startsWith("video");
 
     const prisma = getPrisma();
+
+    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } });
+    const limits = PLAN_LIMITS[user?.plan || "FREE"];
+
+    if (limits.maxMeetingsPerMonth !== Infinity) {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const countThisMonth = await prisma.meeting.count({
+        where: { userId: req.userId, createdAt: { gte: startOfMonth } },
+      });
+
+      if (countThisMonth >= limits.maxMeetingsPerMonth) {
+        fs.unlinkSync(req.file.path);
+        return res.status(402).json({
+          error: `You've reached the Free plan limit of ${limits.maxMeetingsPerMonth} meetings this month. Upgrade to Pro for unlimited meetings.`,
+          code: "PLAN_LIMIT_REACHED",
+        });
+      }
+    }
+
     const meeting = await prisma.meeting.create({
       data: {
         title: req.file.originalname,
@@ -70,6 +93,16 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
 
     const shouldChunk = await needsChunking(audioPath);
     const duration = await getAudioDuration(audioPath);
+
+    const maxSeconds = limits.maxMeetingDurationMinutes * 60;
+    if (duration > maxSeconds) {
+      await prisma.meeting.delete({ where: { id: meeting.id } });
+      fs.unlinkSync(filePath);
+      return res.status(402).json({
+        error: `This recording is ${Math.round(duration / 60)} min, longer than your plan's ${limits.maxMeetingDurationMinutes} min limit. Upgrade to Pro.`,
+        code: "PLAN_LIMIT_REACHED",
+      });
+    }
 
     await prisma.meeting.update({
       where: { id: meeting.id },
