@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/page-loader";
 import { RecentMeetingsNav } from "@/components/recent-meetings-nav";
+import { NotificationsBell } from "@/components/notifications-bell";
 import { getMeetings, type MeetingListItem } from "@/lib/api";
 
 // Meeting data changes on every upload; never serve a stale build-time snapshot.
@@ -34,6 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </nav>
           </div>
           <div className="flex items-center gap-4">
+            <NotificationsBell />
             <Link href="/dashboard/upload">
               <Button variant="primary" size="sm">Upload</Button>
             </Link>

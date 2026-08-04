@@ -20,9 +20,10 @@ model User {
   summaryLength      SummaryLength @default(STANDARD)
   emailNotifications Boolean       @default(true)
 
-  accounts     Account[]
-  sessions     Session[]
-  integrations Integration[]
+  accounts      Account[]
+  sessions      Session[]
+  integrations  Integration[]
+  notifications Notification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -47,6 +48,28 @@ model Integration {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, provider])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  read      Boolean          @default(false)
+  meetingId String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+}
+
+enum NotificationType {
+  SUCCESS
+  WARNING
+  INFO
+  NEUTRAL
 }
 
 model Account {

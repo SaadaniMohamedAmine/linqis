@@ -235,3 +235,21 @@ export function getIntegrationStatus(userId: string): Promise<IntegrationStatus[
 export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
   return request<{ authUrl: string }>("/api/integrations/google-calendar/auth-url");
 }
+
+export interface Notification {
+  id: string;
+  type: "SUCCESS" | "WARNING" | "INFO" | "NEUTRAL";
+  title: string;
+  message: string;
+  read: boolean;
+  meetingId: string | null;
+  createdAt: string;
+}
+
+export function getNotifications(userId: string): Promise<Notification[]> {
+  return request<Notification[]>(`/api/notifications/${userId}`);
+}
+
+export function markAllNotificationsRead(userId: string): Promise<void> {
+  return request(`/api/notifications/${userId}/read-all`, { method: "PATCH" });
+}
