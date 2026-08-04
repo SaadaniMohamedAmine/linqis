@@ -12,6 +12,7 @@ interface ChatMessage {
   content: string;
   sources?: { id: string; title: string }[];
   isError?: boolean;
+  isPlanLimit?: boolean;
 }
 
 export default function AskPage() {
@@ -38,7 +39,8 @@ export default function AskPage() {
       setMessages((prev) => [...prev, { role: "assistant", content: answer, sources }]);
     } catch (err) {
       const message = err instanceof ApiError ? err.message : "Something went wrong answering that.";
-      setMessages((prev) => [...prev, { role: "assistant", content: message, isError: true }]);
+      const isPlanLimit = err instanceof ApiError && err.status === 402;
+      setMessages((prev) => [...prev, { role: "assistant", content: message, isError: true, isPlanLimit }]);
     } finally {
       setLoading(false);
     }
@@ -68,6 +70,9 @@ export default function AskPage() {
               <p className={`text-sm whitespace-pre-wrap ${m.isError ? "text-danger" : "text-text-primary"}`}>
                 {m.content}
               </p>
+              {m.isPlanLimit && (
+                <Link href="/pricing" className="text-xs text-success hover:underline">Upgrade to Pro →</Link>
+              )}
               {m.sources && m.sources.length > 0 && (
                 <div className="mt-3 pt-3 border-t border-border flex flex-col gap-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Sources</p>

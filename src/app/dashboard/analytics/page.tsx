@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { getAnalytics, type AnalyticsData } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { getAnalytics, ApiError, type AnalyticsData } from "@/lib/api";
 
 const KPI_CARDS = (data: AnalyticsData) => [
   { label: "Total meetings", value: data.totalMeetings },
@@ -13,8 +15,30 @@ const KPI_CARDS = (data: AnalyticsData) => [
 
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPlanLimit, setIsPlanLimit] = useState(false);
 
-  useEffect(() => { getAnalytics().then(setData); }, []);
+  useEffect(() => {
+    getAnalytics()
+      .then(setData)
+      .catch((err) => {
+        setError(err instanceof ApiError ? err.message : "Failed to load analytics.");
+        setIsPlanLimit(err instanceof ApiError && err.status === 402);
+      });
+  }, []);
+
+  if (error) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center gap-4 text-center">
+        <p className="text-text-secondary">{error}</p>
+        {isPlanLimit && (
+          <Link href="/pricing">
+            <Button variant="primary">Upgrade to Pro</Button>
+          </Link>
+        )}
+      </div>
+    );
+  }
 
   if (!data) return <div className="p-8 text-text-secondary">Loading analytics...</div>;
 

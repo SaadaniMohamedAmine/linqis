@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export default function MeetingDetailPage() {
   const [copied, setCopied] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfIsPlanLimit, setPdfIsPlanLimit] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -154,10 +156,12 @@ export default function MeetingDetailPage() {
     if (!meeting) return;
     setPdfLoading(true);
     setPdfError(null);
+    setPdfIsPlanLimit(false);
     try {
       await downloadMeetingPdf(meeting.id, meeting.title);
     } catch (err) {
       setPdfError(err instanceof ApiError ? err.message : "Failed to download PDF.");
+      setPdfIsPlanLimit(err instanceof ApiError && err.status === 402);
     } finally {
       setPdfLoading(false);
     }
@@ -252,7 +256,12 @@ export default function MeetingDetailPage() {
           <Button variant="danger" onClick={handleDelete}>Delete</Button>
         </div>
       </div>
-      {pdfError && <p className="px-6 py-2 text-xs text-danger">{pdfError}</p>}
+      {pdfError && (
+        <div className="px-6 py-2 flex items-center gap-2">
+          <p className="text-xs text-danger">{pdfError}</p>
+          {pdfIsPlanLimit && <Link href="/pricing" className="text-xs text-success hover:underline">Upgrade to Pro →</Link>}
+        </div>
+      )}
 
       {/* Tabs Header */}
       <div className="flex border-b border-border px-6">

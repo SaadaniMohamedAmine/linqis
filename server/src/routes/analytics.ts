@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
+import { PLAN_LIMITS } from "../lib/plans";
 
 export const router = Router();
 
@@ -8,6 +9,14 @@ router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const userId = req.userId;
+
+    const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { plan: true } });
+    if (!PLAN_LIMITS[currentUser?.plan || "FREE"].analyticsEnabled) {
+      return res.status(402).json({
+        error: "Analytics is a Pro feature. Upgrade to see meeting trends and insights.",
+        code: "PLAN_LIMIT_REACHED",
+      });
+    }
 
     const [totalMeetings, meetings, actionItems, moodCounts] = await Promise.all([
       prisma.meeting.count({ where: { userId } }),

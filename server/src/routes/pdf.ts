@@ -2,19 +2,31 @@ import { Router } from "express";
 import PDFDocument from "pdfkit";
 import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
+import { PLAN_LIMITS } from "../lib/plans";
 
 export const router = Router();
 
 router.get("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const prisma = getPrisma();
-    const meeting = await prisma.meeting.findUnique({
-      where: { id: req.params.id },
-      include: { decisions: true, actionItems: true, participants: true },
-    });
+
+    const [meeting, user] = await Promise.all([
+      prisma.meeting.findUnique({
+        where: { id: req.params.id },
+        include: { decisions: true, actionItems: true, participants: true },
+      }),
+      prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } }),
+    ]);
 
     if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
+    }
+
+    if (!PLAN_LIMITS[user?.plan || "FREE"].pdfExportEnabled) {
+      return res.status(402).json({
+        error: "PDF export is a Pro feature. Upgrade to download meeting PDFs.",
+        code: "PLAN_LIMIT_REACHED",
+      });
     }
 
     res.setHeader("Content-Type", "application/pdf");

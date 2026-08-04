@@ -3,6 +3,7 @@ import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
 import { embedText, cosineSimilarity } from "../services/ai/embeddings";
 import { ai } from "../services/ai";
+import { PLAN_LIMITS } from "../lib/plans";
 
 export const router = Router();
 
@@ -14,6 +15,15 @@ router.post("/", async (req: AuthedRequest, res) => {
     }
 
     const prisma = getPrisma();
+
+    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } });
+    if (!PLAN_LIMITS[user?.plan || "FREE"].chatEnabled) {
+      return res.status(402).json({
+        error: "Asking your meetings is a Pro feature. Upgrade to chat across your meetings.",
+        code: "PLAN_LIMIT_REACHED",
+      });
+    }
+
     const questionEmbedding = await embedText(question);
 
     // Only load embeddings for THIS user's meetings -- strict isolation.

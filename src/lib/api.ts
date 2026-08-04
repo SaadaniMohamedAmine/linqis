@@ -105,7 +105,10 @@ export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPu
 export async function downloadMeetingPdf(id: string, filename: string): Promise<void> {
   const token = await getBackendToken();
   const res = await fetch(`${API_URL}/api/pdf/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new ApiError(res.status, "Failed to generate PDF");
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, body.error || "Failed to generate PDF");
+  }
 
   const blob = await res.blob();
   const url = window.URL.createObjectURL(blob);
