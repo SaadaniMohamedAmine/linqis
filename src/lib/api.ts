@@ -251,6 +251,10 @@ export function updateUser(
   });
 }
 
+export function completeOnboarding(data: { role: string; teamSize: string; primaryUseCase: string }): Promise<void> {
+  return request("/api/users/me/onboarding", { method: "PATCH", body: JSON.stringify(data) });
+}
+
 export interface IntegrationStatus {
   provider: string;
   createdAt: string;

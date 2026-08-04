@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN "onboardingCompleted" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "User" ADD COLUMN "tourCompleted" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "User" ADD COLUMN "role" TEXT;
+ALTER TABLE "User" ADD COLUMN "teamSize" TEXT;
+ALTER TABLE "User" ADD COLUMN "primaryUseCase" TEXT;

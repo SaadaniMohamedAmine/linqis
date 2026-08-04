@@ -22,8 +22,13 @@ export const authConfig = {
       if (user) token.sub = user.id;
       return token;
     },
+    // Edge-safe: just reads fields already baked into the token, no DB call.
+    // onboardingCompleted is populated once at actual sign-in by auth.ts's
+    // own jwt callback (Node runtime only) and persists in the signed token
+    // from then on, so middleware can read it here without touching Prisma.
     session: ({ session, token }) => {
       if (token.sub) session.user.id = token.sub;
+      session.user.onboardingCompleted = (token.onboardingCompleted as boolean) ?? false;
       return session;
     },
   },
