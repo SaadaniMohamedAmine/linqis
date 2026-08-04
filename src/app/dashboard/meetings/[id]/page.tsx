@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import ExportModal from "@/components/export-modal";
 import {
   getMeeting,
   updateActionItemStatus,
@@ -42,6 +44,7 @@ export default function MeetingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("transcript");
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -118,6 +121,7 @@ export default function MeetingDetailPage() {
           )}
           {meeting.status === "FAILED" && <p className="text-xs text-danger">Processing failed for this meeting.</p>}
         </div>
+        <Button variant="secondary" onClick={() => setExportModalOpen(true)}>Export</Button>
       </div>
 
       {/* Tabs Header */}
@@ -294,6 +298,8 @@ export default function MeetingDetailPage() {
           </div>
         </div>
       )}
+
+      <ExportModal isOpen={exportModalOpen} onClose={() => setExportModalOpen(false)} meetingId={meeting.id} />
     </div>
   );
 }

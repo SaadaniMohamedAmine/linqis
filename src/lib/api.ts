@@ -178,3 +178,24 @@ export function resolveAudioUrl(audioUrl: string | null): string | null {
   if (audioUrl.startsWith("http")) return audioUrl;
   return `${API_URL}${audioUrl}`;
 }
+
+export async function exportToNotion(meetingId: string): Promise<{ pageId: string }> {
+  return request<{ pageId: string }>("/api/export/notion", {
+    method: "POST",
+    body: JSON.stringify({ meetingId }),
+  });
+}
+
+export async function exportToSlack(meetingId: string, webhookUrl: string): Promise<void> {
+  await request("/api/export/slack", {
+    method: "POST",
+    body: JSON.stringify({ meetingId, webhookUrl }),
+  });
+}
+
+export async function exportToEmail(meetingId: string, to: string): Promise<void> {
+  await request("/api/export/email", {
+    method: "POST",
+    body: JSON.stringify({ meetingId, to }),
+  });
+}
