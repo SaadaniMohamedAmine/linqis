@@ -337,3 +337,18 @@ export interface ChatResponse {
 export function askMeetings(question: string): Promise<ChatResponse> {
   return request<ChatResponse>("/api/chat", { method: "POST", body: JSON.stringify({ question }) });
 }
+
+export interface AnalyticsData {
+  totalMeetings: number;
+  totalHours: number;
+  avgDurationMinutes: number;
+  completionRate: number;
+  totalActionItems: number;
+  moodDistribution: { mood: string; count: number }[];
+  topOwners: { owner: string; count: number }[];
+  meetingsPerWeek: { week: string; count: number }[];
+}
+
+export function getAnalytics(): Promise<AnalyticsData> {
+  return request<AnalyticsData>("/api/analytics");
+}

@@ -35,6 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Link href="/dashboard/action-items" data-tour="action-items-nav" className="text-text-secondary hover:text-success transition-colors">Action Items</Link>
               <Link href="/dashboard/integrations" className="text-text-secondary hover:text-success transition-colors">Integrations</Link>
               <Link href="/dashboard/ask" className="text-text-secondary hover:text-success transition-colors">💬 Ask</Link>
+              <Link href="/dashboard/analytics" className="text-text-secondary hover:text-success transition-colors">Analytics</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
