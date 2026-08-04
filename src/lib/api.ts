@@ -234,6 +234,8 @@ export interface UserProfile {
   image: string | null;
   summaryLength: "CONCISE" | "STANDARD" | "DETAILED";
   emailNotifications: boolean;
+  notionApiKey: string | null;
+  notionDatabaseId: string | null;
 }
 
 export function getUser(): Promise<UserProfile> {
@@ -241,7 +243,7 @@ export function getUser(): Promise<UserProfile> {
 }
 
 export function updateUser(
-  data: Partial<Pick<UserProfile, "name" | "summaryLength" | "emailNotifications">>
+  data: Partial<Pick<UserProfile, "name" | "summaryLength" | "emailNotifications" | "notionApiKey" | "notionDatabaseId">>
 ): Promise<UserProfile> {
   return request<UserProfile>("/api/users/me", {
     method: "PATCH",

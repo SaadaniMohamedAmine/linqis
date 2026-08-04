@@ -10,25 +10,33 @@ router.post("/notion", async (req: AuthedRequest, res) => {
     const { meetingId } = req.body;
     const prisma = getPrisma();
 
-    const meeting = await prisma.meeting.findUnique({
-      where: { id: meetingId },
-      include: {
-        actionItems: true,
-        decisions: true,
-      },
-    });
+    const [meeting, user] = await Promise.all([
+      prisma.meeting.findUnique({ where: { id: meetingId }, include: { actionItems: true, decisions: true } }),
+      prisma.user.findUnique({ where: { id: req.userId }, select: { notionApiKey: true, notionDatabaseId: true } }),
+    ]);
 
     if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
 
-    const pageId = await exportToNotion({
-      meetingId,
-      title: meeting.title,
-      summary: meeting.summary || "",
-      decisions: meeting.decisions,
-      actionItems: meeting.actionItems,
-    });
+    // Falls back to a global integration if the user hasn't connected their
+    // own Notion workspace yet in Settings.
+    const apiKey = user?.notionApiKey || process.env.NOTION_API_KEY;
+    const databaseId = user?.notionDatabaseId || process.env.NOTION_DATABASE_ID;
+    if (!apiKey || !databaseId) {
+      return res.status(400).json({ error: "Connect your Notion account in Settings before exporting." });
+    }
+
+    const pageId = await exportToNotion(
+      {
+        meetingId,
+        title: meeting.title,
+        summary: meeting.summary || "",
+        decisions: meeting.decisions,
+        actionItems: meeting.actionItems,
+      },
+      { apiKey, databaseId }
+    );
 
     await prisma.export.create({
       data: {

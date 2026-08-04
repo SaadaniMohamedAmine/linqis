@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,8 @@ export default function SettingsPage() {
   const [name, setName] = useState("");
   const [summaryLength, setSummaryLength] = useState<UserProfile["summaryLength"]>("STANDARD");
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [notionApiKey, setNotionApiKey] = useState("");
+  const [notionDatabaseId, setNotionDatabaseId] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -23,6 +26,8 @@ export default function SettingsPage() {
       setName(u.name || "");
       setSummaryLength(u.summaryLength);
       setEmailNotifications(u.emailNotifications);
+      setNotionApiKey(u.notionApiKey || "");
+      setNotionDatabaseId(u.notionDatabaseId || "");
     });
   }, [session?.user?.id]);
 
@@ -31,7 +36,7 @@ export default function SettingsPage() {
     setSaving(true);
     setSaved(false);
     try {
-      await updateUser({ name, summaryLength, emailNotifications });
+      await updateUser({ name, summaryLength, emailNotifications, notionApiKey, notionDatabaseId });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } finally {
@@ -174,6 +179,43 @@ export default function SettingsPage() {
                     }`}
                   />
                 </button>
+              </div>
+            </Card>
+          </section>
+
+          {/* Notion Integration Section */}
+          <section className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-semibold">Notion Integration</h3>
+              <p className="text-text-secondary">Export meeting summaries to your own Notion workspace instead of the shared default.</p>
+            </div>
+            <Card className="p-6 space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider">Notion API Key</label>
+                <Input
+                  value={notionApiKey}
+                  onChange={(e) => setNotionApiKey(e.target.value)}
+                  type="password"
+                  placeholder="ntn_..."
+                />
+                <p className="text-xs text-text-secondary">
+                  <Link
+                    href="https://developers.notion.com/docs/create-a-notion-integration"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-success hover:underline"
+                  >
+                    How to get your Notion API key?
+                  </Link>
+                </p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider">Notion Database ID</label>
+                <Input
+                  value={notionDatabaseId}
+                  onChange={(e) => setNotionDatabaseId(e.target.value)}
+                  placeholder="3ac0b40b15f58068bd31f9ec426efec5"
+                />
               </div>
             </Card>
           </section>
