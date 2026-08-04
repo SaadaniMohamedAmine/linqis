@@ -62,3 +62,13 @@ router.patch("/me/onboarding", async (req: AuthedRequest, res) => {
     res.status(500).json({ error: "Failed to complete onboarding" });
   }
 });
+
+router.patch("/me/tour-seen", async (req: AuthedRequest, res) => {
+  try {
+    const prisma = getPrisma();
+    await prisma.user.update({ where: { id: req.userId }, data: { tourCompleted: true } });
+    res.json({ status: "ok" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update" });
+  }
+});

@@ -172,7 +172,7 @@ export default function MeetingDetailPage() {
           {meeting.status === "FAILED" && <p className="text-xs text-danger">Processing failed for this meeting.</p>}
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="secondary" onClick={() => setExportModalOpen(true)}>Export</Button>
+          <Button variant="secondary" data-tour="export-button" onClick={() => setExportModalOpen(true)}>Export</Button>
           <Button variant="danger" onClick={handleDelete}>Delete</Button>
         </div>
       </div>
