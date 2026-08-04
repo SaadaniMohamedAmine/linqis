@@ -22,11 +22,31 @@ export class ApiError extends Error {
   }
 }
 
+// Express (Railway) is a separate deployment from Next.js (Vercel) and can't
+// read NextAuth's session cookies directly. Instead we mint a short-lived
+// signed token from a Next.js route (which does have the session) and
+// attach it to every backend call; Express verifies it and derives the
+// user id from the token, never from anything the client sends.
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
+async function getBackendToken(): Promise<string> {
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 30_000) {
+    return cachedToken.value;
+  }
+  const res = await fetch("/api/auth/backend-token");
+  if (!res.ok) throw new ApiError(res.status, "Not authenticated");
+  const { token, expiresIn } = await res.json();
+  cachedToken = { value: token, expiresAt: Date.now() + expiresIn * 1000 };
+  return token;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = await getBackendToken();
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      Authorization: `Bearer ${token}`,
       ...init?.headers,
     },
   });
@@ -103,13 +123,16 @@ export function uploadMeetingFile(
   file: File,
   onUploadProgress?: (percent: number) => void
 ): Promise<UploadResponse> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    const token = await getBackendToken();
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("userId", "anonymous");
+    // No userId in the body -- the backend derives it from the Authorization
+    // token, never from anything the client sends.
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${API_URL}/api/upload`);
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && onUploadProgress) {

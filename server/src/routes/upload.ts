@@ -101,8 +101,13 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 });
 
-// SSE endpoint for real-time progress
-router.get("/progress/:jobId", (req, res) => {
+// SSE endpoint for real-time progress. EventSource can't send custom headers,
+// so this can't carry the Authorization bearer token -- it's mounted
+// separately without requireAuth. The jobId is an unguessable BullMQ UUID,
+// and the only thing it leaks is a processing percentage, so this is an
+// accepted tradeoff rather than a real auth gap.
+export const publicRouter = Router();
+publicRouter.get("/:jobId", (req, res) => {
   const { jobId } = req.params;
   subscribeToProgress(jobId, res);
 });
