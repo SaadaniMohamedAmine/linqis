@@ -17,6 +17,10 @@ export default function SettingsPage() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [notionApiKey, setNotionApiKey] = useState("");
   const [notionDatabaseId, setNotionDatabaseId] = useState("");
+  const [plan, setPlan] = useState<UserProfile["plan"]>("FREE");
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
+  const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -28,8 +32,22 @@ export default function SettingsPage() {
       setEmailNotifications(u.emailNotifications);
       setNotionApiKey(u.notionApiKey || "");
       setNotionDatabaseId(u.notionDatabaseId || "");
+      setPlan(u.plan);
+      setSubscriptionStatus(u.subscriptionStatus);
+      setCurrentPeriodEnd(u.currentPeriodEnd);
     });
   }, [session?.user?.id]);
+
+  const handleManageBilling = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/billing/portal", { method: "POST" });
+      const body = await res.json().catch(() => ({}));
+      if (body.url) window.location.href = body.url;
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!session?.user?.id) return;
@@ -180,6 +198,41 @@ export default function SettingsPage() {
                   />
                 </button>
               </div>
+            </Card>
+          </section>
+
+          {/* Billing Section */}
+          <section className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-semibold">Billing</h3>
+              <p className="text-text-secondary">Manage your plan and subscription.</p>
+            </div>
+            <Card className="p-6 flex items-center justify-between">
+              <div>
+                <p className="text-lg font-semibold text-text-primary">
+                  {plan === "PRO" ? "Pro plan" : "Free plan"}
+                </p>
+                {plan === "PRO" ? (
+                  <p className="text-sm text-text-secondary">
+                    {subscriptionStatus === "active" || subscriptionStatus === "trialing"
+                      ? currentPeriodEnd
+                        ? `Renews on ${new Date(currentPeriodEnd).toLocaleDateString()}`
+                        : "Active subscription"
+                      : `Status: ${subscriptionStatus || "unknown"}`}
+                  </p>
+                ) : (
+                  <p className="text-sm text-text-secondary">5 meetings/month, 30 min max, no exports.</p>
+                )}
+              </div>
+              {plan === "PRO" ? (
+                <Button variant="secondary" onClick={handleManageBilling} disabled={portalLoading}>
+                  {portalLoading ? "Loading..." : "Manage billing"}
+                </Button>
+              ) : (
+                <Link href="/pricing">
+                  <Button variant="primary">Upgrade to Pro</Button>
+                </Link>
+              )}
             </Card>
           </section>
 
