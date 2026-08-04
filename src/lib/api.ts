@@ -199,3 +199,26 @@ export async function exportToEmail(meetingId: string, to: string): Promise<void
     body: JSON.stringify({ meetingId, to }),
   });
 }
+
+export interface UserProfile {
+  id: string;
+  name: string | null;
+  email: string | null;
+  image: string | null;
+  summaryLength: "CONCISE" | "STANDARD" | "DETAILED";
+  emailNotifications: boolean;
+}
+
+export function getUser(userId: string): Promise<UserProfile> {
+  return request<UserProfile>(`/api/users/${userId}`);
+}
+
+export function updateUser(
+  userId: string,
+  data: Partial<Pick<UserProfile, "name" | "summaryLength" | "emailNotifications">>
+): Promise<UserProfile> {
+  return request<UserProfile>(`/api/users/${userId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

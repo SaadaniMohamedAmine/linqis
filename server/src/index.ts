@@ -9,6 +9,7 @@ import { router as uploadRouter } from "./routes/upload";
 import { router as exportRouter } from "./routes/exports";
 import { router as integrationRouter } from "./routes/integrations";
 import { router as actionItemRouter } from "./routes/action-items";
+import { router as userRouter } from "./routes/user";
 import { worker } from "./queue/worker";
 
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/export", exportRouter);
 app.use("/api/integrations", integrationRouter);
 app.use("/api/action-items", actionItemRouter);
+app.use("/api/users", userRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));

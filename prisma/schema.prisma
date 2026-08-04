@@ -17,11 +17,20 @@ model User {
   emailVerified DateTime?
   image         String?
 
+  summaryLength      SummaryLength @default(STANDARD)
+  emailNotifications Boolean       @default(true)
+
   accounts Account[]
   sessions Session[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum SummaryLength {
+  CONCISE
+  STANDARD
+  DETAILED
 }
 
 model Account {
