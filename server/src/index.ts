@@ -11,6 +11,7 @@ import { router as integrationRouter } from "./routes/integrations";
 import { router as actionItemRouter } from "./routes/action-items";
 import { router as userRouter } from "./routes/user";
 import { router as notificationRouter } from "./routes/notifications";
+import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
 import { worker } from "./queue/worker";
 
 const app = express();
@@ -30,6 +31,9 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+app.use("/api", apiRateLimit);
+app.use("/api/upload", uploadRateLimit);
 
 app.use("/api/meetings", meetingRouter);
 app.use("/api/queue", queueRouter);
