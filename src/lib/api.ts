@@ -93,6 +93,34 @@ export function renameMeeting(id: string, title: string): Promise<void> {
   return request(`/api/meetings/${id}`, { method: "PATCH", body: JSON.stringify({ title }) });
 }
 
+export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPublic: boolean; shareToken: string | null }> {
+  return request(`/api/meetings/${id}/share`, { method: "PATCH", body: JSON.stringify({ enabled }) });
+}
+
+/**
+ * Downloads via fetch + blob rather than a plain <a href> because the PDF
+ * route is protected -- a bare link wouldn't carry the Authorization
+ * bearer token the backend requires.
+ */
+export async function downloadMeetingPdf(id: string, filename: string): Promise<void> {
+  const token = await getBackendToken();
+  const res = await fetch(`${API_URL}/api/pdf/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, body.error || "Failed to generate PDF");
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 export function getActionItems(): Promise<ActionItemWithMeeting[]> {
   return request<ActionItemWithMeeting[]>("/api/action-items");
 }
@@ -291,4 +319,39 @@ export function getNotifications(): Promise<Notification[]> {
 
 export function markAllNotificationsRead(): Promise<void> {
   return request("/api/notifications/read-all", { method: "PATCH" });
+}
+
+export interface SearchResult {
+  id: string;
+  title: string;
+  snippet: string;
+  rank: number;
+}
+
+export function searchMeetings(query: string): Promise<SearchResult[]> {
+  return request<SearchResult[]>(`/api/search?q=${encodeURIComponent(query)}`);
+}
+
+export interface ChatResponse {
+  answer: string;
+  sources: { id: string; title: string }[];
+}
+
+export function askMeetings(question: string): Promise<ChatResponse> {
+  return request<ChatResponse>("/api/chat", { method: "POST", body: JSON.stringify({ question }) });
+}
+
+export interface AnalyticsData {
+  totalMeetings: number;
+  totalHours: number;
+  avgDurationMinutes: number;
+  completionRate: number;
+  totalActionItems: number;
+  moodDistribution: { mood: string; count: number }[];
+  topOwners: { owner: string; count: number }[];
+  meetingsPerWeek: { week: string; count: number }[];
+}
+
+export function getAnalytics(): Promise<AnalyticsData> {
+  return request<AnalyticsData>("/api/analytics");
 }

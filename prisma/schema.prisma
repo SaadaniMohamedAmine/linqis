@@ -191,12 +191,16 @@ model Meeting {
   summary  String?       @db.Text
   mood     MeetingMood?
 
+  isPublic   Boolean @default(false)
+  shareToken String? @unique
+
   participants  Participant[]
   transcripts   Transcript[]
   decisions     Decision[]
   actionItems   ActionItem[]
   exports       Export[]
   disagreements Disagreement[]
+  embeddings    MeetingEmbedding[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -263,6 +267,18 @@ model Export {
   target    String
   status    ExportStatus   @default(PENDING)
   createdAt DateTime       @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+}
+
+model MeetingEmbedding {
+  id        String   @id @default(cuid())
+  meetingId String
+  chunkText String   @db.Text
+  embedding Json // array of floats -- cosine similarity computed in application code, no pgvector needed
+  createdAt DateTime @default(now())
 
   meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 

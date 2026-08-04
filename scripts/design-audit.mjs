@@ -18,6 +18,10 @@ const ALLOWED = [
   // codes here are exact copies of the design tokens, just necessarily
   // hardcoded because of how the renderer works.
   { entry: "opengraph-image.tsx", dir: join(SRC_DIR, "app") },
+  // recharts' stroke/fill/contentStyle props are SVG presentation
+  // attributes, not Tailwind classes -- same constraint as the OG image.
+  // Values are exact copies of --color-border/-text-secondary/-surface/-success.
+  { entry: "page.tsx", dir: join(SRC_DIR, "app", "dashboard", "analytics") },
 ];
 
 const offenders = [];
