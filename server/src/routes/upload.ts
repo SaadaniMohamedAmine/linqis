@@ -6,6 +6,7 @@ import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../se
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
 import { subscribeToProgress } from "../services/sse";
+import type { AuthedRequest } from "../middleware/auth";
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -32,7 +33,7 @@ const upload = multer({
 
 export const router = Router();
 
-router.post("/", upload.single("file"), async (req, res) => {
+router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -49,7 +50,6 @@ router.post("/", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "File content does not match an allowed audio/video format." });
     }
 
-    const { userId } = req.body;
     const filePath = req.file.path;
     const isVideo = req.file.mimetype.startsWith("video");
 
@@ -57,7 +57,7 @@ router.post("/", upload.single("file"), async (req, res) => {
     const meeting = await prisma.meeting.create({
       data: {
         title: req.file.originalname,
-        userId: userId || "anonymous",
+        userId: req.userId!, // derived from the verified token, never the body
         audioUrl: `/uploads/${req.file.filename}`,
         status: "PROCESSING",
       },

@@ -1,7 +1,17 @@
 import { Request, Response, NextFunction } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
+import type { ParsedQs } from "qs";
 import jwt from "jsonwebtoken";
 
-export interface AuthedRequest extends Request {
+// Generic like Express's own Request so route handlers can still get
+// precise req.params typing (e.g. AuthedRequest<{ id: string }>) instead of
+// falling back to ParamsDictionary's `string | string[]`.
+export interface AuthedRequest<
+  P = ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = ParsedQs,
+> extends Request<P, ResBody, ReqBody, ReqQuery> {
   userId?: string;
 }
 

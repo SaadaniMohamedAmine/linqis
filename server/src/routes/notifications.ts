@@ -1,13 +1,14 @@
 import { Router } from "express";
 import { getPrisma } from "../db";
+import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
-router.get("/:userId", async (req, res) => {
+router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const notifications = await prisma.notification.findMany({
-      where: { userId: req.params.userId },
+      where: { userId: req.userId },
       orderBy: { createdAt: "desc" },
       take: 50,
     });
@@ -17,11 +18,11 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-router.patch("/:userId/read-all", async (req, res) => {
+router.patch("/read-all", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     await prisma.notification.updateMany({
-      where: { userId: req.params.userId, read: false },
+      where: { userId: req.userId, read: false },
       data: { read: true },
     });
     res.json({ status: "ok" });

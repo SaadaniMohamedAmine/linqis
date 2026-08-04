@@ -1,14 +1,24 @@
 import { Router } from "express";
 import { getPrisma } from "../db";
+import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
-router.get("/:userId", async (req, res) => {
+router.get("/me", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const user = await prisma.user.findUnique({
-      where: { id: req.params.userId },
-      select: { id: true, name: true, email: true, image: true, summaryLength: true, emailNotifications: true },
+      where: { id: req.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        summaryLength: true,
+        emailNotifications: true,
+        notionApiKey: true,
+        notionDatabaseId: true,
+      },
     });
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
@@ -18,16 +28,18 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-router.patch("/:userId", async (req, res) => {
+router.patch("/me", async (req: AuthedRequest, res) => {
   try {
-    const { name, summaryLength, emailNotifications } = req.body;
+    const { name, summaryLength, emailNotifications, notionApiKey, notionDatabaseId } = req.body;
     const prisma = getPrisma();
     const user = await prisma.user.update({
-      where: { id: req.params.userId },
+      where: { id: req.userId },
       data: {
         ...(name !== undefined && { name }),
         ...(summaryLength !== undefined && { summaryLength }),
         ...(emailNotifications !== undefined && { emailNotifications }),
+        ...(notionApiKey !== undefined && { notionApiKey }),
+        ...(notionDatabaseId !== undefined && { notionDatabaseId }),
       },
     });
     res.json(user);

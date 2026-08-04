@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { getPrisma } from "../db";
 import { exportToNotion, exportToSlack, exportToEmail } from "../services/export";
+import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
-router.post("/notion", async (req, res) => {
+router.post("/notion", async (req: AuthedRequest, res) => {
   try {
     const { meetingId } = req.body;
     const prisma = getPrisma();
@@ -17,7 +18,7 @@ router.post("/notion", async (req, res) => {
       },
     });
 
-    if (!meeting) {
+    if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
 
@@ -45,7 +46,7 @@ router.post("/notion", async (req, res) => {
   }
 });
 
-router.post("/slack", async (req, res) => {
+router.post("/slack", async (req: AuthedRequest, res) => {
   try {
     const { meetingId, webhookUrl } = req.body;
     const prisma = getPrisma();
@@ -58,7 +59,7 @@ router.post("/slack", async (req, res) => {
       },
     });
 
-    if (!meeting) {
+    if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
 
@@ -88,7 +89,7 @@ router.post("/slack", async (req, res) => {
   }
 });
 
-router.post("/email", async (req, res) => {
+router.post("/email", async (req: AuthedRequest, res) => {
   try {
     const { meetingId, to } = req.body;
     const prisma = getPrisma();
@@ -101,7 +102,7 @@ router.post("/email", async (req, res) => {
       },
     });
 
-    if (!meeting) {
+    if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
 

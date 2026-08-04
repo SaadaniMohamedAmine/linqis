@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!session?.user?.id) return;
-    getUser(session.user.id).then((u) => {
+    getUser().then((u) => {
       setName(u.name || "");
       setSummaryLength(u.summaryLength);
       setEmailNotifications(u.emailNotifications);
@@ -31,7 +31,7 @@ export default function SettingsPage() {
     setSaving(true);
     setSaved(false);
     try {
-      await updateUser(session.user.id, { name, summaryLength, emailNotifications });
+      await updateUser({ name, summaryLength, emailNotifications });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } finally {

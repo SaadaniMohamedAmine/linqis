@@ -27,14 +27,14 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
 
   useEffect(() => {
     if (isOpen && session?.user?.id) {
-      getNotifications(session.user.id).then(setNotifications);
+      getNotifications().then(setNotifications);
     }
   }, [isOpen, session?.user?.id]);
 
   const markAllRead = async () => {
     if (!session?.user?.id) return;
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    await markAllNotificationsRead(session.user.id);
+    await markAllNotificationsRead();
   };
 
   const unread = notifications.filter((n) => !n.read);

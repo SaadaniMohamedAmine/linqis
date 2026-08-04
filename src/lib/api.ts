@@ -236,15 +236,14 @@ export interface UserProfile {
   emailNotifications: boolean;
 }
 
-export function getUser(userId: string): Promise<UserProfile> {
-  return request<UserProfile>(`/api/users/${userId}`);
+export function getUser(): Promise<UserProfile> {
+  return request<UserProfile>("/api/users/me");
 }
 
 export function updateUser(
-  userId: string,
   data: Partial<Pick<UserProfile, "name" | "summaryLength" | "emailNotifications">>
 ): Promise<UserProfile> {
-  return request<UserProfile>(`/api/users/${userId}`, {
+  return request<UserProfile>("/api/users/me", {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -255,8 +254,8 @@ export interface IntegrationStatus {
   createdAt: string;
 }
 
-export function getIntegrationStatus(userId: string): Promise<IntegrationStatus[]> {
-  return request<IntegrationStatus[]>(`/api/integrations/status/${userId}`);
+export function getIntegrationStatus(): Promise<IntegrationStatus[]> {
+  return request<IntegrationStatus[]>("/api/integrations/status");
 }
 
 export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
@@ -273,10 +272,10 @@ export interface Notification {
   createdAt: string;
 }
 
-export function getNotifications(userId: string): Promise<Notification[]> {
-  return request<Notification[]>(`/api/notifications/${userId}`);
+export function getNotifications(): Promise<Notification[]> {
+  return request<Notification[]>("/api/notifications");
 }
 
-export function markAllNotificationsRead(userId: string): Promise<void> {
-  return request(`/api/notifications/${userId}/read-all`, { method: "PATCH" });
+export function markAllNotificationsRead(): Promise<void> {
+  return request("/api/notifications/read-all", { method: "PATCH" });
 }
