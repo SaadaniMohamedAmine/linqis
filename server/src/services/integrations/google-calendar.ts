@@ -23,6 +23,11 @@ export function getGoogleAuthUrl(): string {
   });
 }
 
+export async function exchangeGoogleCode(code: string) {
+  const { tokens } = await oauth2Client.getToken(code);
+  return tokens; // { access_token, refresh_token, expiry_date, ... }
+}
+
 export async function getGoogleCalendarEvents(accessToken: string, timeMin?: string, timeMax?: string): Promise<CalendarEvent[]> {
   oauth2Client.setCredentials({ access_token: accessToken });
   const calendar = google.calendar({ version: "v3", auth: oauth2Client });

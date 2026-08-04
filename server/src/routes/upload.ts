@@ -38,6 +38,17 @@ router.post("/", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
+    // The multer fileFilter above only checks the extension, which anyone
+    // can fake -- sniff the actual file bytes before trusting it.
+    // file-type is ESM-only; dynamic import keeps this file CJS-compatible.
+    const { fileTypeFromFile } = await import("file-type");
+    const detectedType = await fileTypeFromFile(req.file.path);
+    const allowedMimes = ["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav", "video/mp4", "video/quicktime", "video/webm"];
+    if (!detectedType || !allowedMimes.includes(detectedType.mime)) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: "File content does not match an allowed audio/video format." });
+    }
+
     const { userId } = req.body;
     const filePath = req.file.path;
     const isVideo = req.file.mimetype.startsWith("video");

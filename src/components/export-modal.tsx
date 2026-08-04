@@ -2,125 +2,110 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { exportToNotion, exportToSlack, exportToEmail, ApiError } from "@/lib/api";
 
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  meetingId: string;
 }
 
-export default function ExportModal({ isOpen, onClose }: ExportModalProps) {
-  const [selectedTarget, setSelectedTarget] = useState("notion");
+type Target = "notion" | "slack" | "email";
+type Status = "idle" | "exporting" | "success" | "error";
+
+export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalProps) {
+  const [selectedTarget, setSelectedTarget] = useState<Target>("notion");
+  const [slackWebhookUrl, setSlackWebhookUrl] = useState(process.env.NEXT_PUBLIC_DEFAULT_SLACK_WEBHOOK || "");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const reset = () => {
+    setStatus("idle");
+    setError(null);
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const handleExport = async () => {
+    setStatus("exporting");
+    setError(null);
+    try {
+      if (selectedTarget === "notion") {
+        await exportToNotion(meetingId);
+      } else if (selectedTarget === "slack") {
+        if (!slackWebhookUrl) throw new Error("Enter a Slack webhook URL.");
+        await exportToSlack(meetingId, slackWebhookUrl);
+      } else {
+        if (!email) throw new Error("Enter a recipient email.");
+        await exportToEmail(meetingId, email);
+      }
+      setStatus("success");
+      setTimeout(handleClose, 1200);
+    } catch (err) {
+      setStatus("error");
+      setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Export failed.");
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-full max-w-[380px] bg-surface-high border border-border rounded-xl shadow-lg flex flex-col overflow-hidden">
-        {/* Modal Header */}
         <div className="p-6 border-b border-border flex justify-between items-start">
           <div>
             <h2 className="text-lg font-semibold text-text-primary mb-1">Export Meeting</h2>
-            <p className="text-sm text-text-secondary">Choose your destination and target workspace.</p>
+            <p className="text-sm text-text-secondary">Choose your destination.</p>
           </div>
-          <button onClick={onClose} className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer">
-            <span></span>
-          </button>
+          <button onClick={handleClose} className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer">✕</button>
         </div>
 
-        {/* Modal Body */}
         <div className="p-6 flex flex-col gap-6">
-          {/* Notion Option */}
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input
-                checked={selectedTarget === "notion"}
-                onChange={() => setSelectedTarget("notion")}
-                className="w-5 h-5 text-success border-border bg-surface focus:ring-0 focus:ring-offset-0"
-                name="export-target"
-                type="radio"
-              />
-              <div className="flex items-center gap-2 flex-1">
-                <span className="text-text-primary"></span>
-                <span className="font-medium text-text-primary">Notion</span>
-              </div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-surface-low text-text-secondary border border-border">CONNECTED</span>
-            </label>
-            <div className="ml-8">
-              <div className="relative">
-                <select
-                  disabled={selectedTarget !== "notion"}
-                  className={`w-full bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none appearance-none cursor-pointer ${selectedTarget !== "notion" ? "opacity-50" : ""}`}
-                >
-                  <option>Q4 Planning Documents</option>
-                  <option>Engineering Wiki</option>
-                  <option>Product Roadmap</option>
-                  <option>New Page...</option>
-                </select>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary"><span></span></span>
-              </div>
-            </div>
-          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input checked={selectedTarget === "notion"} onChange={() => setSelectedTarget("notion")} type="radio" name="export-target" className="w-5 h-5 text-success" />
+            <span className="font-medium text-text-primary">Notion</span>
+          </label>
 
-          {/* Slack Option */}
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input
-                checked={selectedTarget === "slack"}
-                onChange={() => setSelectedTarget("slack")}
-                className="w-5 h-5 text-success border-border bg-surface focus:ring-0 focus:ring-offset-0"
-                name="export-target"
-                type="radio"
-              />
-              <div className="flex items-center gap-2 flex-1">
-                <span className="text-text-primary"></span>
-                <span className="font-medium text-text-primary">Slack</span>
-              </div>
-            </label>
-            <div className="ml-8">
-              <div className="relative">
-                <select
-                  disabled={selectedTarget !== "slack"}
-                  className={`w-full bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none appearance-none cursor-pointer ${selectedTarget !== "slack" ? "opacity-50" : ""}`}
-                >
-                  <option>#general</option>
-                  <option>#product-updates</option>
-                  <option>#meeting-summaries</option>
-                </select>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary opacity-50"><span></span></span>
-              </div>
-            </div>
-          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input checked={selectedTarget === "slack"} onChange={() => setSelectedTarget("slack")} type="radio" name="export-target" className="w-5 h-5 text-success" />
+            <span className="font-medium text-text-primary">Slack</span>
+          </label>
+          {selectedTarget === "slack" && (
+            <input
+              value={slackWebhookUrl}
+              onChange={(e) => setSlackWebhookUrl(e.target.value)}
+              placeholder="https://hooks.slack.com/services/..."
+              className="ml-7 w-[calc(100%-1.75rem)] bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none"
+            />
+          )}
 
-          {/* Email Option */}
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input
-                checked={selectedTarget === "email"}
-                onChange={() => setSelectedTarget("email")}
-                className="w-5 h-5 text-success border-border bg-surface focus:ring-0 focus:ring-offset-0"
-                name="export-target"
-                type="radio"
-              />
-              <div className="flex items-center gap-2 flex-1">
-                <span className="text-text-primary"></span>
-                <span className="font-medium text-text-primary">Email Recap</span>
-              </div>
-            </label>
-            <div className="ml-8">
-              <input
-                disabled={selectedTarget !== "email"}
-                className={`w-full bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none ${selectedTarget !== "email" ? "opacity-50" : ""}`}
-                placeholder="Enter recipient email..."
-                type="email"
-              />
-            </div>
-          </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input checked={selectedTarget === "email"} onChange={() => setSelectedTarget("email")} type="radio" name="export-target" className="w-5 h-5 text-success" />
+            <span className="font-medium text-text-primary">Email Recap</span>
+          </label>
+          {selectedTarget === "email" && (
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder="Enter recipient email..."
+              className="ml-7 w-[calc(100%-1.75rem)] bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none"
+            />
+          )}
+
+          {status === "error" && <p className="text-sm text-danger">{error}</p>}
+          {status === "success" && <p className="text-sm text-success">Exported successfully.</p>}
         </div>
 
-        {/* Modal Footer */}
         <div className="p-6 bg-surface-low border-t border-border flex gap-4">
-          <Button variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" className="flex-1">Export Now</Button>
+          <Button variant="secondary" className="flex-1" onClick={handleClose} disabled={status === "exporting"}>Cancel</Button>
+          <Button variant="primary" className="flex-1" onClick={handleExport} disabled={status === "exporting"}>
+            {status === "exporting" ? "Exporting..." : "Export Now"}
+          </Button>
         </div>
       </div>
     </div>

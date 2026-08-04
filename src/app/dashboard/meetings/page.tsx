@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getMeetings, ApiError, type MeetingListItem } from "@/lib/api";
+import { getMeetings, deleteMeeting, ApiError, type MeetingListItem } from "@/lib/api";
 import { formatDuration, formatMeetingDate } from "@/lib/utils";
 
 const STATUS_BADGE: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
@@ -41,6 +41,12 @@ export default function MeetingsListPage() {
   const filtered = meetings.filter((m) =>
     m.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this meeting? This cannot be undone.")) return;
+    await deleteMeeting(id);
+    setMeetings((prev) => prev.filter((m) => m.id !== id));
+  };
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
@@ -93,6 +99,7 @@ export default function MeetingsListPage() {
                       <th className="px-6 py-4 font-medium text-text-secondary">Participants</th>
                       <th className="px-6 py-4 font-medium text-text-secondary">Action Items</th>
                       <th className="px-6 py-4 font-medium text-text-secondary">Status</th>
+                      <th className="px-6 py-4 font-medium text-text-secondary"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -122,6 +129,15 @@ export default function MeetingsListPage() {
                           </td>
                           <td className="px-6 py-4">
                             <Badge variant={badge.variant}>{badge.label}</Badge>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => handleDelete(meeting.id)}
+                              className="text-text-secondary hover:text-danger transition-colors"
+                              aria-label="Delete meeting"
+                            >
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       );

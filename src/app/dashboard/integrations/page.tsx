@@ -1,9 +1,30 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getIntegrationStatus, getGoogleCalendarAuthUrl, type IntegrationStatus } from "@/lib/api";
 
 export default function IntegrationsPage() {
+  const { data: session } = useSession();
+  const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
+
+  useEffect(() => {
+    if (session?.user?.id) getIntegrationStatus(session.user.id).then(setIntegrations);
+  }, [session?.user?.id]);
+
+  const isConnected = (provider: string) => integrations.some((i) => i.provider === provider);
+
+  const handleConnectGoogleCalendar = async () => {
+    const { authUrl } = await getGoogleCalendarAuthUrl();
+    window.location.href = authUrl;
+  };
+
+  const zoomConfigured = process.env.NEXT_PUBLIC_ZOOM_ENABLED === "true";
+
   return (
     <div className="min-h-screen bg-background text-text-primary flex">
       {/* SideNavBar */}
@@ -13,24 +34,19 @@ export default function IntegrationsPage() {
           <p className="text-sm text-text-secondary">AI-summarized sessions</p>
         </div>
         <Button variant="primary" className="w-full gap-2 mb-4">
-          <span></span>
           New Meeting
         </Button>
         <nav className="flex flex-col gap-1">
           <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface/50 rounded-lg transition-all">
-            <span></span>
             <span className="font-medium">Overview</span>
           </Link>
           <Link href="/dashboard/meetings" className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface/50 rounded-lg transition-all">
-            <span></span>
             <span className="font-medium">Recent Meetings</span>
           </Link>
           <Link href="/dashboard/action-items" className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface/50 rounded-lg transition-all">
-            <span></span>
             <span className="font-medium">Action Items</span>
           </Link>
           <Link href="/dashboard/integrations" className="flex items-center gap-3 px-3 py-2 bg-surface text-success rounded-lg transition-all">
-            <span></span>
             <span className="font-medium">Integrations</span>
           </Link>
         </nav>
@@ -50,17 +66,20 @@ export default function IntegrationsPage() {
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center">
-                  <span className="text-success text-2xl"></span>
+                  <span className="text-success text-2xl" />
                 </div>
-                <Badge variant="success">Active</Badge>
+                <Badge variant={isConnected("google-calendar") ? "success" : "neutral"}>
+                  {isConnected("google-calendar") ? "Active" : "Not Linked"}
+                </Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Google Calendar</h3>
               <p className="text-sm text-text-secondary mb-6">Automatically fetch meeting details and update schedule statuses.</p>
             </div>
-            <div className="flex gap-3">
-              <Button variant="secondary" className="flex-grow">Manage</Button>
-              <Button variant="danger" className="px-4">Disconnect</Button>
-            </div>
+            {isConnected("google-calendar") ? (
+              <Button variant="secondary" className="w-full" disabled>Connected</Button>
+            ) : (
+              <Button variant="primary" className="w-full" onClick={handleConnectGoogleCalendar}>Connect Google Calendar</Button>
+            )}
           </Card>
 
           {/* Zoom */}
@@ -68,16 +87,14 @@ export default function IntegrationsPage() {
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center">
-                  <span className="text-info text-2xl"></span>
+                  <span className="text-info text-2xl" />
                 </div>
-                <Badge variant="success">Active</Badge>
+                <Badge variant={zoomConfigured ? "success" : "neutral"}>
+                  {zoomConfigured ? "Configured via environment" : "Not configured"}
+                </Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Zoom</h3>
               <p className="text-sm text-text-secondary mb-6">Record meetings directly and generate AI transcripts in real-time.</p>
-            </div>
-            <div className="flex gap-3">
-              <Button variant="secondary" className="flex-grow">Manage</Button>
-              <Button variant="danger" className="px-4">Disconnect</Button>
             </div>
           </Card>
 
@@ -86,14 +103,16 @@ export default function IntegrationsPage() {
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center">
-                  <span className="text-text-primary text-2xl"></span>
+                  <span className="text-text-primary text-2xl" />
                 </div>
-                <Badge variant="neutral">Not Linked</Badge>
+                <Badge variant="neutral">Configured via export</Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Notion</h3>
               <p className="text-sm text-text-secondary mb-6">Sync meeting summaries and action items to your workspace databases.</p>
             </div>
-            <Button variant="primary" className="w-full">Connect Notion</Button>
+            <Link href="/dashboard/settings">
+              <Button variant="secondary" className="w-full">Configure in Settings</Button>
+            </Link>
           </Card>
 
           {/* Slack */}
@@ -101,50 +120,16 @@ export default function IntegrationsPage() {
             <div>
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center">
-                  <span className="text-warning text-2xl"></span>
+                  <span className="text-warning text-2xl" />
                 </div>
-                <Badge variant="success">Active</Badge>
+                <Badge variant="neutral">Configured via export</Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Slack</h3>
               <p className="text-sm text-text-secondary mb-6">Push summaries to designated channels and tag participants.</p>
             </div>
-            <div className="flex gap-3">
-              <Button variant="secondary" className="flex-grow">Configure</Button>
-              <Button variant="danger" className="px-4">Disconnect</Button>
-            </div>
-          </Card>
-
-          {/* Resend */}
-          <Card className="p-5 hover:border-border-hover transition-all flex flex-col justify-between min-h-[220px]">
-            <div>
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center">
-                  <span className="text-success text-2xl"></span>
-                </div>
-                <Badge variant="neutral">Not Linked</Badge>
-              </div>
-              <h3 className="text-lg font-semibold mb-1">Resend</h3>
-              <p className="text-sm text-text-secondary mb-6">Send clean, formatted email digests to all meeting attendees automatically.</p>
-            </div>
-            <Button variant="primary" className="w-full">Setup API Key</Button>
-          </Card>
-
-          {/* Google Meet */}
-          <Card className="p-5 hover:border-border-hover transition-all flex flex-col justify-between min-h-[220px]">
-            <div>
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-lg bg-surface flex items-center justify-center">
-                  <span className="text-blue-500 text-2xl"></span>
-                </div>
-                <Badge variant="success">Active</Badge>
-              </div>
-              <h3 className="text-lg font-semibold mb-1">Google Meet</h3>
-              <p className="text-sm text-text-secondary mb-6">Native integration for seamless capturing of browser-based video calls.</p>
-            </div>
-            <div className="flex gap-3">
-              <Button variant="secondary" className="flex-grow">Manage</Button>
-              <Button variant="danger" className="px-4">Disconnect</Button>
-            </div>
+            <Link href="/dashboard/settings">
+              <Button variant="secondary" className="w-full">Configure in Settings</Button>
+            </Link>
           </Card>
         </div>
 

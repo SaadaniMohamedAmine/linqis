@@ -69,6 +69,10 @@ export function deleteMeeting(id: string): Promise<void> {
   return request<void>(`/api/meetings/${id}`, { method: "DELETE" });
 }
 
+export function renameMeeting(id: string, title: string): Promise<void> {
+  return request(`/api/meetings/${id}`, { method: "PATCH", body: JSON.stringify({ title }) });
+}
+
 export function getActionItems(): Promise<ActionItemWithMeeting[]> {
   return request<ActionItemWithMeeting[]>("/api/action-items");
 }
@@ -177,4 +181,79 @@ export function resolveAudioUrl(audioUrl: string | null): string | null {
   if (!audioUrl) return null;
   if (audioUrl.startsWith("http")) return audioUrl;
   return `${API_URL}${audioUrl}`;
+}
+
+export async function exportToNotion(meetingId: string): Promise<{ pageId: string }> {
+  return request<{ pageId: string }>("/api/export/notion", {
+    method: "POST",
+    body: JSON.stringify({ meetingId }),
+  });
+}
+
+export async function exportToSlack(meetingId: string, webhookUrl: string): Promise<void> {
+  await request("/api/export/slack", {
+    method: "POST",
+    body: JSON.stringify({ meetingId, webhookUrl }),
+  });
+}
+
+export async function exportToEmail(meetingId: string, to: string): Promise<void> {
+  await request("/api/export/email", {
+    method: "POST",
+    body: JSON.stringify({ meetingId, to }),
+  });
+}
+
+export interface UserProfile {
+  id: string;
+  name: string | null;
+  email: string | null;
+  image: string | null;
+  summaryLength: "CONCISE" | "STANDARD" | "DETAILED";
+  emailNotifications: boolean;
+}
+
+export function getUser(userId: string): Promise<UserProfile> {
+  return request<UserProfile>(`/api/users/${userId}`);
+}
+
+export function updateUser(
+  userId: string,
+  data: Partial<Pick<UserProfile, "name" | "summaryLength" | "emailNotifications">>
+): Promise<UserProfile> {
+  return request<UserProfile>(`/api/users/${userId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export interface IntegrationStatus {
+  provider: string;
+  createdAt: string;
+}
+
+export function getIntegrationStatus(userId: string): Promise<IntegrationStatus[]> {
+  return request<IntegrationStatus[]>(`/api/integrations/status/${userId}`);
+}
+
+export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
+  return request<{ authUrl: string }>("/api/integrations/google-calendar/auth-url");
+}
+
+export interface Notification {
+  id: string;
+  type: "SUCCESS" | "WARNING" | "INFO" | "NEUTRAL";
+  title: string;
+  message: string;
+  read: boolean;
+  meetingId: string | null;
+  createdAt: string;
+}
+
+export function getNotifications(userId: string): Promise<Notification[]> {
+  return request<Notification[]>(`/api/notifications/${userId}`);
+}
+
+export function markAllNotificationsRead(userId: string): Promise<void> {
+  return request(`/api/notifications/${userId}/read-all`, { method: "PATCH" });
 }

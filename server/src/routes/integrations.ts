@@ -2,7 +2,7 @@ import { Router } from "express";
 import fs from "fs";
 import path from "path";
 import { getZoomRecordings, downloadZoomRecording } from "../services/integrations/zoom";
-import { getGoogleAuthUrl, getGoogleCalendarEvents } from "../services/integrations/google-calendar";
+import { getGoogleAuthUrl, getGoogleCalendarEvents, exchangeGoogleCode } from "../services/integrations/google-calendar";
 import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../services/media";
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
@@ -121,5 +121,51 @@ router.get("/google-calendar/events", async (req, res) => {
   } catch (error) {
     console.error("Google Calendar events error:", error);
     res.status(500).json({ error: "Failed to fetch calendar events" });
+  }
+});
+
+router.post("/google-calendar/exchange", async (req, res) => {
+  try {
+    const { code, userId } = req.body;
+    if (!code || !userId) {
+      return res.status(400).json({ error: "code and userId are required" });
+    }
+
+    const tokens = await exchangeGoogleCode(code);
+    const prisma = getPrisma();
+
+    await prisma.integration.upsert({
+      where: { userId_provider: { userId, provider: "google-calendar" } },
+      create: {
+        userId,
+        provider: "google-calendar",
+        accessToken: tokens.access_token!,
+        refreshToken: tokens.refresh_token,
+        expiresAt: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
+      },
+      update: {
+        accessToken: tokens.access_token!,
+        ...(tokens.refresh_token && { refreshToken: tokens.refresh_token }),
+        expiresAt: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
+      },
+    });
+
+    res.json({ status: "connected" });
+  } catch (error) {
+    console.error("Google Calendar token exchange error:", error);
+    res.status(500).json({ error: "Failed to connect Google Calendar" });
+  }
+});
+
+router.get("/status/:userId", async (req, res) => {
+  try {
+    const prisma = getPrisma();
+    const integrations = await prisma.integration.findMany({
+      where: { userId: req.params.userId },
+      select: { provider: true, createdAt: true },
+    });
+    res.json(integrations);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch integration status" });
   }
 });

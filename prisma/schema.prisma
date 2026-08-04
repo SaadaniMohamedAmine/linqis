@@ -17,11 +17,59 @@ model User {
   emailVerified DateTime?
   image         String?
 
-  accounts Account[]
-  sessions Session[]
+  summaryLength      SummaryLength @default(STANDARD)
+  emailNotifications Boolean       @default(true)
+
+  accounts      Account[]
+  sessions      Session[]
+  integrations  Integration[]
+  notifications Notification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum SummaryLength {
+  CONCISE
+  STANDARD
+  DETAILED
+}
+
+model Integration {
+  id           String    @id @default(cuid())
+  userId       String
+  provider     String // "google-calendar" | "zoom"
+  accessToken  String    @db.Text
+  refreshToken String?   @db.Text
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  read      Boolean          @default(false)
+  meetingId String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+}
+
+enum NotificationType {
+  SUCCESS
+  WARNING
+  INFO
+  NEUTRAL
 }
 
 model Account {

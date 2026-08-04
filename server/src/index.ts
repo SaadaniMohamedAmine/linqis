@@ -9,6 +9,9 @@ import { router as uploadRouter } from "./routes/upload";
 import { router as exportRouter } from "./routes/exports";
 import { router as integrationRouter } from "./routes/integrations";
 import { router as actionItemRouter } from "./routes/action-items";
+import { router as userRouter } from "./routes/user";
+import { router as notificationRouter } from "./routes/notifications";
+import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
 import { worker } from "./queue/worker";
 
 const app = express();
@@ -29,12 +32,17 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+app.use("/api", apiRateLimit);
+app.use("/api/upload", uploadRateLimit);
+
 app.use("/api/meetings", meetingRouter);
 app.use("/api/queue", queueRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/export", exportRouter);
 app.use("/api/integrations", integrationRouter);
 app.use("/api/action-items", actionItemRouter);
+app.use("/api/users", userRouter);
+app.use("/api/notifications", notificationRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));

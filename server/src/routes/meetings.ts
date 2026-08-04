@@ -68,6 +68,23 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.patch("/:id", async (req, res) => {
+  try {
+    const { title } = req.body;
+    if (!title || typeof title !== "string") {
+      return res.status(400).json({ error: "title is required" });
+    }
+    const prisma = getPrisma();
+    const meeting = await prisma.meeting.update({
+      where: { id: req.params.id },
+      data: { title },
+    });
+    res.json(meeting);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to rename meeting" });
+  }
+});
+
 router.delete("/:id", async (req, res) => {
   try {
     const prisma = getPrisma();
