@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getPrisma } from "../db";
 import { exportToNotion, exportToSlack, exportToEmail } from "../services/export";
 import type { AuthedRequest } from "../middleware/auth";
+import { PLAN_LIMITS } from "../lib/plans";
 
 export const router = Router();
 
@@ -12,11 +13,18 @@ router.post("/notion", async (req: AuthedRequest, res) => {
 
     const [meeting, user] = await Promise.all([
       prisma.meeting.findUnique({ where: { id: meetingId }, include: { actionItems: true, decisions: true } }),
-      prisma.user.findUnique({ where: { id: req.userId }, select: { notionApiKey: true, notionDatabaseId: true } }),
+      prisma.user.findUnique({ where: { id: req.userId }, select: { notionApiKey: true, notionDatabaseId: true, plan: true } }),
     ]);
 
     if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
+    }
+
+    if (!PLAN_LIMITS[user?.plan || "FREE"].exportsEnabled) {
+      return res.status(402).json({
+        error: "Exports are a Pro feature. Upgrade to export to Notion, Slack, or Email.",
+        code: "PLAN_LIMIT_REACHED",
+      });
     }
 
     // Falls back to a global integration if the user hasn't connected their
@@ -59,16 +67,20 @@ router.post("/slack", async (req: AuthedRequest, res) => {
     const { meetingId, webhookUrl } = req.body;
     const prisma = getPrisma();
 
-    const meeting = await prisma.meeting.findUnique({
-      where: { id: meetingId },
-      include: {
-        actionItems: true,
-        decisions: true,
-      },
-    });
+    const [meeting, user] = await Promise.all([
+      prisma.meeting.findUnique({ where: { id: meetingId }, include: { actionItems: true, decisions: true } }),
+      prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } }),
+    ]);
 
     if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
+    }
+
+    if (!PLAN_LIMITS[user?.plan || "FREE"].exportsEnabled) {
+      return res.status(402).json({
+        error: "Exports are a Pro feature. Upgrade to export to Notion, Slack, or Email.",
+        code: "PLAN_LIMIT_REACHED",
+      });
     }
 
     await exportToSlack({
@@ -102,16 +114,20 @@ router.post("/email", async (req: AuthedRequest, res) => {
     const { meetingId, to } = req.body;
     const prisma = getPrisma();
 
-    const meeting = await prisma.meeting.findUnique({
-      where: { id: meetingId },
-      include: {
-        actionItems: true,
-        decisions: true,
-      },
-    });
+    const [meeting, user] = await Promise.all([
+      prisma.meeting.findUnique({ where: { id: meetingId }, include: { actionItems: true, decisions: true } }),
+      prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } }),
+    ]);
 
     if (!meeting || meeting.userId !== req.userId) {
       return res.status(404).json({ error: "Meeting not found" });
+    }
+
+    if (!PLAN_LIMITS[user?.plan || "FREE"].exportsEnabled) {
+      return res.status(402).json({
+        error: "Exports are a Pro feature. Upgrade to export to Notion, Slack, or Email.",
+        code: "PLAN_LIMIT_REACHED",
+      });
     }
 
     await exportToEmail({
