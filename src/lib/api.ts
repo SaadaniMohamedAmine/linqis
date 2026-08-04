@@ -303,3 +303,12 @@ export interface SearchResult {
 export function searchMeetings(query: string): Promise<SearchResult[]> {
   return request<SearchResult[]>(`/api/search?q=${encodeURIComponent(query)}`);
 }
+
+export interface ChatResponse {
+  answer: string;
+  sources: { id: string; title: string }[];
+}
+
+export function askMeetings(question: string): Promise<ChatResponse> {
+  return request<ChatResponse>("/api/chat", { method: "POST", body: JSON.stringify({ question }) });
+}

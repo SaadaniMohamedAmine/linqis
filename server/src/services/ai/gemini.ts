@@ -71,3 +71,16 @@ ${transcript}`;
   if (mood.includes("POSITIVE")) return "POSITIVE";
   return "NEUTRAL";
 }
+
+export async function answerFromContext(question: string, context: string): Promise<string> {
+  const prompt = `You are a helpful assistant answering questions about the user's past meetings, using ONLY the context below. If the answer isn't in the context, say so honestly instead of guessing.
+
+Context from the user's meetings:
+${context}
+
+Question: ${question}
+
+Answer concisely, and mention which meeting(s) the information comes from:`;
+
+  return complete(prompt);
+}

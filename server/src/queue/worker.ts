@@ -2,6 +2,7 @@ import { Worker, Job } from "bullmq";
 import { redis } from "./config";
 import { transcribeWithTimestamps, diarizeSpeakers, reassembleTranscript, mergeTranscripts } from "../services/transcription";
 import { ai, detectDisagreements, detectMoodWithAnalysis } from "../services/ai";
+import { embedText, chunkText } from "../services/ai/embeddings";
 import { getPrisma } from "../db";
 import { publishProgress, publishComplete, publishError } from "../services/sse";
 
@@ -48,6 +49,20 @@ export const worker = new Worker<MeetingJob>(
         timestamp: seg.timestamp,
       })),
     });
+
+    // Non-blocking: chat/RAG is a secondary feature -- an embedding failure
+    // must never take down the primary summary/decisions/action-items path.
+    try {
+      const chunks = chunkText(fullTranscript);
+      for (const chunk of chunks) {
+        const embedding = await embedText(chunk);
+        await prisma.meetingEmbedding.create({
+          data: { meetingId, chunkText: chunk, embedding },
+        });
+      }
+    } catch (err) {
+      console.error("Failed to generate embeddings (non-blocking):", err);
+    }
 
     await publishProgress(job.id, { status: "analyzing", progress: 45 });
 
