@@ -3,21 +3,27 @@ import { join, extname } from "path";
 
 const SRC_DIR = join(process.cwd(), "src");
 const HEX_PATTERN = /#[0-9a-fA-F]{3,8}\b/g;
-const ALLOWED_FILES = new Set([
-  "globals.css", // only place raw hex tokens are legitimate
-  // Third-party brand colors (Google's multicolor "G"), not part of the
-  // Linqis design system -- these are exact provider brand hex codes.
-  "page.tsx", // guarded further by directory check below, see walk()
-]);
-// Directories where the "page.tsx" exception above actually applies.
-const ALLOWED_BRAND_LOGO_DIRS = [join(SRC_DIR, "app", "(public)", "sign-in"), join(SRC_DIR, "app", "(public)", "sign-up")];
+
+// Files (or file-in-directory pairs) where raw hex is legitimate, with why:
+const ALLOWED = [
+  // The only place raw hex tokens themselves are defined.
+  { entry: "globals.css" },
+  // Google's multicolor "G" logo -- third-party brand colors, not part of
+  // the Linqis design system. Scoped by directory since "page.tsx" is the
+  // basename of every route in the App Router.
+  { entry: "page.tsx", dir: join(SRC_DIR, "app", "(public)", "sign-in") },
+  { entry: "page.tsx", dir: join(SRC_DIR, "app", "(public)", "sign-up") },
+  // next/og's ImageResponse (Satori) can't consume CSS variables or
+  // Tailwind classes -- it requires literal inline style values. The hex
+  // codes here are exact copies of the design tokens, just necessarily
+  // hardcoded because of how the renderer works.
+  { entry: "opengraph-image.tsx", dir: join(SRC_DIR, "app") },
+];
 
 const offenders = [];
 
 function isAllowed(fullPath, entry) {
-  if (entry === "globals.css") return true;
-  if (entry === "page.tsx" && ALLOWED_BRAND_LOGO_DIRS.some((dir) => fullPath.startsWith(dir))) return true;
-  return false;
+  return ALLOWED.some((rule) => rule.entry === entry && (!rule.dir || fullPath.startsWith(rule.dir)));
 }
 
 function walk(dir) {
