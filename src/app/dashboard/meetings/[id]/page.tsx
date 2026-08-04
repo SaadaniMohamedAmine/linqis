@@ -14,6 +14,7 @@ import {
   renameMeeting,
   deleteMeeting,
   toggleMeetingShare,
+  downloadMeetingPdf,
   ApiError,
   type MeetingDetail,
 } from "@/lib/api";
@@ -55,6 +56,8 @@ export default function MeetingDetailPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -147,6 +150,19 @@ export default function MeetingDetailPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadPdf = async () => {
+    if (!meeting) return;
+    setPdfLoading(true);
+    setPdfError(null);
+    try {
+      await downloadMeetingPdf(meeting.id, meeting.title);
+    } catch (err) {
+      setPdfError(err instanceof ApiError ? err.message : "Failed to download PDF.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -230,9 +246,13 @@ export default function MeetingDetailPage() {
             </div>
           )}
           <Button variant="secondary" data-tour="export-button" onClick={() => setExportModalOpen(true)}>Export</Button>
+          <Button variant="secondary" onClick={handleDownloadPdf} disabled={pdfLoading}>
+            {pdfLoading ? "Generating..." : "Download PDF"}
+          </Button>
           <Button variant="danger" onClick={handleDelete}>Delete</Button>
         </div>
       </div>
+      {pdfError && <p className="px-6 py-2 text-xs text-danger">{pdfError}</p>}
 
       {/* Tabs Header */}
       <div className="flex border-b border-border px-6">

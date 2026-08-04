@@ -97,6 +97,27 @@ export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPu
   return request(`/api/meetings/${id}/share`, { method: "PATCH", body: JSON.stringify({ enabled }) });
 }
 
+/**
+ * Downloads via fetch + blob rather than a plain <a href> because the PDF
+ * route is protected -- a bare link wouldn't carry the Authorization
+ * bearer token the backend requires.
+ */
+export async function downloadMeetingPdf(id: string, filename: string): Promise<void> {
+  const token = await getBackendToken();
+  const res = await fetch(`${API_URL}/api/pdf/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!res.ok) throw new ApiError(res.status, "Failed to generate PDF");
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
 export function getActionItems(): Promise<ActionItemWithMeeting[]> {
   return request<ActionItemWithMeeting[]>("/api/action-items");
 }

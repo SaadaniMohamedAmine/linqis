@@ -18,7 +18,8 @@
     "googleapis": "^173.0.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pdfkit": "^0.19.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -26,6 +27,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.9",
     "@types/node": "^26.1.2",
+    "@types/pdfkit": "^0.17.6",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.0",

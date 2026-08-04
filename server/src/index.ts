@@ -14,6 +14,7 @@ import { router as notificationRouter } from "./routes/notifications";
 import { router as searchRouter } from "./routes/search";
 import { router as chatRouter } from "./routes/chat";
 import { router as publicRouter } from "./routes/public";
+import { router as pdfRouter } from "./routes/pdf";
 import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
 import { requireAuth } from "./middleware/auth";
 import { worker } from "./queue/worker";
@@ -60,6 +61,7 @@ app.use("/api/chat", requireAuth, chatRouter);
 // Deliberately public -- this is the read endpoint for shared meeting links,
 // gated only by an unguessable shareToken and meeting.isPublic, not a login.
 app.use("/api/public", publicRouter);
+app.use("/api/pdf", requireAuth, pdfRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));
