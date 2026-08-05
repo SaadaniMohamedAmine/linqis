@@ -37,3 +37,11 @@ test("Security section is visible", async ({ page }) => {
   await page.goto("http://localhost:3000");
   await expect(page.locator("#security").getByText("Your meetings stay yours.")).toBeVisible();
 });
+
+test("FAQ accordion expands on click", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  const faqItem = page.locator("#faq details").first();
+  await expect(faqItem.locator("p")).toBeHidden();
+  await faqItem.locator("summary").click();
+  await expect(faqItem.locator("p")).toBeVisible();
+});

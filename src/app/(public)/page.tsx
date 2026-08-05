@@ -45,6 +45,14 @@ const SECURITY_POINTS = [
   { icon: Trash2, title: "Delete anytime", desc: "Remove a meeting and its transcript, summary, and action items are gone — no soft-delete limbo." },
 ];
 
+const FAQS = [
+  { q: "What file formats can I upload?", a: "MP3, MP4, WAV, M4A, MOV, and WebM — audio or video, Linqis extracts the audio automatically." },
+  { q: "Is my meeting data private?", a: "Yes. Meetings are scoped to your account only — no other user can see, search, or export your data. You can delete any meeting permanently at any time." },
+  { q: "What happens when I hit the Free plan limit?", a: "You'll get a clear message before anything fails, with the option to upgrade to Pro for unlimited meetings and longer recordings." },
+  { q: "Can I export to tools I already use?", a: "Yes — one click sends a summary to Notion, Slack, or email. Notion exports use your own account by default, or ours if you haven't connected one yet." },
+  { q: "How does \"Ask your meetings\" work?", a: "It's a chat that searches across every meeting you've processed and answers using only what was actually said, with links back to the source meeting." },
+];
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-hidden">
@@ -388,6 +396,32 @@ export default function Home() {
                   <p className="text-sm text-text-secondary">{point.desc}</p>
                 </Card>
               </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-24 border-t border-border">
+        <div className="max-w-[720px] mx-auto px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl font-semibold mb-12 text-center"
+          >
+            Frequently asked questions
+          </motion.h2>
+
+          <div className="flex flex-col gap-3">
+            {FAQS.map((faq) => (
+              <details key={faq.q} className="group bg-surface border border-border rounded-lg px-5 py-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-text-primary">
+                  {faq.q}
+                  <span className="text-text-secondary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                </summary>
+                <p className="text-sm text-text-secondary mt-3">{faq.a}</p>
+              </details>
             ))}
           </div>
         </div>
