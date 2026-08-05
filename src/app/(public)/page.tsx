@@ -15,6 +15,29 @@ const INTEGRATIONS = [
   { icon: Video, name: "Zoom" },
 ];
 
+const USE_CASES = [
+  {
+    role: "Product Manager",
+    headline: "Never lose a decision in a doc nobody reopens.",
+    desc: "Every decision and action item is extracted automatically and stays searchable across every meeting you've ever had.",
+  },
+  {
+    role: "Engineering Lead",
+    headline: "Keep async teammates in the loop without a recap meeting.",
+    desc: "Push a clean summary straight to Slack the moment a meeting ends, so nobody has to sit through the recording.",
+  },
+  {
+    role: "Founder / Executive",
+    headline: "Ask a question, get an answer from every meeting at once.",
+    desc: "Ask your meetings anything — \"What did we decide about pricing last month?\" — and get an answer with sources, not a transcript to skim.",
+  },
+  {
+    role: "Designer",
+    headline: "Spot the disagreements before they become rework.",
+    desc: "Linqis flags tension and unresolved disagreement in design reviews, so you follow up before it turns into a Monday surprise.",
+  },
+];
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-hidden">
@@ -292,6 +315,39 @@ export default function Home() {
               </div>
             </Card>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Use Cases by Role Section */}
+      <section id="use-cases" className="py-24 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="text-3xl font-semibold mb-4">Built for how you actually work.</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">Whatever the meeting, Linqis adapts to what you need out of it.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {USE_CASES.map((uc, i) => (
+              <motion.div
+                key={uc.role}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full p-6 border-border hover:border-success/40 transition-colors">
+                  <p className="text-xs font-semibold text-success uppercase tracking-widest mb-3">{uc.role}</p>
+                  <h3 className="text-base font-semibold mb-2">{uc.headline}</h3>
+                  <p className="text-sm text-text-secondary">{uc.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

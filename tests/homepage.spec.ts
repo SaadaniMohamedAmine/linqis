@@ -23,3 +23,12 @@ test("Ask your meetings section is visible", async ({ page }) => {
   await page.goto("http://localhost:3000");
   await expect(page.locator("#ask").getByText("Ask your meetings anything.")).toBeVisible();
 });
+
+test("Use cases section lists all four roles", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  const useCases = page.locator("#use-cases");
+  await expect(useCases.getByText("Product Manager")).toBeVisible();
+  await expect(useCases.getByText("Engineering Lead")).toBeVisible();
+  await expect(useCases.getByText("Founder / Executive")).toBeVisible();
+  await expect(useCases.getByText("Designer")).toBeVisible();
+});
