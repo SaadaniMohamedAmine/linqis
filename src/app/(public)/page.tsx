@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { FileText, MessageCircle, Mail, Calendar, Video } from "lucide-react";
+import { FileText, MessageCircle, Mail, Calendar, Video, ShieldCheck, Lock, Trash2, KeyRound } from "lucide-react";
 
 const INTEGRATIONS = [
   { icon: FileText, name: "Notion" },
@@ -36,6 +36,13 @@ const USE_CASES = [
     headline: "Spot the disagreements before they become rework.",
     desc: "Linqis flags tension and unresolved disagreement in design reviews, so you follow up before it turns into a Monday surprise.",
   },
+];
+
+const SECURITY_POINTS = [
+  { icon: Lock, title: "Your data, isolated", desc: "Every meeting, transcript, and summary is scoped to your account. No other user can query or list your data, ever." },
+  { icon: ShieldCheck, title: "Encrypted in transit", desc: "All traffic between your browser, Linqis, and its AI providers runs over HTTPS/TLS." },
+  { icon: KeyRound, title: "You control exports", desc: "Connect your own Notion workspace in Settings, or start exporting right away with ours." },
+  { icon: Trash2, title: "Delete anytime", desc: "Remove a meeting and its transcript, summary, and action items are gone — no soft-delete limbo." },
 ];
 
 export default function Home() {
@@ -344,6 +351,41 @@ export default function Home() {
                   <p className="text-xs font-semibold text-success uppercase tracking-widest mb-3">{uc.role}</p>
                   <h3 className="text-base font-semibold mb-2">{uc.headline}</h3>
                   <p className="text-sm text-text-secondary">{uc.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Security Section */}
+      <section id="security" className="py-24 bg-surface/50 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="text-3xl font-semibold mb-4">Your meetings stay yours.</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">Meeting content is sensitive. Linqis is built to keep it that way.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {SECURITY_POINTS.map((point, i) => (
+              <motion.div
+                key={point.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full p-6 border-border">
+                  <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center mb-4 border border-border">
+                    <point.icon className="w-5 h-5 text-success" />
+                  </div>
+                  <h3 className="text-base font-semibold mb-2">{point.title}</h3>
+                  <p className="text-sm text-text-secondary">{point.desc}</p>
                 </Card>
               </motion.div>
             ))}

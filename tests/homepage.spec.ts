@@ -32,3 +32,8 @@ test("Use cases section lists all four roles", async ({ page }) => {
   await expect(useCases.getByText("Founder / Executive")).toBeVisible();
   await expect(useCases.getByText("Designer")).toBeVisible();
 });
+
+test("Security section is visible", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page.locator("#security").getByText("Your meetings stay yours.")).toBeVisible();
+});
