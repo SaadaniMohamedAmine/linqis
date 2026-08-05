@@ -73,6 +73,10 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
+section[id] {
+  scroll-margin-top: 4rem;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

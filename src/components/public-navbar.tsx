@@ -13,8 +13,8 @@ export function PublicNavbar() {
         
         <nav className="hidden md:flex items-center gap-8">
           <Link href="/#features" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Features</Link>
-          <Link href="/#steps" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Steps</Link>
-          <Link href="/#cta" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Action</Link>
+          <Link href="/#use-cases" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Use Cases</Link>
+          <Link href="/#security" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Security</Link>
           <Link href="/pricing" className="text-text-secondary hover:text-success transition-colors">Pricing</Link>
         </nav>
 

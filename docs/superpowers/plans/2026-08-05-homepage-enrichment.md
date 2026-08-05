@@ -1,0 +1,705 @@
+# Homepage Enrichment Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Rewrite the public homepage (`src/app/(public)/page.tsx`) to add 5 new sections (Integrations, Ask your meetings, Use cases by role, Security, FAQ), correct 4 invented marketing claims in the existing sections, and update the navbar anchors to match.
+
+**Architecture:** Single-page Next.js client component built from static const arrays (`INTEGRATIONS`, `USE_CASES`, `SECURITY_POINTS`, `FAQS`) mapped into `<section id="...">` blocks, consistent with the existing Hero/Features/Steps/CTA sections already in the file. No new components, no new routes, no server changes.
+
+**Tech Stack:** Next.js 16 (App Router), TypeScript, Tailwind (CSS variables, no hardcoded hex outside `globals.css` — enforced by `npm run design-audit`), `framer-motion` for scroll-reveal animation, `lucide-react` for icons, Playwright for e2e tests (`tests/homepage.spec.ts`).
+
+## Global Constraints
+
+- No hardcoded hex colors in `src/**/*.tsx` — use Tailwind classes or `var(--color-*)`. Verified by `npm run design-audit`.
+- Integration/security icons are generic `lucide-react` icons, never brand logos (Notion/Slack/Zoom/Google Calendar) — avoids brand-asset licensing questions.
+- New section `id`s must exactly match the design spec so nav anchors (`/#use-cases`, `/#security`) resolve: `integrations`, `ask`, `use-cases`, `security`, `faq`.
+- Role labels in the new "Use cases" section must exactly match `ROLES` in `src/app/onboarding/page.tsx:9` (`"Product Manager"`, `"Engineering Lead"`, `"Founder / Executive"`, `"Designer"`).
+- Full design spec: `docs/superpowers/specs/2026-08-05-homepage-enrichment-design.md` — every task below implements one section of it verbatim.
+- Every task is its own commit (user preference — do not batch multiple tasks into one commit).
+
+## File Structure
+
+- Modify: `src/app/(public)/page.tsx` — grows incrementally, one section per task. Existing Hero/Features/Steps/CTA sections stay in place; new sections are inserted between them.
+- Modify: `src/components/public-navbar.tsx` — nav anchors updated once, after all sections exist (Task 7).
+- Modify: `tests/homepage.spec.ts` — one new Playwright assertion per task, run against a local dev server.
+
+## Testing Approach
+
+This is a content/marketing page, not business logic — there's nothing to unit-test. The test cycle for each task is: add a Playwright assertion for the new section → start (or reuse) the Next.js dev server → run that one assertion → confirm it fails (section doesn't exist yet) → build the section → run it again → confirm it passes. `npm run typecheck` is also run every task as a fast compile-correctness gate.
+
+Starting the dev server is idempotent across tasks: if a server from an earlier task is still running on port 3000, `npm run dev` will simply fail to bind and you already have what you need — skip straight to running the test.
+
+---
+
+### Task 1: Correct the invented marketing claims in existing sections
+
+**Files:**
+- Modify: `src/app/(public)/page.tsx:35` (hero badge), `:127-129` (features array), `:227` (CTA copy)
+- Test: `tests/homepage.spec.ts`
+
+**Interfaces:**
+- Consumes: nothing new — pure text edits to JSX already in the file.
+- Produces: nothing new — no new consts, no new sections. Later tasks are unaffected by this task's changes.
+
+- [ ] **Step 1: Write the failing test**
+
+Edit `tests/homepage.spec.ts`, add an assertion to the existing first test:
+
+```ts
+test("Homepage loads correctly", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page).toHaveTitle(/Linqis/);
+  await expect(page.getByText("Every meeting, decoded.")).toBeVisible();
+  await expect(page.getByText("AI-powered meeting intelligence")).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Start the dev server and run the test to verify it fails**
+
+Run in background: `npm run dev`
+Wait ~5s for it to bind, then run: `npx playwright test tests/homepage.spec.ts -g "Homepage loads correctly"`
+Expected: FAIL — `AI-powered meeting intelligence` is not yet in the page (the badge still says `NEW: AI Summary V2.0`).
+
+- [ ] **Step 3: Fix the three invented claims**
+
+In `src/app/(public)/page.tsx`, replace the hero badge text:
+
+```tsx
+              <span className="text-xs text-success">NEW: AI Summary V2.0</span>
+```
+with:
+```tsx
+              <span className="text-xs text-success">AI-powered meeting intelligence</span>
+```
+
+Replace the Features section's card array:
+```tsx
+            {[
+              { icon: "⚡", title: "Instant Transcription", desc: "Proprietary neural engines convert speech to text with 99.4% accuracy in real-time, handling 40+ languages natively." },
+              { icon: "✨", title: "AI Summary", desc: "Get concise executive summaries and bulleted action items generated by a custom GPT model trained on business contexts." },
+              { icon: "🔗", title: "Export Anywhere", desc: "One-click integrations with Notion, Slack, Jira, and GitHub. Sync your meeting insights directly to your workspace." }
+            ].map((feature, i) => (
+```
+with:
+```tsx
+            {[
+              { icon: "⚡", title: "Instant Transcription", desc: "Speech-to-text powered by Whisper, with automatic speaker separation and a summary ready minutes after upload." },
+              { icon: "✨", title: "AI Summary", desc: "Get a concise executive summary, decisions, and bulleted action items — extracted automatically, not written by hand." },
+              { icon: "🔗", title: "Export Anywhere", desc: "One-click export to Notion, Slack, or email. Sync your meeting insights directly to the tools your team already uses." }
+            ].map((feature, i) => (
+```
+
+Replace the CTA copy:
+```tsx
+          <p className="text-lg text-text-secondary mb-12 max-w-xl mx-auto">Join 50,000+ teams who use Linqis to stay aligned without the manual effort.</p>
+```
+with:
+```tsx
+          <p className="text-lg text-text-secondary mb-12 max-w-xl mx-auto">Join teams who use Linqis to stay aligned without the manual effort.</p>
+```
+
+- [ ] **Step 4: Run typecheck and the test again**
+
+Run: `npm run typecheck`
+Expected: no errors.
+
+Run: `npx playwright test tests/homepage.spec.ts -g "Homepage loads correctly"`
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/app/\(public\)/page.tsx tests/homepage.spec.ts
+git commit -m "fix: correct invented marketing claims on homepage"
+```
+
+---
+
+### Task 2: Add the Integrations section
+
+**Files:**
+- Modify: `src/app/(public)/page.tsx` — add import, add `INTEGRATIONS` const, insert section before the Steps section.
+- Test: `tests/homepage.spec.ts`
+
+**Interfaces:**
+- Consumes: nothing from Task 1.
+- Produces: `INTEGRATIONS` const (array of `{ icon: LucideIcon, name: string }`) — not consumed by any later task, local to this section.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/homepage.spec.ts`:
+
+```ts
+test("Integrations section lists real integrations", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  const integrations = page.locator("#integrations");
+  await expect(integrations.getByText("Notion")).toBeVisible();
+  await expect(integrations.getByText("Zoom")).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Ensure the dev server is running (`npm run dev` in background, skip if already up from Task 1).
+Run: `npx playwright test tests/homepage.spec.ts -g "Integrations section"`
+Expected: FAIL — `#integrations` doesn't exist yet.
+
+- [ ] **Step 3: Add the import and the data**
+
+In `src/app/(public)/page.tsx`, after:
+```tsx
+import { Badge } from "@/components/ui/badge";
+```
+add:
+```tsx
+import { FileText, MessageCircle, Mail, Calendar, Video } from "lucide-react";
+```
+
+Before `export default function Home() {`, add:
+```tsx
+const INTEGRATIONS = [
+  { icon: FileText, name: "Notion" },
+  { icon: MessageCircle, name: "Slack" },
+  { icon: Mail, name: "Email" },
+  { icon: Calendar, name: "Google Calendar" },
+  { icon: Video, name: "Zoom" },
+];
+```
+
+- [ ] **Step 4: Insert the section**
+
+Immediately before the line `{/* Steps Section */}`, insert:
+
+```tsx
+      {/* Integrations Section */}
+      <section id="integrations" className="py-20 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <p className="text-sm text-text-secondary uppercase tracking-widest">Works with the tools you already use</p>
+          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {INTEGRATIONS.map((integration, i) => (
+              <motion.div
+                key={integration.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="flex items-center gap-2 bg-surface border border-border rounded-full px-5 py-3 text-text-secondary hover:border-success/40 hover:text-text-primary transition-colors"
+              >
+                <integration.icon className="w-4 h-4" />
+                <span className="text-sm font-medium">{integration.name}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+```
+
+- [ ] **Step 5: Run typecheck and the test again**
+
+Run: `npm run typecheck`
+Expected: no errors.
+
+Run: `npx playwright test tests/homepage.spec.ts -g "Integrations section"`
+Expected: PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/app/\(public\)/page.tsx tests/homepage.spec.ts
+git commit -m "feat: add Integrations section to homepage"
+```
+
+---
+
+### Task 3: Add the "Ask your meetings" section
+
+**Files:**
+- Modify: `src/app/(public)/page.tsx` — insert section before the CTA section.
+- Test: `tests/homepage.spec.ts`
+
+**Interfaces:**
+- Consumes: `Badge`, `Card`, `Button`, `Link` — all already imported.
+- Produces: nothing consumed by later tasks.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/homepage.spec.ts`:
+
+```ts
+test("Ask your meetings section is visible", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page.locator("#ask").getByText("Ask your meetings anything.")).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Ensure the dev server is running (skip if already up).
+Run: `npx playwright test tests/homepage.spec.ts -g "Ask your meetings section"`
+Expected: FAIL — `#ask` doesn't exist yet.
+
+- [ ] **Step 3: Insert the section**
+
+Immediately before the line `{/* CTA Section */}`, insert:
+
+```tsx
+      {/* Ask Your Meetings Section */}
+      <section id="ask" className="py-24 bg-surface/50 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge variant="success" className="mb-4">New</Badge>
+            <h2 className="text-3xl font-semibold mb-4">Ask your meetings anything.</h2>
+            <p className="text-text-secondary max-w-md mb-6">
+              Stop scrolling through transcripts. Linqis searches across every meeting you've processed and answers in plain English — with a link back to exactly where it came from.
+            </p>
+            <Link href="/sign-up">
+              <Button variant="primary">Try it free</Button>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="p-6 rounded-xl bg-surface/80 backdrop-blur-md border-border">
+              <div className="flex justify-end mb-4">
+                <div className="bg-success/10 border border-success/20 rounded-lg rounded-tr-none px-4 py-3 max-w-[80%]">
+                  <p className="text-sm">What did we decide about the Q3 budget?</p>
+                </div>
+              </div>
+              <div className="flex justify-start">
+                <div className="bg-background border border-border rounded-lg rounded-tl-none px-4 py-3 max-w-[85%]">
+                  <p className="text-sm text-text-secondary mb-2">
+                    You approved a 12% increase for the design team, contingent on the Q2 hiring plan closing on time.
+                  </p>
+                  <Link href="#" className="text-xs text-success hover:underline">Source: "Q3 Strategy" — Aug 3</Link>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+```
+
+- [ ] **Step 4: Run typecheck and the test again**
+
+Run: `npm run typecheck`
+Expected: no errors.
+
+Run: `npx playwright test tests/homepage.spec.ts -g "Ask your meetings section"`
+Expected: PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/app/\(public\)/page.tsx tests/homepage.spec.ts
+git commit -m "feat: add Ask your meetings section to homepage"
+```
+
+---
+
+### Task 4: Add the "Use cases by role" section
+
+**Files:**
+- Modify: `src/app/(public)/page.tsx` — add `USE_CASES` const, insert section before the CTA section.
+- Test: `tests/homepage.spec.ts`
+
+**Interfaces:**
+- Consumes: nothing new.
+- Produces: `USE_CASES` const (array of `{ role: string, headline: string, desc: string }`) — local to this section, but `role` values must exactly match `ROLES` in `src/app/onboarding/page.tsx:9`.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/homepage.spec.ts`:
+
+```ts
+test("Use cases section lists all four roles", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  const useCases = page.locator("#use-cases");
+  await expect(useCases.getByText("Product Manager")).toBeVisible();
+  await expect(useCases.getByText("Engineering Lead")).toBeVisible();
+  await expect(useCases.getByText("Founder / Executive")).toBeVisible();
+  await expect(useCases.getByText("Designer")).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Ensure the dev server is running (skip if already up).
+Run: `npx playwright test tests/homepage.spec.ts -g "Use cases section"`
+Expected: FAIL — `#use-cases` doesn't exist yet.
+
+- [ ] **Step 3: Add the data**
+
+Before `export default function Home() {`, add:
+
+```tsx
+const USE_CASES = [
+  {
+    role: "Product Manager",
+    headline: "Never lose a decision in a doc nobody reopens.",
+    desc: "Every decision and action item is extracted automatically and stays searchable across every meeting you've ever had.",
+  },
+  {
+    role: "Engineering Lead",
+    headline: "Keep async teammates in the loop without a recap meeting.",
+    desc: "Push a clean summary straight to Slack the moment a meeting ends, so nobody has to sit through the recording.",
+  },
+  {
+    role: "Founder / Executive",
+    headline: "Ask a question, get an answer from every meeting at once.",
+    desc: "Ask your meetings anything — \"What did we decide about pricing last month?\" — and get an answer with sources, not a transcript to skim.",
+  },
+  {
+    role: "Designer",
+    headline: "Spot the disagreements before they become rework.",
+    desc: "Linqis flags tension and unresolved disagreement in design reviews, so you follow up before it turns into a Monday surprise.",
+  },
+];
+```
+
+- [ ] **Step 4: Insert the section**
+
+Immediately before the line `{/* CTA Section */}`, insert:
+
+```tsx
+      {/* Use Cases by Role Section */}
+      <section id="use-cases" className="py-24 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="text-3xl font-semibold mb-4">Built for how you actually work.</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">Whatever the meeting, Linqis adapts to what you need out of it.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {USE_CASES.map((uc, i) => (
+              <motion.div
+                key={uc.role}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full p-6 border-border hover:border-success/40 transition-colors">
+                  <p className="text-xs font-semibold text-success uppercase tracking-widest mb-3">{uc.role}</p>
+                  <h3 className="text-base font-semibold mb-2">{uc.headline}</h3>
+                  <p className="text-sm text-text-secondary">{uc.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+```
+
+- [ ] **Step 5: Run typecheck and the test again**
+
+Run: `npm run typecheck`
+Expected: no errors.
+
+Run: `npx playwright test tests/homepage.spec.ts -g "Use cases section"`
+Expected: PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/app/\(public\)/page.tsx tests/homepage.spec.ts
+git commit -m "feat: add Use cases by role section to homepage"
+```
+
+---
+
+### Task 5: Add the Security section
+
+**Files:**
+- Modify: `src/app/(public)/page.tsx` — extend the `lucide-react` import, add `SECURITY_POINTS` const, insert section before the CTA section.
+- Test: `tests/homepage.spec.ts`
+
+**Interfaces:**
+- Consumes: nothing new.
+- Produces: `SECURITY_POINTS` const (array of `{ icon: LucideIcon, title: string, desc: string }`) — local to this section.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/homepage.spec.ts`:
+
+```ts
+test("Security section is visible", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page.locator("#security").getByText("Your meetings stay yours.")).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Ensure the dev server is running (skip if already up).
+Run: `npx playwright test tests/homepage.spec.ts -g "Security section"`
+Expected: FAIL — `#security` doesn't exist yet.
+
+- [ ] **Step 3: Extend the icon import and add the data**
+
+Replace:
+```tsx
+import { FileText, MessageCircle, Mail, Calendar, Video } from "lucide-react";
+```
+with:
+```tsx
+import { FileText, MessageCircle, Mail, Calendar, Video, ShieldCheck, Lock, Trash2, KeyRound } from "lucide-react";
+```
+
+Before `export default function Home() {`, add:
+
+```tsx
+const SECURITY_POINTS = [
+  { icon: Lock, title: "Your data, isolated", desc: "Every meeting, transcript, and summary is scoped to your account. No other user can query or list your data, ever." },
+  { icon: ShieldCheck, title: "Encrypted in transit", desc: "All traffic between your browser, Linqis, and its AI providers runs over HTTPS/TLS." },
+  { icon: KeyRound, title: "You control exports", desc: "Connect your own Notion workspace in Settings, or start exporting right away with ours." },
+  { icon: Trash2, title: "Delete anytime", desc: "Remove a meeting and its transcript, summary, and action items are gone — no soft-delete limbo." },
+];
+```
+
+Note: the "You control exports" copy was corrected during spec review — see `docs/superpowers/specs/2026-08-05-homepage-enrichment-design.md` for why (Notion export falls back to a shared API key when the user hasn't connected their own, per `server/src/routes/exports.ts:30-33`).
+
+- [ ] **Step 4: Insert the section**
+
+Immediately before the line `{/* CTA Section */}`, insert:
+
+```tsx
+      {/* Security Section */}
+      <section id="security" className="py-24 bg-surface/50 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="text-3xl font-semibold mb-4">Your meetings stay yours.</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">Meeting content is sensitive. Linqis is built to keep it that way.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {SECURITY_POINTS.map((point, i) => (
+              <motion.div
+                key={point.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Card className="h-full p-6 border-border">
+                  <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center mb-4 border border-border">
+                    <point.icon className="w-5 h-5 text-success" />
+                  </div>
+                  <h3 className="text-base font-semibold mb-2">{point.title}</h3>
+                  <p className="text-sm text-text-secondary">{point.desc}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+```
+
+- [ ] **Step 5: Run typecheck and the test again**
+
+Run: `npm run typecheck`
+Expected: no errors.
+
+Run: `npx playwright test tests/homepage.spec.ts -g "Security section"`
+Expected: PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/app/\(public\)/page.tsx tests/homepage.spec.ts
+git commit -m "feat: add Security section to homepage"
+```
+
+---
+
+### Task 6: Add the FAQ section
+
+**Files:**
+- Modify: `src/app/(public)/page.tsx` — add `FAQS` const, insert section before the CTA section.
+- Test: `tests/homepage.spec.ts`
+
+**Interfaces:**
+- Consumes: nothing new.
+- Produces: `FAQS` const (array of `{ q: string, a: string }`) — local to this section.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/homepage.spec.ts`:
+
+```ts
+test("FAQ accordion expands on click", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  const faqItem = page.locator("#faq details").first();
+  await expect(faqItem.locator("p")).toBeHidden();
+  await faqItem.locator("summary").click();
+  await expect(faqItem.locator("p")).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Ensure the dev server is running (skip if already up).
+Run: `npx playwright test tests/homepage.spec.ts -g "FAQ accordion"`
+Expected: FAIL — `#faq` doesn't exist yet.
+
+- [ ] **Step 3: Add the data**
+
+Before `export default function Home() {`, add:
+
+```tsx
+const FAQS = [
+  { q: "What file formats can I upload?", a: "MP3, MP4, WAV, M4A, MOV, and WebM — audio or video, Linqis extracts the audio automatically." },
+  { q: "Is my meeting data private?", a: "Yes. Meetings are scoped to your account only — no other user can see, search, or export your data. You can delete any meeting permanently at any time." },
+  { q: "What happens when I hit the Free plan limit?", a: "You'll get a clear message before anything fails, with the option to upgrade to Pro for unlimited meetings and longer recordings." },
+  { q: "Can I export to tools I already use?", a: "Yes — one click sends a summary to Notion, Slack, or email. Notion exports use your own account by default, or ours if you haven't connected one yet." },
+  { q: "How does \"Ask your meetings\" work?", a: "It's a chat that searches across every meeting you've processed and answers using only what was actually said, with links back to the source meeting." },
+];
+```
+
+- [ ] **Step 4: Insert the section**
+
+Immediately before the line `{/* CTA Section */}`, insert:
+
+```tsx
+      {/* FAQ Section */}
+      <section id="faq" className="py-24 border-t border-border">
+        <div className="max-w-[720px] mx-auto px-6">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl font-semibold mb-12 text-center"
+          >
+            Frequently asked questions
+          </motion.h2>
+
+          <div className="flex flex-col gap-3">
+            {FAQS.map((faq) => (
+              <details key={faq.q} className="group bg-surface border border-border rounded-lg px-5 py-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-text-primary">
+                  {faq.q}
+                  <span className="text-text-secondary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                </summary>
+                <p className="text-sm text-text-secondary mt-3">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+```
+
+- [ ] **Step 5: Run typecheck and the test again**
+
+Run: `npm run typecheck`
+Expected: no errors.
+
+Run: `npx playwright test tests/homepage.spec.ts -g "FAQ accordion"`
+Expected: PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/app/\(public\)/page.tsx tests/homepage.spec.ts
+git commit -m "feat: add FAQ section to homepage"
+```
+
+---
+
+### Task 7: Update navbar anchors and run full regression
+
+**Files:**
+- Modify: `src/components/public-navbar.tsx:14-19`
+- Test: `tests/homepage.spec.ts`, full suite + `npm run design-audit`
+
+**Interfaces:**
+- Consumes: `#use-cases` and `#security` ids produced by Tasks 4 and 5.
+- Produces: nothing consumed elsewhere — this is the last task.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `tests/homepage.spec.ts`:
+
+```ts
+test("Navbar anchors point to the new sections", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page.locator('nav a[href="/#use-cases"]')).toBeVisible();
+  await expect(page.locator('nav a[href="/#security"]')).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Ensure the dev server is running (skip if already up).
+Run: `npx playwright test tests/homepage.spec.ts -g "Navbar anchors"`
+Expected: FAIL — the nav still links to `/#steps` and `/#cta`, not `/#use-cases` or `/#security`.
+
+- [ ] **Step 3: Update the nav links**
+
+In `src/components/public-navbar.tsx`, replace:
+
+```tsx
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/#features" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Features</Link>
+          <Link href="/#steps" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Steps</Link>
+          <Link href="/#cta" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Action</Link>
+          <Link href="/pricing" className="text-text-secondary hover:text-success transition-colors">Pricing</Link>
+        </nav>
+```
+with:
+```tsx
+        <nav className="hidden md:flex items-center gap-8">
+          <Link href="/#features" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Features</Link>
+          <Link href="/#use-cases" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Use Cases</Link>
+          <Link href="/#security" className="text-text-secondary hover:text-success transition-colors cursor-pointer">Security</Link>
+          <Link href="/pricing" className="text-text-secondary hover:text-success transition-colors">Pricing</Link>
+        </nav>
+```
+
+- [ ] **Step 4: Run the full verification suite**
+
+Run: `npm run typecheck` — expected: no errors.
+Run: `npm run design-audit` — expected: `✅ No hardcoded hex colors found outside globals.css.`
+Run: `npx playwright test tests/homepage.spec.ts` (full file, no `-g` filter) — expected: all tests PASS, including the "Navbar anchors" test and every test added in Tasks 1–6.
+
+- [ ] **Step 5: Manual visual check**
+
+With the dev server running, open `http://localhost:3000` in a browser and scroll through all 9 sections (Hero, Features, Integrations, Steps, Ask, Use Cases, Security, FAQ, CTA). Click a FAQ item to confirm the accordion opens. Click each new nav link to confirm it scrolls to the right section.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/components/public-navbar.tsx tests/homepage.spec.ts
+git commit -m "feat: update navbar anchors for new homepage sections"
+```
+
+- [ ] **Step 7: Stop the dev server**
+
+Kill the background `npm run dev` process started during this plan.
