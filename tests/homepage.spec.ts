@@ -11,3 +11,10 @@ test("Sign Up page is accessible", async ({ page }) => {
   await page.goto("http://localhost:3000/sign-up");
   await expect(page.getByText("Create your account")).toBeVisible();
 });
+
+test("Integrations section lists real integrations", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  const integrations = page.locator("#integrations");
+  await expect(integrations.getByText("Notion")).toBeVisible();
+  await expect(integrations.getByText("Zoom")).toBeVisible();
+});

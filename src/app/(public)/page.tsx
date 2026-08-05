@@ -5,6 +5,15 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FileText, MessageCircle, Mail, Calendar, Video } from "lucide-react";
+
+const INTEGRATIONS = [
+  { icon: FileText, name: "Notion" },
+  { icon: MessageCircle, name: "Slack" },
+  { icon: Mail, name: "Email" },
+  { icon: Calendar, name: "Google Calendar" },
+  { icon: Video, name: "Zoom" },
+];
 
 export default function Home() {
   return (
@@ -142,6 +151,35 @@ export default function Home() {
                   <h3 className="text-xl font-semibold mb-2 group-hover:text-success transition-colors">{feature.title}</h3>
                   <p className="text-sm text-text-secondary">{feature.desc}</p>
                 </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Integrations Section */}
+      <section id="integrations" className="py-20 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <p className="text-sm text-text-secondary uppercase tracking-widest">Works with the tools you already use</p>
+          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {INTEGRATIONS.map((integration, i) => (
+              <motion.div
+                key={integration.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="flex items-center gap-2 bg-surface border border-border rounded-full px-5 py-3 text-text-secondary hover:border-success/40 hover:text-text-primary transition-colors"
+              >
+                <integration.icon className="w-4 h-4" />
+                <span className="text-sm font-medium">{integration.name}</span>
               </motion.div>
             ))}
           </div>
