@@ -24,12 +24,12 @@ const USE_CASES = [
   {
     role: "Engineering Lead",
     headline: "Keep async teammates in the loop without a recap meeting.",
-    desc: "Push a clean summary straight to Slack the moment a meeting ends, so nobody has to sit through the recording.",
+    desc: "Send a clean summary to Slack in one click after a meeting ends, so nobody has to sit through the recording.",
   },
   {
     role: "Founder / Executive",
     headline: "Ask a question, get an answer from every meeting at once.",
-    desc: "Ask your meetings anything — \"What did we decide about pricing last month?\" — and get an answer with sources, not a transcript to skim.",
+    desc: "Ask a plain-English question like \"What did we decide about pricing last month?\" and get an answer with sources, not a transcript to skim.",
   },
   {
     role: "Designer",
@@ -41,15 +41,15 @@ const USE_CASES = [
 const SECURITY_POINTS = [
   { icon: Lock, title: "Your data, isolated", desc: "Every meeting, transcript, and summary is scoped to your account. No other user can query or list your data, ever." },
   { icon: ShieldCheck, title: "Encrypted in transit", desc: "All traffic between your browser, Linqis, and its AI providers runs over HTTPS/TLS." },
-  { icon: KeyRound, title: "You control exports", desc: "Connect your own Notion workspace in Settings, or start exporting right away with ours." },
+  { icon: KeyRound, title: "You control exports", desc: "On Pro, connect your own Notion workspace in Settings, or start exporting right away with ours." },
   { icon: Trash2, title: "Delete anytime", desc: "Remove a meeting and its transcript, summary, and action items are gone — no soft-delete limbo." },
 ];
 
 const FAQS = [
   { q: "What file formats can I upload?", a: "MP3, MP4, WAV, M4A, MOV, and WebM — audio or video, Linqis extracts the audio automatically." },
-  { q: "Is my meeting data private?", a: "Yes. Meetings are scoped to your account only — no other user can see, search, or export your data. You can delete any meeting permanently at any time." },
+  { q: "Is my meeting data private?", a: "Yes. Meetings are scoped to your account only — no other user can see, search, or export your data, unless you explicitly create a public share link for a meeting. You can delete any meeting permanently at any time." },
   { q: "What happens when I hit the Free plan limit?", a: "You'll get a clear message before anything fails, with the option to upgrade to Pro for unlimited meetings and longer recordings." },
-  { q: "Can I export to tools I already use?", a: "Yes — one click sends a summary to Notion, Slack, or email. Notion exports use your own account by default, or ours if you haven't connected one yet." },
+  { q: "Can I export to tools I already use?", a: "On the Pro plan, yes — one click sends a summary to Notion, Slack, or email. Notion exports use your own account by default, or ours if you haven't connected one yet." },
   { q: "How does \"Ask your meetings\" work?", a: "It's a chat that searches across every meeting you've processed and answers using only what was actually said, with links back to the source meeting." },
 ];
 
@@ -171,9 +171,9 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: "⚡", title: "Instant Transcription", desc: "Speech-to-text powered by Whisper, with automatic speaker separation and a summary ready minutes after upload." },
+              { icon: "⚡", title: "Instant Transcription", desc: "Speech-to-text powered by Whisper, with speaker labeling and a summary ready minutes after upload." },
               { icon: "✨", title: "AI Summary", desc: "Get a concise executive summary, decisions, and bulleted action items — extracted automatically, not written by hand." },
-              { icon: "🔗", title: "Export Anywhere", desc: "One-click export to Notion, Slack, or email. Sync your meeting insights directly to the tools your team already uses." }
+              { icon: "🔗", title: "Export Anywhere", desc: "One-click export to Notion, Slack, or email on the Pro plan. Sync your meeting insights directly to the tools your team already uses." }
             ].map((feature, i) => (
               <motion.div
                 key={i}
@@ -204,7 +204,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <p className="text-sm text-text-secondary uppercase tracking-widest">Works with the tools you already use</p>
+            <h2 className="text-sm text-text-secondary uppercase tracking-widest">Works with the tools you already use</h2>
           </motion.div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             {INTEGRATIONS.map((integration, i) => (
@@ -299,13 +299,13 @@ export default function Home() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Badge variant="success" className="mb-4">New</Badge>
+            <Badge variant="success" className="mb-4">Pro</Badge>
             <h2 className="text-3xl font-semibold mb-4">Ask your meetings anything.</h2>
             <p className="text-text-secondary max-w-md mb-6">
-              Stop scrolling through transcripts. Linqis searches across every meeting you've processed and answers in plain English — with a link back to exactly where it came from.
+              Stop scrolling through transcripts. Linqis searches across every meeting you've processed and answers in plain English — with a link back to exactly where it came from. Available on the Pro plan.
             </p>
-            <Link href="/sign-up">
-              <Button variant="primary">Try it free</Button>
+            <Link href="/pricing">
+              <Button variant="primary">See Pro plans</Button>
             </Link>
           </motion.div>
 
@@ -418,7 +418,7 @@ export default function Home() {
               <details key={faq.q} className="group bg-surface border border-border rounded-lg px-5 py-4">
                 <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-text-primary">
                   {faq.q}
-                  <span className="text-text-secondary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
+                  <span aria-hidden="true" className="text-text-secondary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
                 </summary>
                 <p className="text-sm text-text-secondary mt-3">{faq.a}</p>
               </details>
