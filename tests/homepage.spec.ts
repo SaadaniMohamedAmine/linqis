@@ -45,3 +45,9 @@ test("FAQ accordion expands on click", async ({ page }) => {
   await faqItem.locator("summary").click();
   await expect(faqItem.locator("p")).toBeVisible();
 });
+
+test("Navbar anchors point to the new sections", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page.locator('nav a[href="/#use-cases"]')).toBeVisible();
+  await expect(page.locator('nav a[href="/#security"]')).toBeVisible();
+});
