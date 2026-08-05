@@ -253,6 +253,48 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Ask Your Meetings Section */}
+      <section id="ask" className="py-24 bg-surface/50 border-t border-border">
+        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Badge variant="success" className="mb-4">New</Badge>
+            <h2 className="text-3xl font-semibold mb-4">Ask your meetings anything.</h2>
+            <p className="text-text-secondary max-w-md mb-6">
+              Stop scrolling through transcripts. Linqis searches across every meeting you've processed and answers in plain English — with a link back to exactly where it came from.
+            </p>
+            <Link href="/sign-up">
+              <Button variant="primary">Try it free</Button>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="p-6 rounded-xl bg-surface/80 backdrop-blur-md border-border">
+              <div className="flex justify-end mb-4">
+                <div className="bg-success/10 border border-success/20 rounded-lg rounded-tr-none px-4 py-3 max-w-[80%]">
+                  <p className="text-sm">What did we decide about the Q3 budget?</p>
+                </div>
+              </div>
+              <div className="flex justify-start">
+                <div className="bg-background border border-border rounded-lg rounded-tl-none px-4 py-3 max-w-[85%]">
+                  <p className="text-sm text-text-secondary mb-2">
+                    You approved a 12% increase for the design team, contingent on the Q2 hiring plan closing on time.
+                  </p>
+                  <Link href="#" className="text-xs text-success hover:underline">Source: "Q3 Strategy" — Aug 3</Link>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section id="cta" className="py-24 bg-success/5">
         <motion.div 

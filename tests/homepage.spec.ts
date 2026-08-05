@@ -18,3 +18,8 @@ test("Integrations section lists real integrations", async ({ page }) => {
   await expect(integrations.getByText("Notion")).toBeVisible();
   await expect(integrations.getByText("Zoom")).toBeVisible();
 });
+
+test("Ask your meetings section is visible", async ({ page }) => {
+  await page.goto("http://localhost:3000");
+  await expect(page.locator("#ask").getByText("Ask your meetings anything.")).toBeVisible();
+});
