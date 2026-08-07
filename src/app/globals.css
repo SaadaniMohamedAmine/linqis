@@ -69,6 +69,62 @@ body {
   animation: glitch 4s infinite linear;
 }
 
+@keyframes widget-in {
+  0% { opacity: 0; transform: translateY(8px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-widget-in {
+  animation: widget-in 0.18s ease-out;
+  transform-origin: bottom right;
+}
+
+@keyframes widget-out {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(8px) scale(0.97); }
+}
+
+.animate-widget-out {
+  animation: widget-out 0.15s ease-in forwards;
+  transform-origin: bottom right;
+}
+
+@keyframes drawer-in {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-drawer-in {
+  animation: drawer-in 0.2s ease-out;
+}
+
+@keyframes drawer-out {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-drawer-out {
+  animation: drawer-out 0.2s ease-in forwards;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.2s ease-in forwards;
+}
+
 details > summary::-webkit-details-marker {
   display: none;
 }

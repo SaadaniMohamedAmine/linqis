@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -68,7 +69,7 @@ export default function SignUpPage() {
 
       <main className="relative z-10 w-full flex flex-col items-center justify-center p-4">
         {/* Auth Card */}
-        <div className="w-1/3 bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
+        <div className="w-1/4 bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
           <header className="mb-8 text-center">
             <h1 className="text-xl font-semibold mb-1">Create your account</h1>
             <p className="text-text-secondary">Elevate your meetings with AI intelligence.</p>
@@ -124,9 +125,8 @@ export default function SignUpPage() {
             </div>
             <div className="space-y-1">
               <label className="text-sm text-text-secondary ml-1">Password</label>
-              <Input 
-                placeholder="••••••••" 
-                type="password" 
+              <PasswordInput
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

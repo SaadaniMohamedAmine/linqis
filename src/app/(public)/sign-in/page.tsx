@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -96,9 +97,8 @@ export default function SignInPage() {
                 <label className="text-xs text-text-secondary">Password</label>
                 <Link href="#" className="text-xs text-success hover:underline">Forgot password?</Link>
               </div>
-              <Input 
-                placeholder="••••••••" 
-                type="password" 
+              <PasswordInput
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
