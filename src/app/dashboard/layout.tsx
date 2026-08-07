@@ -44,7 +44,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <aside className="hidden md:flex flex-col w-[280px] border-r border-border p-4 gap-6 overflow-y-auto sticky top-16 h-[calc(100vh-64px)]">
           <SidebarNav />
 
-          <div className="flex flex-col gap-4 pt-4 border-t border-border">
+          <div className="flex flex-col gap-4 pt-4 border-t border-border mt-auto">
             <div className="flex flex-col gap-1">
               <h2 className="text-lg font-semibold">Meeting List</h2>
               <p className="text-sm text-text-secondary">AI-summarized sessions</p>
