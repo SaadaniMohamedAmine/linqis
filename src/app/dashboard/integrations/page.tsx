@@ -26,34 +26,8 @@ export default function IntegrationsPage() {
   const zoomConfigured = process.env.NEXT_PUBLIC_ZOOM_ENABLED === "true";
 
   return (
-    <div className="min-h-screen bg-background text-text-primary flex">
-      {/* SideNavBar */}
-      <aside className="hidden md:flex flex-col w-[260px] border-r border-border p-4 gap-2 sticky top-16 h-[calc(100vh-64px)] bg-background">
-        <div className="mb-4 px-2">
-          <h2 className="text-lg font-semibold text-text-primary">Meeting List</h2>
-          <p className="text-sm text-text-secondary">AI-summarized sessions</p>
-        </div>
-        <Button variant="primary" className="w-full gap-2 mb-4">
-          New Meeting
-        </Button>
-        <nav className="flex flex-col gap-1">
-          <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface/50 rounded-lg transition-all">
-            <span className="font-medium">Overview</span>
-          </Link>
-          <Link href="/dashboard/meetings" className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface/50 rounded-lg transition-all">
-            <span className="font-medium">Recent Meetings</span>
-          </Link>
-          <Link href="/dashboard/action-items" className="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface/50 rounded-lg transition-all">
-            <span className="font-medium">Action Items</span>
-          </Link>
-          <Link href="/dashboard/integrations" className="flex items-center gap-3 px-3 py-2 bg-surface text-success rounded-lg transition-all">
-            <span className="font-medium">Integrations</span>
-          </Link>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 md:ml-[260px] p-8 max-w-[1440px]">
+    <div className="min-h-screen bg-background text-text-primary">
+      <main className="p-8 max-w-[1440px] mx-auto">
         <header className="mb-12">
           <h1 className="text-3xl font-semibold mb-2">Connected Workspace</h1>
           <p className="text-text-secondary max-w-2xl">Streamline your workflow by connecting your essential productivity tools. AI summaries will automatically sync to your calendar and communication channels.</p>
