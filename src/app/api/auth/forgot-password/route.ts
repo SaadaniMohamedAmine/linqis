@@ -23,7 +23,16 @@ export async function POST(request: NextRequest) {
     // Google-only account: no password to reset. We inform them honestly by
     // email instead of leaving them wondering, without revealing this in the
     // HTTP response (same anti-enumeration logic).
-    await sendPasswordResetEmail({ to: email, googleOnly: true });
+    // Swallow send failures: an SMTP error must never change the response,
+    // or a caller who can induce one (bad creds, provider rate-limit) could
+    // read account existence straight off the HTTP status code (500 = the
+    // account exists and we tried to email it, 200 = it doesn't) -- exactly
+    // the enumeration this generic response exists to prevent.
+    try {
+      await sendPasswordResetEmail({ to: email, googleOnly: true });
+    } catch (err) {
+      console.error("Failed to send password reset email:", err);
+    }
     return genericResponse;
   }
 
@@ -34,6 +43,12 @@ export async function POST(request: NextRequest) {
     data: { userId: user.id, tokenHash, expiresAt: new Date(Date.now() + 60 * 60 * 1000) }, // 1h
   });
 
-  await sendPasswordResetEmail({ to: email, resetToken: rawToken });
+  // Same anti-enumeration reasoning as above: a send failure must not
+  // surface as a different HTTP status than the nonexistent-email case.
+  try {
+    await sendPasswordResetEmail({ to: email, resetToken: rawToken });
+  } catch (err) {
+    console.error("Failed to send password reset email:", err);
+  }
   return genericResponse;
 }
