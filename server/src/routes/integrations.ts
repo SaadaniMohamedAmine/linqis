@@ -52,6 +52,7 @@ router.post("/zoom/import", async (req: AuthedRequest, res) => {
       data: {
         title: title || `Zoom recording ${recordingId ?? ""}`.trim(),
         userId: req.userId!,
+        workspaceId: req.workspaceId!,
         audioUrl: `/uploads/${fileName}`,
         status: "PROCESSING",
       },

@@ -40,13 +40,31 @@ async function getBackendToken(): Promise<string> {
   return token;
 }
 
+// Which workspace the user is currently looking at. Sent on every backend
+// call; the server only honours it after checking the caller really is a
+// member, so a tampered value gains nothing. Server-side renders have no
+// localStorage, in which case the backend falls back to the personal workspace.
+export const ACTIVE_WORKSPACE_KEY = "linqis-active-workspace";
+
+function getActiveWorkspaceId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+}
+
+export function setActiveWorkspaceId(id: string) {
+  localStorage.setItem(ACTIVE_WORKSPACE_KEY, id);
+  cachedToken = null; // force a clean round-trip rather than mixing caches
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = await getBackendToken();
+  const workspaceId = getActiveWorkspaceId();
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       ...(init?.body ? { "Content-Type": "application/json" } : {}),
       Authorization: `Bearer ${token}`,
+      ...(workspaceId ? { "X-Workspace-Id": workspaceId } : {}),
       ...init?.headers,
     },
   });
@@ -104,7 +122,13 @@ export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPu
  */
 export async function downloadMeetingPdf(id: string, filename: string): Promise<void> {
   const token = await getBackendToken();
-  const res = await fetch(`${API_URL}/api/pdf/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const workspaceId = getActiveWorkspaceId();
+  const res = await fetch(`${API_URL}/api/pdf/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(workspaceId ? { "X-Workspace-Id": workspaceId } : {}),
+    },
+  });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new ApiError(res.status, body.error || "Failed to generate PDF");
@@ -158,9 +182,11 @@ export function uploadMeetingFile(
     // No userId in the body -- the backend derives it from the Authorization
     // token, never from anything the client sends.
 
+    const workspaceId = getActiveWorkspaceId();
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${API_URL}/api/upload`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    if (workspaceId) xhr.setRequestHeader("X-Workspace-Id", workspaceId);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && onUploadProgress) {
@@ -264,13 +290,81 @@ export interface UserProfile {
   emailNotifications: boolean;
   notionApiKey: string | null;
   notionDatabaseId: string | null;
+  // Billing lives on the active workspace, not on the user -- surfaced here
+  // so the settings page keeps a single profile round-trip.
   plan: "FREE" | "PRO";
   subscriptionStatus: string | null;
   currentPeriodEnd: string | null;
+  workspaceId: string | null;
+  workspaceName: string | null;
+  workspaceRole: WorkspaceRole | null;
 }
 
 export function getUser(): Promise<UserProfile> {
   return request<UserProfile>("/api/users/me");
+}
+
+export type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
+
+export interface Workspace {
+  id: string;
+  name: string;
+  role: WorkspaceRole;
+}
+
+export interface WorkspaceMember {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  role: WorkspaceRole;
+  createdAt: string;
+  user: { id: string; name: string | null; email: string | null; image: string | null };
+}
+
+export function getMyWorkspaces(): Promise<Workspace[]> {
+  return request<Workspace[]>("/api/users/me/workspaces");
+}
+
+export function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
+  return request<WorkspaceMember[]>("/api/workspace/members");
+}
+
+export function inviteToWorkspace(email: string, role: "ADMIN" | "MEMBER"): Promise<{ status: string }> {
+  return request("/api/workspace/invite", { method: "POST", body: JSON.stringify({ email, role }) });
+}
+
+export function removeWorkspaceMember(userId: string): Promise<{ status: string }> {
+  return request(`/api/workspace/members/${userId}`, { method: "DELETE" });
+}
+
+export interface InvitePreview {
+  workspaceName: string;
+  email: string;
+  role: WorkspaceRole;
+}
+
+/** Public (no auth): lets the invite landing page name the workspace. */
+export async function getInvitePreview(token: string): Promise<InvitePreview> {
+  const res = await fetch(`${API_URL}/api/workspace/public/invite/${token}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, body.error || "This invite is invalid or has expired");
+  }
+  return res.json();
+}
+
+/** Public (no auth): called once the invited user has signed in. */
+export async function acceptInvite(token: string, userId: string): Promise<{ workspaceId: string }> {
+  const res = await fetch(`${API_URL}/api/workspace/public/accept-invite`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, userId }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, body.error || "Failed to accept invite");
+  }
+  return res.json();
 }
 
 export function updateUser(

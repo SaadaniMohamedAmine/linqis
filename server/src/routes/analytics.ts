@@ -8,10 +8,10 @@ export const router = Router();
 router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
-    const userId = req.userId;
+    const workspaceId = req.workspaceId;
 
-    const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { plan: true } });
-    if (!PLAN_LIMITS[currentUser?.plan || "FREE"].analyticsEnabled) {
+    const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
+    if (!PLAN_LIMITS[workspace?.plan || "FREE"].analyticsEnabled) {
       return res.status(402).json({
         error: "Analytics is a Pro feature. Upgrade to see meeting trends and insights.",
         code: "PLAN_LIMIT_REACHED",
@@ -19,10 +19,10 @@ router.get("/", async (req: AuthedRequest, res) => {
     }
 
     const [totalMeetings, meetings, actionItems, moodCounts] = await Promise.all([
-      prisma.meeting.count({ where: { userId } }),
-      prisma.meeting.findMany({ where: { userId }, select: { duration: true, createdAt: true } }),
-      prisma.actionItem.findMany({ where: { meeting: { userId } }, select: { status: true, owner: true } }),
-      prisma.meeting.groupBy({ by: ["mood"], where: { userId, mood: { not: null } }, _count: true }),
+      prisma.meeting.count({ where: { workspaceId } }),
+      prisma.meeting.findMany({ where: { workspaceId }, select: { duration: true, createdAt: true } }),
+      prisma.actionItem.findMany({ where: { meeting: { workspaceId } }, select: { status: true, owner: true } }),
+      prisma.meeting.groupBy({ by: ["mood"], where: { workspaceId, mood: { not: null } }, _count: true }),
     ]);
 
     const totalMinutes = Math.round(meetings.reduce((sum, m) => sum + (m.duration || 0), 0) / 60);

@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
+  // Set when arriving from an invitation link -- send them back to
+  // /invite/accept instead of the dashboard once they're signed in.
+  const callbackUrl = useSearchParams().get("callbackUrl") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,7 +20,7 @@ export default function SignInPage() {
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl });
   };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
@@ -37,7 +40,7 @@ export default function SignInPage() {
       setError("Invalid email or password.");
       return;
     }
-    router.push("/dashboard");
+    router.push(callbackUrl);
   };
 
   return (
@@ -121,5 +124,14 @@ export default function SignInPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary to keep the page prerenderable.
+export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInForm />
+    </Suspense>
   );
 }

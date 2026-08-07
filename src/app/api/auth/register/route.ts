@@ -23,5 +23,16 @@ export async function POST(request: NextRequest) {
     data: { name, email, hashedPassword },
   });
 
+  // Every account starts with a personal workspace it owns -- meetings are
+  // scoped to a workspace, so without one the user couldn't upload anything.
+  // (Google accounts are created by the PrismaAdapter, not this route; they
+  // get theirs from the `createUser` event in lib/auth.ts.)
+  const workspace = await prisma.workspace.create({
+    data: { name: `${name}'s Workspace`, ownerId: user.id },
+  });
+  await prisma.workspaceMember.create({
+    data: { workspaceId: workspace.id, userId: user.id, role: "OWNER" },
+  });
+
   return NextResponse.json({ id: user.id, email: user.email }, { status: 201 });
 }

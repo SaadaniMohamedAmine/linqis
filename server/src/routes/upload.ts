@@ -56,8 +56,10 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
 
     const prisma = getPrisma();
 
-    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } });
-    const limits = PLAN_LIMITS[user?.plan || "FREE"];
+    // Plan limits are a workspace concern now -- one subscription covers the
+    // whole team, and the monthly quota is shared across its members.
+    const workspace = await prisma.workspace.findUnique({ where: { id: req.workspaceId }, select: { plan: true } });
+    const limits = PLAN_LIMITS[workspace?.plan || "FREE"];
 
     if (limits.maxMeetingsPerMonth !== Infinity) {
       const startOfMonth = new Date();
@@ -65,7 +67,7 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
       startOfMonth.setHours(0, 0, 0, 0);
 
       const countThisMonth = await prisma.meeting.count({
-        where: { userId: req.userId, createdAt: { gte: startOfMonth } },
+        where: { workspaceId: req.workspaceId, createdAt: { gte: startOfMonth } },
       });
 
       if (countThisMonth >= limits.maxMeetingsPerMonth) {
@@ -80,7 +82,8 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
     const meeting = await prisma.meeting.create({
       data: {
         title: req.file.originalname,
-        userId: req.userId!, // derived from the verified token, never the body
+        userId: req.userId!, // who uploaded it -- from the verified token, never the body
+        workspaceId: req.workspaceId!, // access scope
         audioUrl: `/uploads/${req.file.filename}`,
         status: "PROCESSING",
       },

@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  // Set when arriving from an invitation link -- accepting the invite comes
+  // before onboarding so they don't lose the workspace they were invited to.
+  const callbackUrl = useSearchParams().get("callbackUrl");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +21,7 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     setIsLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    await signIn("google", { callbackUrl: callbackUrl || "/dashboard" });
   };
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
@@ -56,7 +59,7 @@ export default function SignUpPage() {
       router.push("/sign-in");
       return;
     }
-    router.push("/onboarding");
+    router.push(callbackUrl || "/onboarding");
   };
 
   return (
@@ -171,5 +174,14 @@ export default function SignUpPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary to keep the page prerenderable.
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignUpForm />
+    </Suspense>
   );
 }

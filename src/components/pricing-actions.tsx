@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ACTIVE_WORKSPACE_KEY } from "@/lib/api";
 
 interface PricingActionsProps {
   isLoggedIn: boolean;
@@ -38,7 +39,12 @@ export function ProCardAction({ isLoggedIn, currentPlan }: PricingActionsProps) 
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/billing/checkout", { method: "POST" });
+      // The subscription pays for a workspace, so tell the server which one.
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId: localStorage.getItem(ACTIVE_WORKSPACE_KEY) }),
+      });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body.url) {
         setError(body.error || "Could not start checkout.");

@@ -17,8 +17,9 @@ import { router as chatRouter } from "./routes/chat";
 import { router as publicRouter } from "./routes/public";
 import { router as pdfRouter } from "./routes/pdf";
 import { router as analyticsRouter } from "./routes/analytics";
+import { router as workspaceRouter, publicRouter as workspacePublicRouter } from "./routes/workspace";
 import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
-import { requireAuth } from "./middleware/auth";
+import { requireAuth, requireWorkspace } from "./middleware/auth";
 import { worker } from "./queue/worker";
 
 const app = express();
@@ -48,23 +49,37 @@ app.use("/api/upload", uploadRateLimit);
 // that's an accepted tradeoff.
 app.use("/api/upload/progress", uploadProgressRouter);
 
+// Invite links have to work for someone who has no account yet, so this one
+// is public. Registered before the protected /api/workspace mount below since
+// Express matches prefixes in registration order.
+app.use("/api/workspace/public", workspacePublicRouter);
+
 // Routes protected by requireAuth -- req.userId is derived from the signed
-// bearer token, never trusted from the request body/params.
-app.use("/api/meetings", requireAuth, meetingRouter);
+// bearer token, never trusted from the request body/params. Everything that
+// touches meetings additionally goes through requireWorkspace, which resolves
+// req.workspaceId from the X-Workspace-Id header after checking membership;
+// that -- not userId -- is the access scope for meeting data.
+app.use("/api/meetings", requireAuth, requireWorkspace, meetingRouter);
 app.use("/api/queue", requireAuth, queueRouter);
-app.use("/api/upload", requireAuth, uploadRouter);
-app.use("/api/export", requireAuth, exportRouter);
-app.use("/api/integrations", requireAuth, integrationRouter);
-app.use("/api/action-items", requireAuth, actionItemRouter);
+app.use("/api/upload", requireAuth, requireWorkspace, uploadRouter);
+app.use("/api/export", requireAuth, requireWorkspace, exportRouter);
+// Integration settings are personal, but POST /zoom/import creates a Meeting,
+// which now needs a workspace -- hence requireWorkspace here too.
+app.use("/api/integrations", requireAuth, requireWorkspace, integrationRouter);
+app.use("/api/action-items", requireAuth, requireWorkspace, actionItemRouter);
+app.use("/api/workspace", requireAuth, requireWorkspace, workspaceRouter);
+// users/notifications stay scoped by req.userId alone (personal preferences).
+// /api/users must NOT require a workspace: it serves the very endpoint the
+// frontend calls to discover which workspaces exist before one is active.
 app.use("/api/users", requireAuth, userRouter);
 app.use("/api/notifications", requireAuth, notificationRouter);
-app.use("/api/search", requireAuth, searchRouter);
-app.use("/api/chat", requireAuth, chatRouter);
+app.use("/api/search", requireAuth, requireWorkspace, searchRouter);
+app.use("/api/chat", requireAuth, requireWorkspace, chatRouter);
 // Deliberately public -- this is the read endpoint for shared meeting links,
 // gated only by an unguessable shareToken and meeting.isPublic, not a login.
 app.use("/api/public", publicRouter);
-app.use("/api/pdf", requireAuth, pdfRouter);
-app.use("/api/analytics", requireAuth, analyticsRouter);
+app.use("/api/pdf", requireAuth, requireWorkspace, pdfRouter);
+app.use("/api/analytics", requireAuth, requireWorkspace, analyticsRouter);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));

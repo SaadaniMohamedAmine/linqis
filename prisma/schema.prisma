@@ -29,19 +29,81 @@ model User {
   teamSize            String?
   primaryUseCase      String?
 
+  // Billing (plan, stripeCustomerId, stripeSubscriptionId, subscriptionStatus,
+  // currentPeriodEnd) lives on Workspace, not here -- a subscription pays for
+  // a team.
+
+  accounts        Account[]
+  sessions        Session[]
+  integrations    Integration[]
+  notifications   Notification[]
+  workspaceMember WorkspaceMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================================
+// Workspaces / team collaboration
+// ============================================================
+
+model Workspace {
+  id      String @id @default(cuid())
+  name    String
+  ownerId String
+
+  // Billing lives here, not on User: a subscription pays for a team, not
+  // for one isolated person.
   plan                 Plan      @default(FREE)
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?   @unique
   subscriptionStatus   String? // "active" | "trialing" | "past_due" | "canceled" | null
   currentPeriodEnd     DateTime?
 
-  accounts      Account[]
-  sessions      Session[]
-  integrations  Integration[]
-  notifications Notification[]
+  meetings Meeting[]
+  team     WorkspaceMember[]
+  invites  WorkspaceInvite[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+model WorkspaceInvite {
+  id          String        @id @default(cuid())
+  workspaceId String
+  email       String
+  role        WorkspaceRole @default(MEMBER)
+  token       String        @unique
+  invitedById String
+  acceptedAt  DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime      @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([email])
 }
 
 enum SummaryLength {
@@ -179,20 +241,23 @@ enum DisagreementSeverity {
 }
 
 model Meeting {
-  id       String        @id @default(cuid())
-  title    String
-  // Not wired to the User relation yet: the upload/import routes don't pass a
-  // real authenticated session id ("anonymous" fallback). Tracked as a plain
-  // string until PR2 (frontend/backend wiring) connects real session data.
-  userId   String
-  audioUrl String?
-  duration Int? // seconds
-  status   MeetingStatus @default(PROCESSING)
-  summary  String?       @db.Text
-  mood     MeetingMood?
+  id    String @id @default(cuid())
+  title String
+  // userId = who uploaded it (attribution). workspaceId = the real access
+  // scope; every query filters on that, so a meeting is visible to the whole
+  // team, not just its uploader.
+  userId      String
+  workspaceId String
+  audioUrl    String?
+  duration    Int? // seconds
+  status      MeetingStatus @default(PROCESSING)
+  summary     String?       @db.Text
+  mood        MeetingMood?
 
   isPublic   Boolean @default(false)
   shareToken String? @unique
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   participants  Participant[]
   transcripts   Transcript[]
@@ -205,8 +270,8 @@ model Meeting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId])
-  @@index([status])
+  @@index([workspaceId])
+  @@index([workspaceId, status])
 }
 
 model Participant {

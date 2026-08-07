@@ -3,16 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
-import { getPrisma } from "@/lib/db";
+import { resolveWorkspaceForUser } from "@/lib/workspace";
 import { FreeCardAction, ProCardAction } from "@/components/pricing-actions";
 
 export default async function PricingPage() {
   const session = await auth();
   let currentPlan: "FREE" | "PRO" | null = null;
   if (session?.user?.id) {
-    const prisma = getPrisma();
-    const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { plan: true } });
-    currentPlan = user?.plan ?? "FREE";
+    // Plans belong to workspaces now. Server-rendered, so there's no
+    // localStorage to read the active one from -- fall back to the personal
+    // workspace, which is the right answer for the common single-team case.
+    const resolved = await resolveWorkspaceForUser(session.user.id);
+    currentPlan = resolved?.workspace.plan ?? "FREE";
   }
   const isLoggedIn = !!session?.user?.id;
 
