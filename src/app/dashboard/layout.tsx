@@ -6,6 +6,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { SearchBar } from "@/components/search-bar";
 import { UserMenu } from "@/components/user-menu";
+import { AskWidget } from "@/components/ask-widget";
 import { ProductTour } from "@/components/product-tour";
 import { getMeetings, type MeetingListItem } from "@/lib/api";
 
@@ -65,6 +66,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </div>
 
       <ProductTour />
+      <AskWidget />
     </div>
   );
 }

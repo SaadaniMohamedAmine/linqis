@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Video, CheckSquare, Plug, MessageCircle, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Video, CheckSquare, Plug, BarChart3 } from "lucide-react";
 
 const LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/meetings", label: "Meetings", icon: Video, dataTour: "meetings-nav" },
   { href: "/dashboard/action-items", label: "Action Items", icon: CheckSquare, dataTour: "action-items-nav" },
   { href: "/dashboard/integrations", label: "Integrations", icon: Plug },
-  { href: "/dashboard/ask", label: "Ask", icon: MessageCircle },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
