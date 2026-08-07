@@ -79,7 +79,6 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
         {/* Panel Header */}
         <div className="p-6 flex items-center justify-between border-b border-border">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-text-primary">Notifications</h2>
             {unread.length > 0 && (
               <span className="bg-success text-background text-[10px] px-1.5 py-0.5 rounded-full font-bold">{unread.length}</span>
             )}
