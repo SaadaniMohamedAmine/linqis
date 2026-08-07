@@ -61,7 +61,7 @@ export function AskWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[560px] max-h-[80vh] bg-surface border border-border rounded-xl shadow-lg flex flex-col overflow-hidden">
+    <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[560px] max-h-[80vh] bg-surface border border-border rounded-xl shadow-lg flex flex-col overflow-hidden animate-widget-in">
       <div className="px-4 pt-4 pb-3 border-b border-border flex items-start justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold text-text-primary">Ask your meetings</h2>
