@@ -394,6 +394,45 @@ export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
   return request<{ authUrl: string }>("/api/integrations/google-calendar/auth-url");
 }
 
+/**
+ * Mirrors Zoom's actual cloud recordings API response (server/src/services/
+ * integrations/zoom.ts), not a flattened shape -- a single recording
+ * ("meeting" in Zoom's vocabulary) can have several recording_files (e.g. a
+ * video file and a separate audio-only file), so the caller has to pick
+ * which file to import.
+ */
+export interface ZoomRecordingFile {
+  id: string;
+  recording_type: string; // e.g. "shared_screen_with_speaker_view", "audio_only"
+  download_url: string;
+}
+
+export interface ZoomRecording {
+  id: string;
+  topic: string;
+  start_time: string;
+  duration: number; // minutes
+  recording_files: ZoomRecordingFile[];
+}
+
+export function getZoomRecordings(from: string, to: string): Promise<ZoomRecording[]> {
+  return request<ZoomRecording[]>(`/api/integrations/zoom/recordings?from=${from}&to=${to}`);
+}
+
+export interface ZoomImportParams {
+  recordingId: string;
+  title: string;
+  downloadUrl: string;
+  isAudioOnly: boolean;
+}
+
+export function importZoomRecording(params: ZoomImportParams): Promise<{ meetingId: string; jobId: string }> {
+  return request("/api/integrations/zoom/import", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
 export interface Notification {
   id: string;
   type: "SUCCESS" | "WARNING" | "INFO" | "NEUTRAL";

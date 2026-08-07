@@ -6,11 +6,13 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ZoomImportModal } from "@/components/zoom-import-modal";
 import { getIntegrationStatus, getGoogleCalendarAuthUrl, type IntegrationStatus } from "@/lib/api";
 
 export default function IntegrationsPage() {
   const { data: session } = useSession();
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
+  const [zoomModalOpen, setZoomModalOpen] = useState(false);
 
   useEffect(() => {
     if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
@@ -70,6 +72,9 @@ export default function IntegrationsPage() {
               <h3 className="text-lg font-semibold mb-1">Zoom</h3>
               <p className="text-sm text-text-secondary mb-6">Record meetings directly and generate AI transcripts in real-time.</p>
             </div>
+            {zoomConfigured && (
+              <Button variant="secondary" className="w-full" onClick={() => setZoomModalOpen(true)}>Browse recordings</Button>
+            )}
           </Card>
 
           {/* Notion */}
@@ -129,6 +134,8 @@ export default function IntegrationsPage() {
           </div>
         </section>
       </main>
+
+      <ZoomImportModal isOpen={zoomModalOpen} onClose={() => setZoomModalOpen(false)} />
     </div>
   );
 }
