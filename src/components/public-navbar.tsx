@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { CommandPalette } from "@/components/command-palette";
 
 export function PublicNavbar() {
   const { data: session } = useSession();
@@ -22,6 +23,7 @@ export function PublicNavbar() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <CommandPalette />
           {session ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: "/" })}>

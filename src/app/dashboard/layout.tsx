@@ -4,7 +4,7 @@ import { PageLoader } from "@/components/page-loader";
 import { RecentMeetingsNav } from "@/components/recent-meetings-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
-import { SearchBar } from "@/components/search-bar";
+import { CommandPalette } from "@/components/command-palette";
 import { UserMenu } from "@/components/user-menu";
 import { AskWidget } from "@/components/ask-widget";
 import { ProductTour } from "@/components/product-tour";
@@ -32,7 +32,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto">
           <Link href="/" className="text-xl font-bold tracking-tight text-success">Linqis</Link>
           <div className="flex items-center gap-4">
-            <SearchBar />
+            <CommandPalette />
             <NotificationsBell />
             <Link href="/dashboard/upload" data-tour="upload-button">
               <Button variant="primary" size="sm">Upload</Button>
