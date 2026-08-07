@@ -33,11 +33,12 @@ model User {
   // currentPeriodEnd) lives on Workspace, not here -- a subscription pays for
   // a team.
 
-  accounts        Account[]
-  sessions        Session[]
-  integrations    Integration[]
-  notifications   Notification[]
-  workspaceMember WorkspaceMember[]
+  accounts            Account[]
+  sessions            Session[]
+  integrations        Integration[]
+  notifications       Notification[]
+  workspaceMember     WorkspaceMember[]
+  passwordResetTokens PasswordResetToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,6 +189,19 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ============================================================

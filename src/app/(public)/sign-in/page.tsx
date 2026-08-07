@@ -22,6 +22,8 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  // Set after a successful /reset-password redirect.
+  const resetSuccess = useSearchParams().get("reset") === "success";
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -89,6 +91,11 @@ function SignInForm() {
 
           {/* Form */}
           <form onSubmit={handleEmailSignIn} className="flex flex-col gap-4">
+            {resetSuccess && (
+              <p className="text-xs text-success bg-success/10 p-2 rounded">
+                Password updated. Sign in with your new password.
+              </p>
+            )}
             {error && <p className="text-xs text-danger bg-danger/10 p-2 rounded">{error}</p>}
             <div className="flex flex-col gap-1">
               <label className="text-xs text-text-secondary px-1">Email address</label>
@@ -103,7 +110,7 @@ function SignInForm() {
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center px-1">
                 <label className="text-xs text-text-secondary">Password</label>
-                <Link href="#" className="text-xs text-success hover:underline">Forgot password?</Link>
+                <Link href="/forgot-password" className="text-xs text-success hover:underline">Forgot password?</Link>
               </div>
               <PasswordInput
                 placeholder="••••••••"
