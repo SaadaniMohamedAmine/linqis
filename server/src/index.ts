@@ -17,6 +17,7 @@ import { router as chatRouter } from "./routes/chat";
 import { router as publicRouter } from "./routes/public";
 import { router as pdfRouter } from "./routes/pdf";
 import { router as analyticsRouter } from "./routes/analytics";
+import { router as contactRouter } from "./routes/contact";
 import {
   router as workspaceRouter,
   publicRouter as workspacePublicRouter,
@@ -61,6 +62,10 @@ app.use("/api/upload/progress", uploadProgressRouter);
 // matches prefixes in registration order.
 app.use("/api/workspace/public", workspacePublicRouter);
 app.use("/api/workspace/invites", requireAuth, workspaceInviteRouter);
+
+// Public contact form (marketing site "Contact Sales" CTA) -- no login, no
+// workspace context; anyone can submit a lead.
+app.use("/api/contact", contactRouter);
 
 // Routes protected by requireAuth -- req.userId is derived from the signed
 // bearer token, never trusted from the request body/params. Everything that

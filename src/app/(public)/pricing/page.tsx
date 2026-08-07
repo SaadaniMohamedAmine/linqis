@@ -138,7 +138,7 @@ export default async function PricingPage() {
                 <span>SSO & Security</span>
               </li>
             </ul>
-            <Link href="/sign-up">
+            <Link href="/contact">
               <Button variant="secondary" className="w-full">Contact Sales</Button>
             </Link>
           </Card>

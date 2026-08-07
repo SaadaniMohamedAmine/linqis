@@ -441,7 +441,9 @@ export default function Home() {
             <Link href="/sign-up">
               <Button variant="primary" size="lg">Start your free trial</Button>
             </Link>
-            <Button variant="secondary" size="lg">Contact Sales</Button>
+            <Link href="/contact">
+              <Button variant="secondary" size="lg">Contact Sales</Button>
+            </Link>
           </div>
         </motion.div>
       </section>
