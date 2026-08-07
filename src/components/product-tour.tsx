@@ -17,6 +17,37 @@ const STEPS: TourStep[] = [
   { target: '[data-tour="export-button"]', title: "Export anywhere", description: "Send a summary to Notion, Slack, or by email in one click, once a meeting is ready." },
 ];
 
+const CARD_WIDTH = 300;
+const CARD_HEIGHT_ESTIMATE = 180;
+const MARGIN = 16;
+
+// Prefers below the spotlighted element, like a normal tooltip. But targets
+// like the meetings sidebar span nearly the full viewport height, which
+// pushes "below" off-screen -- fall back to beside it, then above it.
+function cardPosition(rect: DOMRect): { top: number; left: number } {
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceRight = window.innerWidth - rect.right;
+
+  if (spaceBelow >= CARD_HEIGHT_ESTIMATE + MARGIN) {
+    return {
+      top: rect.bottom + MARGIN,
+      left: Math.min(rect.left, window.innerWidth - CARD_WIDTH - MARGIN),
+    };
+  }
+
+  if (spaceRight >= CARD_WIDTH + MARGIN) {
+    return {
+      top: Math.min(rect.top, window.innerHeight - CARD_HEIGHT_ESTIMATE - MARGIN),
+      left: rect.right + MARGIN,
+    };
+  }
+
+  return {
+    top: Math.max(MARGIN, rect.top - CARD_HEIGHT_ESTIMATE - MARGIN),
+    left: Math.min(rect.left, window.innerWidth - CARD_WIDTH - MARGIN),
+  };
+}
+
 export function ProductTour() {
   const [stepIndex, setStepIndex] = useState<number | null>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -68,7 +99,7 @@ export function ProductTour() {
       />
       <div
         className="fixed bg-surface border border-border rounded-xl p-5 w-[300px] pointer-events-auto shadow-lg"
-        style={{ top: rect.bottom + 16, left: Math.min(rect.left, window.innerWidth - 320) }}
+        style={cardPosition(rect)}
       >
         <p className="text-xs text-text-secondary mb-1">{stepIndex + 1} / {STEPS.length}</p>
         <h3 className="font-semibold text-text-primary mb-2">{step.title}</h3>
