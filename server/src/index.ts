@@ -17,7 +17,11 @@ import { router as chatRouter } from "./routes/chat";
 import { router as publicRouter } from "./routes/public";
 import { router as pdfRouter } from "./routes/pdf";
 import { router as analyticsRouter } from "./routes/analytics";
-import { router as workspaceRouter, publicRouter as workspacePublicRouter } from "./routes/workspace";
+import {
+  router as workspaceRouter,
+  publicRouter as workspacePublicRouter,
+  authedRouter as workspaceInviteRouter,
+} from "./routes/workspace";
 import { apiRateLimit, uploadRateLimit } from "./middleware/rate-limit";
 import { requireAuth, requireWorkspace } from "./middleware/auth";
 import { worker } from "./queue/worker";
@@ -49,10 +53,14 @@ app.use("/api/upload", uploadRateLimit);
 // that's an accepted tradeoff.
 app.use("/api/upload/progress", uploadProgressRouter);
 
-// Invite links have to work for someone who has no account yet, so this one
-// is public. Registered before the protected /api/workspace mount below since
-// Express matches prefixes in registration order.
+// Invite links have to work for someone who has no account yet, so the invite
+// *preview* is public. Accepting one is not: it needs requireAuth so the joining
+// user is taken from the verified token rather than the request body. Neither
+// can use requireWorkspace -- the invitee isn't a member yet. Both are
+// registered before the protected /api/workspace mount below, since Express
+// matches prefixes in registration order.
 app.use("/api/workspace/public", workspacePublicRouter);
+app.use("/api/workspace/invites", requireAuth, workspaceInviteRouter);
 
 // Routes protected by requireAuth -- req.userId is derived from the signed
 // bearer token, never trusted from the request body/params. Everything that

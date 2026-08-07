@@ -353,18 +353,15 @@ export async function getInvitePreview(token: string): Promise<InvitePreview> {
   return res.json();
 }
 
-/** Public (no auth): called once the invited user has signed in. */
-export async function acceptInvite(token: string, userId: string): Promise<{ workspaceId: string }> {
-  const res = await fetch(`${API_URL}/api/workspace/public/accept-invite`, {
+/**
+ * Called once the invited user has signed in. Authenticated: the backend takes
+ * the joining user from the bearer token, so no user id is sent.
+ */
+export function acceptInvite(token: string): Promise<{ workspaceId: string }> {
+  return request<{ workspaceId: string }>("/api/workspace/invites/accept", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, userId }),
+    body: JSON.stringify({ token }),
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.error || "Failed to accept invite");
-  }
-  return res.json();
 }
 
 export function updateUser(

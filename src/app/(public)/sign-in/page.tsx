@@ -12,7 +12,12 @@ function SignInForm() {
   const router = useRouter();
   // Set when arriving from an invitation link -- send them back to
   // /invite/accept instead of the dashboard once they're signed in.
-  const callbackUrl = useSearchParams().get("callbackUrl") || "/dashboard";
+  // Only same-origin relative paths are honoured: anything else (an absolute
+  // URL, or a protocol-relative "//evil.example") would make this an open
+  // redirect that hands a freshly-authenticated user to an attacker's site.
+  const rawCallbackUrl = useSearchParams().get("callbackUrl");
+  const callbackUrl =
+    rawCallbackUrl?.startsWith("/") && !rawCallbackUrl.startsWith("//") ? rawCallbackUrl : "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

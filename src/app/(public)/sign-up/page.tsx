@@ -12,7 +12,12 @@ function SignUpForm() {
   const router = useRouter();
   // Set when arriving from an invitation link -- accepting the invite comes
   // before onboarding so they don't lose the workspace they were invited to.
-  const callbackUrl = useSearchParams().get("callbackUrl");
+  // Only same-origin relative paths are honoured: anything else (an absolute
+  // URL, or a protocol-relative "//evil.example") would make this an open
+  // redirect that hands a freshly-authenticated user to an attacker's site.
+  const rawCallbackUrl = useSearchParams().get("callbackUrl");
+  const callbackUrl =
+    rawCallbackUrl?.startsWith("/") && !rawCallbackUrl.startsWith("//") ? rawCallbackUrl : null;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

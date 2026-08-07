@@ -10,6 +10,14 @@
  *
  * Idempotent: a user who already has a workspace membership is skipped, so a
  * re-run after a partial failure only finishes the remaining users.
+ *
+ * NOTE ON RAW SQL: this script runs against the *intermediate* database shape
+ * (User still has its billing columns, Meeting.workspaceId is still nullable),
+ * but the Prisma client on disk is generated from the *final* schema, where
+ * neither is true. Any query touching those two things therefore has to be raw
+ * SQL -- a typed query would throw PrismaClientValidationError. The writes
+ * below can stay typed because Workspace/WorkspaceMember are identical in both
+ * shapes and setting Meeting.workspaceId to a string is valid either way.
  */
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
@@ -20,18 +28,20 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      plan: true,
-      stripeCustomerId: true,
-      stripeSubscriptionId: true,
-      subscriptionStatus: true,
-      currentPeriodEnd: true,
-    },
-  });
+  // Raw: "plan" and the four stripe/subscription columns are dropped by the
+  // finalize_workspaces migration, so they don't exist on the generated client.
+  const users = await prisma.$queryRaw`
+    SELECT
+      "id",
+      "name",
+      "email",
+      "plan"::text AS "plan",
+      "stripeCustomerId",
+      "stripeSubscriptionId",
+      "subscriptionStatus",
+      "currentPeriodEnd"
+    FROM "User"
+  `;
 
   console.log(`Backfilling ${users.length} personal workspaces...`);
 
@@ -51,7 +61,9 @@ async function main() {
       data: {
         name: user.name ? `${user.name}'s Workspace` : "My Workspace",
         ownerId: user.id,
-        plan: user.plan,
+        // Raw SQL hands this back as a plain string ('FREE' | 'PRO'), which is
+        // exactly what Prisma expects for the Plan enum.
+        plan: user.plan || "FREE",
         stripeCustomerId: user.stripeCustomerId,
         stripeSubscriptionId: user.stripeSubscriptionId,
         subscriptionStatus: user.subscriptionStatus,
@@ -73,7 +85,11 @@ async function main() {
     console.log(`  ${user.email} -> workspace ${workspace.id} (${moved.count} meeting(s) moved)`);
   }
 
-  const orphans = await prisma.meeting.count({ where: { workspaceId: null } });
+  // Raw: Meeting.workspaceId is non-nullable on the final schema, so the
+  // generated client rejects `{ workspaceId: null }` as a filter outright.
+  const [{ orphans }] = await prisma.$queryRaw`
+    SELECT COUNT(*)::int AS "orphans" FROM "Meeting" WHERE "workspaceId" IS NULL
+  `;
 
   console.log(
     `Done. ${created} workspace(s) created, ${skipped} skipped, ${meetingsMoved} meeting(s) moved.`

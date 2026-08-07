@@ -34,7 +34,7 @@ function AcceptInvite() {
     if (!session?.user?.id || submitted.current) return;
     submitted.current = true;
 
-    acceptInvite(token, session.user.id)
+    acceptInvite(token)
       .then(({ workspaceId }) => {
         // Land them straight in the workspace they were invited to.
         setActiveWorkspaceId(workspaceId);

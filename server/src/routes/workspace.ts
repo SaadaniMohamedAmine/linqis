@@ -29,10 +29,18 @@ router.post("/invite", requireWorkspaceAdmin, async (req: AuthedRequest, res) =>
       return res.status(400).json({ error: "email is required" });
     }
 
+    // Emails are stored and matched lowercased. Inviting "Teammate@Corp.com"
+    // when the account is "teammate@corp.com" would otherwise create an invite
+    // that can never be accepted, with no way to recover it.
+    const normalizedEmail = email.trim().toLowerCase();
+
     const prisma = getPrisma();
 
     const existingMember = await prisma.workspaceMember.findFirst({
-      where: { workspaceId: req.workspaceId, user: { email } },
+      where: {
+        workspaceId: req.workspaceId,
+        user: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      },
     });
     if (existingMember) {
       return res.status(409).json({ error: "This person is already a member" });
@@ -42,7 +50,7 @@ router.post("/invite", requireWorkspaceAdmin, async (req: AuthedRequest, res) =>
     const invite = await prisma.workspaceInvite.create({
       data: {
         workspaceId: req.workspaceId!,
-        email,
+        email: normalizedEmail,
         role: role === "ADMIN" ? "ADMIN" : "MEMBER",
         token,
         invitedById: req.userId!,
@@ -51,7 +59,7 @@ router.post("/invite", requireWorkspaceAdmin, async (req: AuthedRequest, res) =>
       include: { workspace: { select: { name: true } } },
     });
 
-    await sendInviteEmail({ to: email, workspaceName: invite.workspace.name, token });
+    await sendInviteEmail({ to: normalizedEmail, workspaceName: invite.workspace.name, token });
     res.status(201).json({ status: "sent" });
   } catch (error) {
     console.error("Invite error:", error);
@@ -101,9 +109,20 @@ publicRouter.get("/invite/:token", async (req, res) => {
   }
 });
 
-publicRouter.post("/accept-invite", async (req, res) => {
+/**
+ * Accepting an invite is mounted under requireAuth (no requireWorkspace -- the
+ * caller is by definition not yet a member of the workspace they're joining).
+ *
+ * The user id comes from the verified JWT, never the request body. Taking it
+ * from the body would let any co-member read a colleague's id out of
+ * GET /members and force them into a workspace without their involvement.
+ */
+export const authedRouter = Router();
+
+authedRouter.post("/accept", async (req: AuthedRequest, res) => {
   try {
-    const { token, userId } = req.body as { token: string; userId: string };
+    const { token } = req.body as { token: string };
+    const userId = req.userId!;
     const prisma = getPrisma();
 
     const invite = await prisma.workspaceInvite.findUnique({ where: { token } });
@@ -113,8 +132,9 @@ publicRouter.post("/accept-invite", async (req, res) => {
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     // The invite is bound to the email it was sent to -- forwarding the link
-    // to someone else must not let them into the workspace.
-    if (!user || user.email !== invite.email) {
+    // to someone else must not let them into the workspace. Compared
+    // case-insensitively so a differently-cased invite still resolves.
+    if (!user?.email || user.email.toLowerCase() !== invite.email.toLowerCase()) {
       return res.status(403).json({ error: "This invite was sent to a different email address" });
     }
 
