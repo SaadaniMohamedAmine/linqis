@@ -18,6 +18,8 @@ import { router as publicRouter } from "./routes/public";
 import { router as pdfRouter } from "./routes/pdf";
 import { router as analyticsRouter } from "./routes/analytics";
 import { router as contactRouter } from "./routes/contact";
+import { router as developersRouter } from "./routes/developers";
+import { router as v1Router } from "./routes/v1";
 import {
   router as workspaceRouter,
   publicRouter as workspacePublicRouter,
@@ -93,6 +95,12 @@ app.use("/api/chat", requireAuth, requireWorkspace, chatRouter);
 app.use("/api/public", publicRouter);
 app.use("/api/pdf", requireAuth, requireWorkspace, pdfRouter);
 app.use("/api/analytics", requireAuth, requireWorkspace, analyticsRouter);
+app.use("/api/developers", requireAuth, requireWorkspace, developersRouter);
+// Public read-only API for external integrations -- deliberately NOT behind
+// requireAuth/requireWorkspace: requireApiKey (mounted inside v1Router) does
+// all of the auth work for this route family, deriving the workspace from
+// the key itself rather than a session/header.
+app.use("/api/v1", v1Router);
 
 // Start worker
 worker.on("ready", () => console.log("Worker ready"));

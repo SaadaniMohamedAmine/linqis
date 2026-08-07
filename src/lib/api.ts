@@ -485,3 +485,46 @@ export interface AnalyticsData {
 export function getAnalytics(): Promise<AnalyticsData> {
   return request<AnalyticsData>("/api/analytics");
 }
+
+export interface ApiKeySummary {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  lastUsedAt: string | null;
+  createdAt: string;
+}
+
+export function getApiKeys(): Promise<ApiKeySummary[]> {
+  return request<ApiKeySummary[]>("/api/developers/api-keys");
+}
+
+export function createApiKey(name: string): Promise<{ key: string }> {
+  return request<{ key: string }>("/api/developers/api-keys", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function revokeApiKey(id: string): Promise<{ status: string }> {
+  return request(`/api/developers/api-keys/${id}`, { method: "DELETE" });
+}
+
+export interface WebhookSubscriptionSummary {
+  id: string;
+  url: string;
+  event: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export function getWebhooks(): Promise<WebhookSubscriptionSummary[]> {
+  return request<WebhookSubscriptionSummary[]>("/api/developers/webhooks");
+}
+
+export function createWebhook(url: string): Promise<{ id: string; url: string; secret: string }> {
+  return request("/api/developers/webhooks", { method: "POST", body: JSON.stringify({ url }) });
+}
+
+export function deleteWebhook(id: string): Promise<{ status: string }> {
+  return request(`/api/developers/webhooks/${id}`, { method: "DELETE" });
+}

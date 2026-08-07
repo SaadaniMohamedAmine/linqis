@@ -64,6 +64,8 @@ model Workspace {
   meetings Meeting[]
   team     WorkspaceMember[]
   invites  WorkspaceInvite[]
+  apiKeys  ApiKey[]
+  webhooks WebhookSubscription[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,6 +91,34 @@ model WorkspaceMember {
 
   @@unique([workspaceId, userId])
   @@index([userId])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  workspaceId String
+  name        String
+  keyHash     String    @unique
+  keyPrefix   String // ex: "lnq_ab12" -- affiché en permanence pour identifier la clé sans la révéler
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+}
+
+model WebhookSubscription {
+  id          String   @id @default(cuid())
+  workspaceId String
+  url         String
+  secret      String
+  event       String   @default("meeting.completed")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
 }
 
 model WorkspaceInvite {

@@ -5,6 +5,7 @@ import { ai, detectDisagreements, detectMoodWithAnalysis } from "../services/ai"
 import { embedText, chunkText } from "../services/ai/embeddings";
 import { getPrisma } from "../db";
 import { publishProgress, publishComplete, publishError } from "../services/sse";
+import { triggerWebhooks } from "../services/webhooks";
 
 interface MeetingJob {
   meetingId: string;
@@ -76,12 +77,17 @@ export const worker = new Worker<MeetingJob>(
 
     await publishProgress(job.id, { status: "saving", progress: 90 });
 
+    // Captured in its own variable (rather than inlined into the update call
+    // below) so the webhook trigger further down can reuse the same text
+    // without a second AI call or an extra read back from the DB.
+    const summaryText = await ai.generateExecutiveSummary(fullTranscript);
+
     // Update meeting
     await prisma.meeting.update({
       where: { id: meetingId },
       data: {
         status: "DONE",
-        summary: await ai.generateExecutiveSummary(fullTranscript),
+        summary: summaryText,
         mood: moodAnalysis.mood,
         decisions: {
           create: decisions.map((d: any) => ({
@@ -113,7 +119,7 @@ export const worker = new Worker<MeetingJob>(
     // Non-blocking: a notification failure should never fail an otherwise-
     // successful processing job.
     try {
-      const meetingRecord = await prisma.meeting.findUnique({ where: { id: meetingId }, select: { userId: true, title: true } });
+      const meetingRecord = await prisma.meeting.findUnique({ where: { id: meetingId }, select: { userId: true, title: true, workspaceId: true } });
       if (meetingRecord) {
         await prisma.notification.create({
           data: {
@@ -124,6 +130,20 @@ export const worker = new Worker<MeetingJob>(
             meetingId,
           },
         });
+
+        // Notify any external systems subscribed to this workspace. Wrapped in
+        // its own try/catch (rather than letting a throw here skip past the
+        // notification above) so a webhook delivery failure never fails an
+        // otherwise-successful processing job.
+        try {
+          await triggerWebhooks(meetingRecord.workspaceId, "meeting.completed", {
+            meetingId,
+            title: meetingRecord.title,
+            summary: summaryText,
+          });
+        } catch (err) {
+          console.error("Webhook trigger failed (non-blocking):", err);
+        }
       }
     } catch (err) {
       console.error("Failed to create notification (non-blocking):", err);
