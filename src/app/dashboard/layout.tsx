@@ -5,6 +5,7 @@ import { RecentMeetingsNav } from "@/components/recent-meetings-nav";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { SearchBar } from "@/components/search-bar";
+import { UserMenu } from "@/components/user-menu";
 import { ProductTour } from "@/components/product-tour";
 import { getMeetings, type MeetingListItem } from "@/lib/api";
 
@@ -35,6 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link href="/dashboard/upload" data-tour="upload-button">
               <Button variant="primary" size="sm">Upload</Button>
             </Link>
+            <UserMenu />
           </div>
         </div>
       </header>
