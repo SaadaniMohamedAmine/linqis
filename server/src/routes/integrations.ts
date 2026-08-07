@@ -15,6 +15,28 @@ if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
+/**
+ * downloadZoomRecording sends the account-wide Zoom Server-to-Server OAuth
+ * token in an Authorization header, so whatever host the URL names receives
+ * that credential -- a key to every recording in the operator's Zoom account.
+ * The URL arrives in the request body, so without this check any member of
+ * any workspace could aim it at their own server (credential exfiltration) or
+ * at an internal host / cloud metadata endpoint (SSRF, with the response
+ * written to uploads/). Only https hosts under zoom.us are accepted; the
+ * download itself also runs with redirects disabled so a redirect can't carry
+ * the header off-domain afterwards.
+ */
+function isZoomDownloadUrl(rawUrl: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "https:") return false;
+  return parsed.hostname.toLowerCase().endsWith(".zoom.us");
+}
+
 // Zoom Routes
 router.get("/zoom/recordings", async (req, res) => {
   try {
@@ -33,6 +55,10 @@ router.post("/zoom/import", async (req: AuthedRequest, res) => {
 
     if (!downloadUrl) {
       return res.status(400).json({ error: "downloadUrl is required" });
+    }
+
+    if (!isZoomDownloadUrl(downloadUrl)) {
+      return res.status(400).json({ error: "downloadUrl must be an https zoom.us URL" });
     }
 
     const prisma = getPrisma();

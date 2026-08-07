@@ -56,9 +56,21 @@ export function setActiveWorkspaceId(id: string) {
   cachedToken = null; // force a clean round-trip rather than mixing caches
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+/**
+ * The exact 403 the backend returns when `X-Workspace-Id` names a workspace
+ * the caller is no longer a member of (server/src/middleware/auth.ts,
+ * requireWorkspace).
+ *
+ * Matched on the message, not just the status, so the *other* 403 the backend
+ * emits -- requireWorkspaceAdmin's "Only workspace owners and admins can do
+ * this" -- is never retried. A plain member hitting that must keep failing:
+ * silently retrying without the header would fall back to a workspace they
+ * *do* own and run the admin action there instead.
+ */
+const STALE_WORKSPACE_ERROR = "You are not a member of this workspace";
+
+async function send<T>(path: string, init: RequestInit | undefined, workspaceId: string | null): Promise<T> {
   const token = await getBackendToken();
-  const workspaceId = getActiveWorkspaceId();
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
@@ -76,6 +88,39 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const workspaceId = getActiveWorkspaceId();
+  try {
+    return await send<T>(path, init, workspaceId);
+  } catch (err) {
+    // Truthiness, not `!== null`, to mirror exactly when the header is sent:
+    // if no header went out there was no stale id to blame, and on the server
+    // (no localStorage) this is always false, so the cleanup below is
+    // browser-only.
+    const isStaleWorkspace =
+      !!workspaceId &&
+      err instanceof ApiError &&
+      err.status === 403 &&
+      err.message === STALE_WORKSPACE_ERROR;
+
+    if (!isStaleWorkspace) throw err;
+
+    // The pinned workspace is gone (the user was removed from it, or it was
+    // deleted) and localStorage would keep replaying it forever, hard-failing
+    // every workspace-scoped call with no way out but manually using the
+    // WorkspaceSwitcher. Drop it and retry once with no header, which makes
+    // requireWorkspace fall back to the caller's own workspace.
+    //
+    // Safe to replay even for POST/DELETE: requireWorkspace rejects before
+    // the route handler runs, so the first attempt had no side effects. This
+    // calls `send` directly rather than recursing, so a failing retry throws
+    // instead of looping.
+    localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
+    cachedToken = null; // match setActiveWorkspaceId: don't mix caches across workspaces
+    return send<T>(path, init, null);
+  }
 }
 
 export type MeetingListItem = Meeting & {

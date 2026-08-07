@@ -7,15 +7,34 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ZoomImportModal } from "@/components/zoom-import-modal";
-import { getIntegrationStatus, getGoogleCalendarAuthUrl, type IntegrationStatus } from "@/lib/api";
+import {
+  getIntegrationStatus,
+  getGoogleCalendarAuthUrl,
+  getMyWorkspaces,
+  ACTIVE_WORKSPACE_KEY,
+  type IntegrationStatus,
+  type WorkspaceRole,
+} from "@/lib/api";
 
 export default function IntegrationsPage() {
   const { data: session } = useSession();
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
+  const [myRole, setMyRole] = useState<WorkspaceRole | null>(null);
 
   useEffect(() => {
     if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    getMyWorkspaces()
+      .then((workspaces) => {
+        const activeId = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+        const active = workspaces.find((w) => w.id === activeId) || workspaces[0];
+        setMyRole(active?.role ?? null);
+      })
+      .catch(() => setMyRole(null));
   }, [session?.user?.id]);
 
   const isConnected = (provider: string) => integrations.some((i) => i.provider === provider);
@@ -26,6 +45,13 @@ export default function IntegrationsPage() {
   };
 
   const zoomConfigured = process.env.NEXT_PUBLIC_ZOOM_ENABLED === "true";
+
+  // The Zoom integration is a single account-wide Server-to-Server OAuth app
+  // configured by the operator -- there is no per-user or per-workspace Zoom
+  // credential. Browsing it therefore exposes the operator's entire recording
+  // library, so it's gated to owners/admins like the Developers page is,
+  // rather than shown to every member of every workspace.
+  const canBrowseZoom = myRole === "OWNER" || myRole === "ADMIN";
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
@@ -72,7 +98,7 @@ export default function IntegrationsPage() {
               <h3 className="text-lg font-semibold mb-1">Zoom</h3>
               <p className="text-sm text-text-secondary mb-6">Record meetings directly and generate AI transcripts in real-time.</p>
             </div>
-            {zoomConfigured && (
+            {zoomConfigured && canBrowseZoom && (
               <Button variant="secondary" className="w-full" onClick={() => setZoomModalOpen(true)}>Browse recordings</Button>
             )}
           </Card>

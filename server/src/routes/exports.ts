@@ -3,6 +3,7 @@ import { getPrisma } from "../db";
 import { exportToNotion, exportToSlack, exportToEmail } from "../services/export";
 import type { AuthedRequest } from "../middleware/auth";
 import { PLAN_LIMITS } from "../lib/plans";
+import { webhookUrlError } from "../lib/safe-url";
 
 export const router = Router();
 
@@ -66,6 +67,19 @@ router.post("/notion", async (req: AuthedRequest, res) => {
 router.post("/slack", async (req: AuthedRequest, res) => {
   try {
     const { meetingId, webhookUrl } = req.body;
+
+    // Same SSRF class as webhook registration: this URL is POSTed to
+    // server-side (services/export/slack.ts -> IncomingWebhook), so it gets
+    // the identical guard rather than being trusted because it came from a
+    // logged-in user.
+    if (!webhookUrl || typeof webhookUrl !== "string") {
+      return res.status(400).json({ error: "webhookUrl is required" });
+    }
+    const urlError = webhookUrlError(webhookUrl);
+    if (urlError) {
+      return res.status(400).json({ error: urlError });
+    }
+
     const prisma = getPrisma();
 
     const [meeting, workspace] = await Promise.all([
