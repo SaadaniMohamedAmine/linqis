@@ -16,8 +16,11 @@ interface ChatMessage {
   isPlanLimit?: boolean;
 }
 
+const CLOSE_ANIMATION_MS = 150;
+
 export function AskWidget() {
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,6 +29,14 @@ export function AskWidget() {
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading, open]);
+
+  const close = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setOpen(false);
+      setClosing(false);
+    }, CLOSE_ANIMATION_MS);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,15 +61,19 @@ export function AskWidget() {
 
   return (
     <>
-      {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] h-[500px] max-h-[70vh] bg-surface border border-border rounded-xl shadow-lg flex flex-col overflow-hidden animate-widget-in">
+      {(open || closing) && (
+        <div
+          className={`fixed bottom-24 right-6 z-50 w-[380px] h-[500px] max-h-[70vh] bg-surface border border-border rounded-xl shadow-lg flex flex-col overflow-hidden ${
+            closing ? "animate-widget-out" : "animate-widget-in"
+          }`}
+        >
           <div className="px-4 pt-4 pb-3 border-b border-border flex items-start justify-between gap-2">
             <div>
               <h2 className="text-sm font-semibold text-text-primary">Ask your meetings</h2>
               <p className="text-xs text-text-secondary">Ask a question across everything Linqis has transcribed for you.</p>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={close}
               aria-label="Close"
               className="text-text-secondary hover:text-text-primary cursor-pointer shrink-0"
             >
@@ -93,7 +108,7 @@ export function AskWidget() {
                         <Link
                           key={s.id}
                           href={`/dashboard/meetings/${s.id}`}
-                          onClick={() => setOpen(false)}
+                          onClick={close}
                           className="text-xs text-success hover:underline"
                         >
                           {s.title}
@@ -134,7 +149,7 @@ export function AskWidget() {
       {/* Launcher stays visible in the same spot and flips to a collapse
           affordance instead of vanishing behind the panel when it opens. */}
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (open ? close() : setOpen(true))}
         aria-label={open ? "Close Ask your meetings" : "Ask your meetings"}
         className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-success text-background shadow-lg flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"
       >
