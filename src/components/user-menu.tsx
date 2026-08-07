@@ -5,23 +5,33 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
+// First letter of the first name + first letter of the last name (e.g.
+// "Mohamed Saadani" -> "MS"). Falls back to the first two letters of a
+// single-word name, then the first letter of the email.
+function getInitials(name?: string | null, email?: string | null): string {
+  const words = name?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (words.length >= 2) return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (email || "?").charAt(0).toUpperCase();
+}
+
 export function UserMenu() {
   const { data: session } = useSession();
   if (!session?.user) return null;
 
   const { name, email, image } = session.user;
-  const initial = (name || email || "?").charAt(0).toUpperCase();
+  const initials = getInitials(name, email);
 
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="h-9 w-9 rounded-full overflow-hidden border border-border cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-success"
+          className="h-9 w-9 shrink-0 rounded-full overflow-hidden border border-border cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-success"
           aria-label="User menu"
         >
-          <Avatar.Root className="flex h-full w-full items-center justify-center bg-success-bg">
-            <Avatar.Image src={image || undefined} alt={name || email || "User"} className="h-full w-full object-cover" />
-            <Avatar.Fallback className="text-sm font-semibold text-success">{initial}</Avatar.Fallback>
+          <Avatar.Root className="flex h-full w-full aspect-square items-center justify-center rounded-full bg-success-bg overflow-hidden">
+            <Avatar.Image src={image || undefined} alt={name || email || "User"} className="h-full w-full rounded-full object-cover" />
+            <Avatar.Fallback className="text-xs font-semibold text-success">{initials}</Avatar.Fallback>
           </Avatar.Root>
         </button>
       </DropdownMenu.Trigger>
