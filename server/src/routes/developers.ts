@@ -7,6 +7,51 @@ import { generateApiKey } from "../services/api-keys";
 
 export const router = Router();
 
+/**
+ * Blocks the obvious SSRF targets at registration time: this URL gets
+ * fetched server-side, from inside the network, every time a meeting
+ * completes (see services/webhooks.ts), and the response is discarded --
+ * so a bad URL here is a blind request primitive any workspace admin could
+ * otherwise point at cloud metadata endpoints, localhost services, or
+ * internal-only hosts. Doesn't attempt DNS-rebinding protection (no
+ * resolve-then-recheck-on-every-delivery) -- just rejects the clearly
+ * dangerous literals at creation time.
+ */
+function webhookUrlError(rawUrl: string): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return "url must be a valid URL";
+  }
+
+  if (parsed.protocol !== "https:") {
+    return "url must use https";
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  if (host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "0.0.0.0") {
+    return "url cannot point to a local address";
+  }
+
+  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4) {
+    const a = Number(ipv4[1]);
+    const b = Number(ipv4[2]);
+    const isLoopback = a === 127;
+    const isPrivate10 = a === 10;
+    const isPrivate172 = a === 172 && b >= 16 && b <= 31;
+    const isPrivate192 = a === 192 && b === 168;
+    const isLinkLocal = a === 169 && b === 254; // covers cloud metadata endpoints (169.254.169.254)
+    const isUnspecified = a === 0;
+    if (isLoopback || isPrivate10 || isPrivate172 || isPrivate192 || isLinkLocal || isUnspecified) {
+      return "url cannot point to a private or internal address";
+    }
+  }
+
+  return null;
+}
+
 // Visible to any workspace member -- knowing a key exists (name, prefix,
 // last used) isn't sensitive; only the raw key value is, and that's never
 // stored so it can't be returned here.
@@ -71,6 +116,10 @@ router.post("/webhooks", requireWorkspaceAdmin, async (req: AuthedRequest, res) 
     const { url } = req.body as { url?: string };
     if (!url || typeof url !== "string") {
       return res.status(400).json({ error: "url is required" });
+    }
+    const urlError = webhookUrlError(url);
+    if (urlError) {
+      return res.status(400).json({ error: urlError });
     }
     const secret = randomBytes(24).toString("hex");
     const prisma = getPrisma();

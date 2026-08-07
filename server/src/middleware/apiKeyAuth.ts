@@ -17,20 +17,36 @@ export interface ApiKeyRequest<
 }
 
 export async function requireApiKey(req: ApiKeyRequest, res: Response, next: NextFunction) {
-  const header = req.headers.authorization;
-  if (!header?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing API key" });
+  try {
+    const header = req.headers.authorization;
+    if (!header?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Missing API key" });
+    }
+
+    const key = header.slice("Bearer ".length);
+    const prisma = getPrisma();
+    const record = await prisma.apiKey.findUnique({ where: { keyHash: hashApiKey(key) } });
+
+    if (!record) {
+      return res.status(401).json({ error: "Invalid API key" });
+    }
+
+    // Best-effort bookkeeping -- a key revoked concurrently with this very
+    // request (findUnique above already succeeded) makes this update throw
+    // P2025 (record not found). That must never take the request down, let
+    // alone the whole process: Express 4 doesn't catch rejected promises
+    // from async middleware, so an uncaught throw here would crash the
+    // server for every in-flight request, reachable by any caller.
+    try {
+      await prisma.apiKey.update({ where: { id: record.id }, data: { lastUsedAt: new Date() } });
+    } catch (err) {
+      console.error("Failed to update API key lastUsedAt (non-blocking):", err);
+    }
+
+    req.workspaceId = record.workspaceId;
+    next();
+  } catch (error) {
+    console.error("API key auth error:", error);
+    res.status(500).json({ error: "Failed to authenticate API key" });
   }
-
-  const key = header.slice("Bearer ".length);
-  const prisma = getPrisma();
-  const record = await prisma.apiKey.findUnique({ where: { keyHash: hashApiKey(key) } });
-
-  if (!record) {
-    return res.status(401).json({ error: "Invalid API key" });
-  }
-
-  await prisma.apiKey.update({ where: { id: record.id }, data: { lastUsedAt: new Date() } });
-  req.workspaceId = record.workspaceId;
-  next();
 }
