@@ -125,6 +125,15 @@ body {
   animation: fade-out 0.2s ease-in forwards;
 }
 
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(28px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 details > summary::-webkit-details-marker {
   display: none;
 }

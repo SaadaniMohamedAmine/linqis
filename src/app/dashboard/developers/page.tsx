@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { KeyRound, Webhook as WebhookIcon, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -54,7 +55,10 @@ function RevealBanner({ label, value }: { label: string; value: string }) {
 
   return (
     <div className="p-4 rounded-lg bg-warning/10 border border-warning/30 space-y-2">
-      <p className="text-sm font-medium text-warning">Copy this {label} now -- you won&apos;t see it again.</p>
+      <p className="text-sm font-medium text-warning flex items-center gap-2">
+        <Lock size={14} />
+        Copy this {label} now -- you won&apos;t see it again.
+      </p>
       <div className="flex items-center gap-2">
         <code className="flex-1 min-w-0 truncate text-xs bg-background px-3 py-2 rounded-md border border-border">{value}</code>
         <Button variant="secondary" size="sm" onClick={handleCopy}>
@@ -160,41 +164,58 @@ export default function DevelopersPage() {
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
-      <section className="p-8 lg:p-12 overflow-y-auto">
-        <div className="max-w-[800px] mx-auto space-y-16">
-          <div>
-            <h3 className="text-2xl font-semibold">Developers</h3>
-            <p className="text-text-secondary">
-              Read-only REST API and outbound webhooks for building your own integrations on top of Linqis.
-            </p>
-          </div>
+      {/* Header */}
+      <div className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[-40%] left-[15%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
+        </div>
+        <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
+          <h1 className="text-3xl font-semibold text-text-primary mb-1">Developers</h1>
+          <p className="text-text-secondary">
+            Read-only REST API and outbound webhooks for building your own integrations on top of Linqis.
+          </p>
+        </div>
+      </div>
 
-          {error && <p className="text-sm text-danger bg-danger/10 p-3 rounded-lg">{error}</p>}
+      <div className="max-w-[800px] mx-auto p-8 flex flex-col gap-12">
+        {error && <p className="text-sm text-danger bg-danger/10 p-3 rounded-lg">{error}</p>}
 
-          {/* API Keys */}
-          <section className="space-y-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h4 className="text-lg font-semibold">API Keys</h4>
-                <p className="text-sm text-text-secondary">
-                  Authenticate requests to <code className="text-xs">/api/v1</code> with{" "}
-                  <code className="text-xs">Authorization: Bearer &lt;key&gt;</code>.
-                </p>
-              </div>
-              {canManage && (
-                <Button variant="primary" size="sm" onClick={() => setKeyModalOpen(true)}>
-                  Create key
-                </Button>
-              )}
+        {/* API Keys */}
+        <section className="flex flex-col gap-4 animate-fade-in-up [animation-delay:150ms]">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <KeyRound size={16} className="text-text-secondary" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">API Keys</h2>
             </div>
+            {canManage && (
+              <Button variant="primary" size="sm" onClick={() => setKeyModalOpen(true)}>
+                Create key
+              </Button>
+            )}
+          </div>
+          <p className="text-sm text-text-secondary -mt-2">
+            Authenticate requests to <code className="text-xs">/api/v1</code> with{" "}
+            <code className="text-xs">Authorization: Bearer &lt;key&gt;</code>.
+          </p>
 
-            {revealedKey && <RevealBanner label="API key" value={revealedKey} />}
+          {revealedKey && <RevealBanner label="API key" value={revealedKey} />}
 
-            <Card className="divide-y divide-border">
-              {loading && <p className="p-6 text-sm text-text-secondary">Loading keys…</p>}
-              {!loading && keys.length === 0 && <p className="p-6 text-sm text-text-secondary">No API keys yet.</p>}
-              {keys.map((key) => (
-                <div key={key.id} className="p-6 flex items-center justify-between gap-4">
+          <Card className="p-0 divide-y divide-border overflow-hidden">
+            {loading && <p className="p-6 text-sm text-text-secondary">Loading keys…</p>}
+            {!loading && keys.length === 0 && (
+              <div className="p-10 flex flex-col items-center text-center gap-2">
+                <div className="w-11 h-11 rounded-full bg-success-bg flex items-center justify-center text-success">
+                  <KeyRound size={18} />
+                </div>
+                <p className="text-sm text-text-secondary">No API keys yet.</p>
+              </div>
+            )}
+            {keys.map((key) => (
+              <div key={key.id} className="p-5 flex items-center justify-between gap-4 hover:bg-background/50 transition-colors">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-10 h-10 rounded-lg bg-success-bg flex items-center justify-center text-success shrink-0">
+                    <KeyRound size={18} />
+                  </div>
                   <div className="min-w-0">
                     <p className="font-medium truncate">{key.name}</p>
                     <p className="text-sm text-text-secondary font-mono">
@@ -204,56 +225,69 @@ export default function DevelopersPage() {
                       Created {formatDate(key.createdAt)} · Last used {formatDate(key.lastUsedAt)}
                     </p>
                   </div>
-                  {canManage && (
-                    <Button variant="danger" size="sm" onClick={() => handleRevokeKey(key.id)}>
-                      Revoke
-                    </Button>
-                  )}
                 </div>
-              ))}
-            </Card>
-          </section>
-
-          {/* Webhooks */}
-          <section className="space-y-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h4 className="text-lg font-semibold">Webhooks</h4>
-                <p className="text-sm text-text-secondary">
-                  Get a signed <code className="text-xs">meeting.completed</code> POST whenever a meeting finishes processing.
-                </p>
+                {canManage && (
+                  <Button variant="danger" size="sm" onClick={() => handleRevokeKey(key.id)} className="shrink-0">
+                    Revoke
+                  </Button>
+                )}
               </div>
-              {canManage && (
-                <Button variant="primary" size="sm" onClick={() => setHookModalOpen(true)}>
-                  Create webhook
-                </Button>
-              )}
+            ))}
+          </Card>
+        </section>
+
+        {/* Webhooks */}
+        <section className="flex flex-col gap-4 animate-fade-in-up [animation-delay:300ms]">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <WebhookIcon size={16} className="text-text-secondary" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Webhooks</h2>
             </div>
+            {canManage && (
+              <Button variant="primary" size="sm" onClick={() => setHookModalOpen(true)}>
+                Create webhook
+              </Button>
+            )}
+          </div>
+          <p className="text-sm text-text-secondary -mt-2">
+            Get a signed <code className="text-xs">meeting.completed</code> POST whenever a meeting finishes processing.
+          </p>
 
-            {revealedSecret && <RevealBanner label="signing secret" value={revealedSecret} />}
+          {revealedSecret && <RevealBanner label="signing secret" value={revealedSecret} />}
 
-            <Card className="divide-y divide-border">
-              {loading && <p className="p-6 text-sm text-text-secondary">Loading webhooks…</p>}
-              {!loading && hooks.length === 0 && <p className="p-6 text-sm text-text-secondary">No webhooks yet.</p>}
-              {hooks.map((hook) => (
-                <div key={hook.id} className="p-6 flex items-center justify-between gap-4">
+          <Card className="p-0 divide-y divide-border overflow-hidden">
+            {loading && <p className="p-6 text-sm text-text-secondary">Loading webhooks…</p>}
+            {!loading && hooks.length === 0 && (
+              <div className="p-10 flex flex-col items-center text-center gap-2">
+                <div className="w-11 h-11 rounded-full bg-info-bg flex items-center justify-center text-info">
+                  <WebhookIcon size={18} />
+                </div>
+                <p className="text-sm text-text-secondary">No webhooks yet.</p>
+              </div>
+            )}
+            {hooks.map((hook) => (
+              <div key={hook.id} className="p-5 flex items-center justify-between gap-4 hover:bg-background/50 transition-colors">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-10 h-10 rounded-lg bg-info-bg flex items-center justify-center text-info shrink-0">
+                    <WebhookIcon size={18} />
+                  </div>
                   <div className="min-w-0">
                     <p className="font-medium truncate">{hook.url}</p>
                     <p className="text-xs text-text-secondary">
                       {hook.event} · {hook.active ? "Active" : "Inactive"} · Created {formatDate(hook.createdAt)}
                     </p>
                   </div>
-                  {canManage && (
-                    <Button variant="danger" size="sm" onClick={() => handleDeleteHook(hook.id)}>
-                      Remove
-                    </Button>
-                  )}
                 </div>
-              ))}
-            </Card>
-          </section>
-        </div>
-      </section>
+                {canManage && (
+                  <Button variant="danger" size="sm" onClick={() => handleDeleteHook(hook.id)} className="shrink-0">
+                    Remove
+                  </Button>
+                )}
+              </div>
+            ))}
+          </Card>
+        </section>
+      </div>
 
       {keyModalOpen && (
         <Modal title="Create API key" onClose={() => setKeyModalOpen(false)}>

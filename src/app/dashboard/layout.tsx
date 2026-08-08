@@ -30,8 +30,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
       <PageLoader />
       {/* TopNavBar */}
-      <header className="bg-background border-b border-border h-16 fixed top-0 left-0 right-0 z-50 flex items-center px-6">
-        <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto">
+      <header className="bg-background border-b border-border h-16 fixed top-0 left-0 right-0 z-50 flex items-center md:pl-[280px]">
+        <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto px-8">
           <Link href="/" className="text-xl font-bold tracking-tight text-success">Linqis</Link>
           <div className="flex items-center gap-4">
             <CommandPalette />
