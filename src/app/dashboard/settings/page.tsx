@@ -101,10 +101,10 @@ export default function SettingsPage() {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition-all duration-200 cursor-pointer active:scale-[0.97] ${
                 activeTab === id
                   ? "text-success border-success"
-                  : "text-text-secondary border-transparent hover:text-text-primary"
+                  : "text-text-secondary border-transparent hover:text-text-primary hover:border-border"
               }`}
             >
               <Icon size={16} />
@@ -113,7 +113,7 @@ export default function SettingsPage() {
           ))}
           <button
             onClick={() => setActiveTab("danger")}
-            className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition-colors cursor-pointer ml-auto border-l border-border pl-6 ${
+            className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 whitespace-nowrap transition-all duration-200 cursor-pointer active:scale-[0.97] ml-auto border-l border-border pl-6 ${
               activeTab === "danger" ? "text-danger border-b-danger" : "text-danger/70 border-b-transparent hover:text-danger"
             }`}
           >
@@ -125,7 +125,7 @@ export default function SettingsPage() {
 
       {/* Tab panel */}
       <main className="max-w-[800px] mx-auto p-8 lg:p-12">
-        <div className="space-y-6 animate-fade-in-up [animation-delay:150ms]">
+        <div key={activeTab} className="space-y-6 animate-tab-in">
           {activeTab === "profile" && (
             <section className="space-y-6">
               <div>
