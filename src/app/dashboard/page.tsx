@@ -51,7 +51,7 @@ export default async function DashboardPage() {
           <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-success/10 rounded-full blur-[120px]" />
           <div className="absolute top-[-30%] right-[-5%] w-[400px] h-[400px] bg-info/10 rounded-full blur-[120px]" />
         </div>
-        <div className="relative z-10 px-8 py-10 flex flex-wrap items-center justify-between gap-6">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 flex flex-wrap items-center justify-between gap-6 animate-fade-in-up">
           <div>
             <h1 className="text-3xl font-semibold text-text-primary">
               {greeting()}{firstName ? `, ${firstName}` : ""} 👋
@@ -73,9 +73,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="p-8 flex flex-col gap-8">
+      <div className="max-w-[1440px] mx-auto p-8 flex flex-col gap-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up [animation-delay:100ms]">
           {STAT_CARDS(analytics, openActionItems).map(({ label, value, icon: Icon }) => (
             <Card
               key={label}
@@ -96,7 +96,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent meetings + Due soon */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up [animation-delay:200ms]">
           <Card className="lg:col-span-2 p-0 overflow-hidden">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between">
               <h2 className="font-semibold text-text-primary">Recent meetings</h2>
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up [animation-delay:300ms]">
           <Card className="p-6 flex items-center gap-4 bg-gradient-to-br from-success/10 to-transparent border-success/20">
             <div className="w-11 h-11 rounded-lg bg-success-bg flex items-center justify-center text-success shrink-0">
               <Upload size={20} />
