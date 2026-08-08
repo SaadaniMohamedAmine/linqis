@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Upload, AlertCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -121,7 +122,7 @@ export default function UploadPage() {
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-warning/20 blur-[120px] rounded-full"></div>
         </div>
 
-        <div className="container max-w-[720px] px-6 z-10">
+        <div className="container max-w-[720px] px-6 z-10 animate-fade-in-up">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold mb-2">Ingest Meeting Data</h1>
             <p className="text-text-secondary">Upload a recording for AI analysis.</p>
@@ -149,8 +150,8 @@ export default function UploadPage() {
                 isBusy ? "opacity-60 cursor-not-allowed border-border" : "cursor-pointer hover:bg-surface/50 border-border"
               } ${isDragging ? "border-success bg-success/5" : ""}`}
             >
-              <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center group-hover:bg-success/20 group-hover:text-success transition-all">
-                <span className="text-2xl">↑</span>
+              <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-text-secondary group-hover:bg-success/20 group-hover:text-success transition-all">
+                <Upload size={20} />
               </div>
               <div className="text-center">
                 <p className="font-medium text-text-primary">
@@ -191,11 +192,17 @@ export default function UploadPage() {
             )}
 
             {stage.kind === "error" && (
-              <div className="bg-danger-bg border border-danger/30 rounded-lg p-4">
-                <p className="text-sm text-danger">{stage.message}</p>
-                {stage.isPlanLimit && (
-                  <Link href="/pricing" className="text-sm text-success hover:underline">Upgrade to Pro →</Link>
-                )}
+              <div className="bg-danger-bg border border-danger/30 rounded-lg p-4 flex gap-3">
+                <AlertCircle size={16} className="text-danger shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-danger">{stage.message}</p>
+                  {stage.isPlanLimit && (
+                    <Link href="/pricing" className="text-sm text-success hover:underline inline-flex items-center gap-1 mt-1">
+                      <Sparkles size={14} />
+                      Upgrade to Pro
+                    </Link>
+                  )}
+                </div>
               </div>
             )}
 
