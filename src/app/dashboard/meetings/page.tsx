@@ -60,7 +60,7 @@ export default function MeetingsListPage() {
   };
 
   return (
-    <div className="bg-background text-text-primary">
+    <div className="min-h-screen bg-background text-text-primary">
       {/* Header */}
       <div className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -110,15 +110,19 @@ export default function MeetingsListPage() {
           ) : error ? (
             <div className="p-16 text-center text-danger">{error}</div>
           ) : meetings.length === 0 ? (
-            <div className="p-16 flex flex-col items-center text-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-success-bg flex items-center justify-center text-success">
-                <Video size={24} />
+            <div className="relative overflow-hidden p-20 flex flex-col items-center text-center gap-4 bg-gradient-to-br from-success/5 via-transparent to-transparent border-2 border-dashed border-border m-4 rounded-xl">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-success/10 rounded-full blur-3xl animate-pulse" />
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-success/20 animate-ping" />
+                <div className="relative w-20 h-20 rounded-full bg-success-bg flex items-center justify-center text-success">
+                  <Video size={32} />
+                </div>
               </div>
-              <h2 className="text-lg font-semibold text-text-primary">No meetings yet</h2>
-              <p className="text-sm text-text-secondary max-w-sm">
-                Upload a recording to get a transcript, executive summary, decisions, and action items.
+              <h2 className="relative text-xl font-semibold text-text-primary">No meetings yet</h2>
+              <p className="relative text-sm text-text-secondary max-w-sm">
+                Upload a recording to get a transcript, executive summary, decisions, and action items — in minutes.
               </p>
-              <Link href="/dashboard/upload">
+              <Link href="/dashboard/upload" className="relative">
                 <Button variant="primary" className="gap-2 mt-2">
                   <Upload size={16} />
                   Upload your first meeting
