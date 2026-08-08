@@ -7,6 +7,7 @@ import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../se
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
+import { requireWorkspaceAdmin } from "../middleware/auth";
 
 export const router = Router();
 
@@ -38,7 +39,17 @@ function isZoomDownloadUrl(rawUrl: string): boolean {
 }
 
 // Zoom Routes
-router.get("/zoom/recordings", async (req, res) => {
+//
+// Both are requireWorkspaceAdmin, unlike the rest of this router. Zoom
+// authenticates once account-wide from env config (there is no per-user or
+// per-workspace Zoom credential), so these two routes read and import from
+// the operator's single shared recording library rather than from anything
+// scoped to the caller's workspace. Hiding the "Browse recordings" button in
+// the dashboard is not a boundary on its own -- without this, any member of
+// any workspace could still curl these directly. The gate is per-route, not
+// on the /api/integrations mount, because the Google Calendar routes below
+// are per-user and must stay member-accessible.
+router.get("/zoom/recordings", requireWorkspaceAdmin, async (req, res) => {
   try {
     const { from, to } = req.query;
     const recordings = await getZoomRecordings(from as string, to as string);
@@ -49,7 +60,7 @@ router.get("/zoom/recordings", async (req, res) => {
   }
 });
 
-router.post("/zoom/import", async (req: AuthedRequest, res) => {
+router.post("/zoom/import", requireWorkspaceAdmin, async (req: AuthedRequest, res) => {
   try {
     const { recordingId, downloadUrl, title, isAudioOnly } = req.body;
 
