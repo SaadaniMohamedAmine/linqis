@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { LayoutDashboard, Video, CheckSquare, Plug, BarChart3, Users, Code2 } from "lucide-react";
+import { LayoutDashboard, Video, CheckSquare, Plug, BarChart3, Users, Code2, Settings } from "lucide-react";
 import { getMyWorkspaces, ACTIVE_WORKSPACE_KEY, type WorkspaceRole } from "@/lib/api";
 
 interface NavLink {
@@ -21,6 +21,7 @@ const LINKS: NavLink[] = [
   { href: "/dashboard/team", label: "Team", icon: Users },
   { href: "/dashboard/integrations", label: "Integrations", icon: Plug },
   { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 // Kept out of LINKS so it can be filtered by role before rendering.

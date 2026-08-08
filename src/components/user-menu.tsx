@@ -3,7 +3,8 @@
 import * as Avatar from "@radix-ui/react-avatar";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { LogOut, Settings } from "lucide-react";
 
 // First letter of the first name + first letter of the last name (e.g.
 // "Mohamed Saadani" -> "MS"). Falls back to the first two letters of a
@@ -46,6 +47,16 @@ export function UserMenu() {
             {name && <p className="text-sm font-medium text-text-primary truncate">{name}</p>}
             {email && <p className="text-xs text-text-secondary truncate">{email}</p>}
           </div>
+          <DropdownMenu.Separator className="h-px bg-border my-1" />
+          <DropdownMenu.Item asChild>
+            <Link
+              href="/dashboard/settings"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-text-primary rounded-md cursor-pointer outline-none hover:bg-surface-high data-[highlighted]:bg-surface-high"
+            >
+              <Settings size={16} />
+              Settings
+            </Link>
+          </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-px bg-border my-1" />
           <DropdownMenu.Item
             onSelect={() => signOut({ callbackUrl: "/" })}
