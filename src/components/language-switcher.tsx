@@ -1,32 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
-
-type LocaleCode = "en" | "fr";
-
-const STORAGE_KEY = "linqis-locale";
+import { useLocale, type LocaleCode } from "@/lib/i18n/locale-context";
 
 const LOCALES: { code: LocaleCode; label: string; Flag: React.ComponentType }[] = [
   { code: "en", label: "English", Flag: FlagGB },
   { code: "fr", label: "Français", Flag: FlagFR },
 ];
 
-// UI-only for now -- there's no i18n wiring in the app yet, this just
-// remembers the visitor's preference for whenever translations land.
+// Drives the shared LocaleProvider, so any page reading useDictionary()
+// re-renders with translated copy the moment a locale is picked here.
 export function LanguageSwitcher() {
-  const [locale, setLocale] = useState<LocaleCode>("en");
-
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "en" || stored === "fr") setLocale(stored);
-  }, []);
-
-  const select = (code: LocaleCode) => {
-    setLocale(code);
-    localStorage.setItem(STORAGE_KEY, code);
-  };
+  const { locale, setLocale } = useLocale();
 
   const current = LOCALES.find((l) => l.code === locale)!;
 
@@ -54,7 +40,7 @@ export function LanguageSwitcher() {
           {LOCALES.map(({ code, label, Flag }) => (
             <DropdownMenu.Item
               key={code}
-              onSelect={() => select(code)}
+              onSelect={() => setLocale(code)}
               className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md cursor-pointer outline-none data-[highlighted]:bg-background ${
                 code === locale ? "text-success font-medium" : "text-text-primary"
               }`}

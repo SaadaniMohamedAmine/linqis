@@ -11,9 +11,9 @@ export function PublicFooter() {
           </div>
           <div className="flex items-center gap-6 text-sm text-text-secondary">
             <Link href="#" className="hover:text-success transition-colors">GitHub</Link>
-            <Link href="#" className="hover:text-success transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-success transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-success transition-colors">Contact</Link>
+            <Link href="/privacy" className="hover:text-success transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-success transition-colors">Terms of Service</Link>
+            <Link href="/contact" className="hover:text-success transition-colors">Contact</Link>
           </div>
         </div>
       </div>

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, MessageCircle, Mail, Calendar, Video, ShieldCheck, Lock, Trash2, KeyRound } from "lucide-react";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { homeDictionary } from "@/lib/i18n/dictionaries/home";
 
 const INTEGRATIONS = [
   { icon: FileText, name: "Notion" },
@@ -15,45 +17,13 @@ const INTEGRATIONS = [
   { icon: Video, name: "Zoom" },
 ];
 
-const USE_CASES = [
-  {
-    role: "Product Manager",
-    headline: "Never lose a decision in a doc nobody reopens.",
-    desc: "Every decision and action item is extracted automatically and stays searchable across every meeting you've ever had.",
-  },
-  {
-    role: "Engineering Lead",
-    headline: "Keep async teammates in the loop without a recap meeting.",
-    desc: "Send a clean summary to Slack in one click after a meeting ends, so nobody has to sit through the recording.",
-  },
-  {
-    role: "Founder / Executive",
-    headline: "Ask a question, get an answer from every meeting at once.",
-    desc: "Ask a plain-English question like \"What did we decide about pricing last month?\" and get an answer with sources, not a transcript to skim.",
-  },
-  {
-    role: "Designer",
-    headline: "Spot the disagreements before they become rework.",
-    desc: "Linqis flags tension and unresolved disagreement in design reviews, so you follow up before it turns into a Monday surprise.",
-  },
-];
-
-const SECURITY_POINTS = [
-  { icon: Lock, title: "Your data, isolated", desc: "Every meeting, transcript, and summary is scoped to your account. No other user can query or list your data, ever." },
-  { icon: ShieldCheck, title: "Encrypted in transit", desc: "All traffic between your browser, Linqis, and its AI providers runs over HTTPS/TLS." },
-  { icon: KeyRound, title: "You control exports", desc: "On Pro, connect your own Notion workspace in Settings, or start exporting right away with ours." },
-  { icon: Trash2, title: "Delete anytime", desc: "Remove a meeting and its transcript, summary, and action items are gone — no soft-delete limbo." },
-];
-
-const FAQS = [
-  { q: "What file formats can I upload?", a: "MP3, MP4, WAV, M4A, MOV, and WebM — audio or video, Linqis extracts the audio automatically." },
-  { q: "Is my meeting data private?", a: "Yes. Meetings are scoped to your account only — no other user can see, search, or export your data, unless you explicitly create a public share link for a meeting. You can delete any meeting permanently at any time." },
-  { q: "What happens when I hit the Free plan limit?", a: "You'll get a clear message before anything fails, with the option to upgrade to Pro for unlimited meetings and longer recordings." },
-  { q: "Can I export to tools I already use?", a: "On the Pro plan, yes — one click sends a summary to Notion, Slack, or email. Notion exports use your own account by default, or ours if you haven't connected one yet." },
-  { q: "How does \"Ask your meetings\" work?", a: "It's a chat that searches across every meeting you've processed and answers using only what was actually said, with links back to the source meeting." },
-];
+// Icons are paired with the security dictionary items by index -- lucide
+// components aren't translatable data, so they stay out of the dictionary.
+const SECURITY_ICONS = [Lock, ShieldCheck, KeyRound, Trash2];
 
 export default function Home() {
+  const t = useDictionary(homeDictionary);
+
   return (
     <div className="min-h-screen bg-background text-text-primary overflow-hidden">
       {/* Hero Section */}
@@ -79,20 +49,20 @@ export default function Home() {
               className="inline-flex items-center gap-2 bg-surface px-4 py-1 rounded-full border border-border mb-6 w-fit"
             >
               <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-xs text-success">AI-powered meeting intelligence</span>
+              <span className="text-xs text-success">{t.hero.badge}</span>
             </motion.div>
-            
+
             <h1 className="text-6xl leading-[1.1] font-extrabold tracking-tighter mb-6">
-              Every meeting, <span className="text-success">decoded.</span>
+              {t.hero.titlePrefix} <span className="text-success">{t.hero.titleHighlight}</span>
             </h1>
             <p className="text-lg text-text-secondary max-w-lg mb-12">
-              Linqis transforms chaotic conversations into structured action items. Use AI-driven intelligence to capture every insight, automatically.
+              {t.hero.subtitle}
             </p>
             <div className="flex items-center gap-4">
               <Link href="/sign-up">
-                <Button variant="primary" size="lg">Start free</Button>
+                <Button variant="primary" size="lg">{t.hero.ctaPrimary}</Button>
               </Link>
-              <Button variant="secondary" size="lg">See how it works</Button>
+              <Button variant="secondary" size="lg">{t.hero.ctaSecondary}</Button>
             </div>
           </motion.div>
 
@@ -107,7 +77,7 @@ export default function Home() {
               <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
                 <div className="flex items-center gap-2">
                   <span className="text-success"></span>
-                  <span className="text-sm font-medium">Meeting Analysis: Q3 Strategy</span>
+                  <span className="text-sm font-medium">{t.mockup.label}</span>
                 </div>
                 <span className="text-xs text-text-secondary">04:32 / 18:45</span>
               </div>
@@ -132,12 +102,12 @@ export default function Home() {
                 >
                   <span className="text-success">✓</span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">Finalize Q4 roadmap by Friday</p>
-                    <p className="text-xs text-text-secondary">Assigned to Sarah K.</p>
+                    <p className="text-sm font-medium">{t.mockup.task1}</p>
+                    <p className="text-xs text-text-secondary">{t.mockup.task1Owner}</p>
                   </div>
-                  <Badge variant="danger">URGENT</Badge>
+                  <Badge variant="danger">{t.mockup.task1Badge}</Badge>
                 </motion.div>
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1 }}
@@ -145,8 +115,8 @@ export default function Home() {
                 >
                   <span className="text-text-secondary">○</span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">Schedule sync with dev team</p>
-                    <p className="text-xs text-text-secondary">Pending... (AI Tag: Ops)</p>
+                    <p className="text-sm font-medium">{t.mockup.task2}</p>
+                    <p className="text-xs text-text-secondary">{t.mockup.task2Status}</p>
                   </div>
                 </motion.div>
               </div>
@@ -165,16 +135,12 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="mb-24 text-center"
           >
-            <h2 className="text-3xl font-semibold mb-4">Superpowered by Intelligence</h2>
-            <p className="text-text-secondary max-w-2xl mx-auto">Focused on speed, privacy, and actionable outcomes for high-performance teams.</p>
+            <h2 className="text-3xl font-semibold mb-4">{t.featuresSection.title}</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">{t.featuresSection.subtitle}</p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { icon: "⚡", title: "Instant Transcription", desc: "Speech-to-text powered by Whisper, with speaker labeling and a summary ready minutes after upload." },
-              { icon: "✨", title: "AI Summary", desc: "Get a concise executive summary, decisions, and bulleted action items — extracted automatically, not written by hand." },
-              { icon: "🔗", title: "Export Anywhere", desc: "One-click export to Notion, Slack, or email on the Pro plan. Sync your meeting insights directly to the tools your team already uses." }
-            ].map((feature, i) => (
+            {t.featuresSection.items.map((feature, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 40 }}
@@ -204,7 +170,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-sm text-text-secondary uppercase tracking-widest">Works with the tools you already use</h2>
+            <h2 className="text-sm text-text-secondary uppercase tracking-widest">{t.integrations.title}</h2>
           </motion.div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             {INTEGRATIONS.map((integration, i) => (
@@ -235,14 +201,10 @@ export default function Home() {
                 viewport={{ once: true }}
                 className="text-3xl font-semibold mb-12"
               >
-                From voice to value in seconds.
+                {t.steps.title}
               </motion.h2>
               <div className="space-y-12">
-                {[
-                  { num: 1, title: "Upload", desc: "Record live or drag and drop any video or audio file. We support all major formats including MP4, MP3, and WAV." },
-                  { num: 2, title: "Process", desc: "Our AI engine analyzes the transcript, identifies speakers, and extracts key decisions using semantic understanding." },
-                  { num: 3, title: "Export", desc: "Review your dashboard and push the results to your favorite tools. Your knowledge base grows with every meeting." }
-                ].map((step, i) => (
+                {t.steps.items.map((step, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -30 }}
@@ -252,11 +214,11 @@ export default function Home() {
                     className="flex gap-6"
                   >
                     <div className="flex flex-col items-center">
-                      <motion.div 
+                      <motion.div
                         whileHover={{ scale: 1.1 }}
                         className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${i === 0 ? 'bg-success text-background' : 'bg-surface border border-text-secondary text-text-primary'}`}
                       >
-                        {step.num}
+                        {i + 1}
                       </motion.div>
                       {i < 2 && <div className="w-px h-16 bg-border mt-2" />}
                     </div>
@@ -268,7 +230,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -276,14 +238,14 @@ export default function Home() {
             >
               <div className="aspect-video bg-surface rounded-2xl overflow-hidden border border-border relative flex items-center justify-center group cursor-pointer hover:border-success/50 transition-colors">
                 <div className="text-center">
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.1 }}
                     className="bg-success/20 p-4 rounded-full inline-flex mb-4"
                   >
                     <span className="text-success text-4xl group-hover:text-white transition-colors">▶</span>
                   </motion.div>
-                  <p className="font-medium">Watch product demo</p>
-                  <p className="text-xs text-text-secondary">2:14 min</p>
+                  <p className="font-medium">{t.steps.demo.title}</p>
+                  <p className="text-xs text-text-secondary">{t.steps.demo.duration}</p>
                 </div>
               </div>
             </motion.div>
@@ -299,13 +261,13 @@ export default function Home() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <Badge variant="success" className="mb-4">Pro</Badge>
-            <h2 className="text-3xl font-semibold mb-4">Ask your meetings anything.</h2>
+            <Badge variant="success" className="mb-4">{t.ask.badge}</Badge>
+            <h2 className="text-3xl font-semibold mb-4">{t.ask.title}</h2>
             <p className="text-text-secondary max-w-md mb-6">
-              Stop scrolling through transcripts. Linqis searches across every meeting you've processed and answers in plain English — with a link back to exactly where it came from. Available on the Pro plan.
+              {t.ask.desc}
             </p>
             <Link href="/pricing">
-              <Button variant="primary">See Pro plans</Button>
+              <Button variant="primary">{t.ask.cta}</Button>
             </Link>
           </motion.div>
 
@@ -317,15 +279,15 @@ export default function Home() {
             <Card className="p-6 rounded-xl bg-surface/80 backdrop-blur-md border-border">
               <div className="flex justify-end mb-4">
                 <div className="bg-success/10 border border-success/20 rounded-lg rounded-tr-none px-4 py-3 max-w-[80%]">
-                  <p className="text-sm">What did we decide about the Q3 budget?</p>
+                  <p className="text-sm">{t.ask.question}</p>
                 </div>
               </div>
               <div className="flex justify-start">
                 <div className="bg-background border border-border rounded-lg rounded-tl-none px-4 py-3 max-w-[85%]">
                   <p className="text-sm text-text-secondary mb-2">
-                    You approved a 12% increase for the design team, contingent on the Q2 hiring plan closing on time.
+                    {t.ask.answer}
                   </p>
-                  <Link href="#" className="text-xs text-success hover:underline">Source: "Q3 Strategy" — Aug 3</Link>
+                  <Link href="#" className="text-xs text-success hover:underline">{t.ask.source}</Link>
                 </div>
               </div>
             </Card>
@@ -342,12 +304,12 @@ export default function Home() {
             viewport={{ once: true }}
             className="mb-16 text-center"
           >
-            <h2 className="text-3xl font-semibold mb-4">Built for how you actually work.</h2>
-            <p className="text-text-secondary max-w-2xl mx-auto">Whatever the meeting, Linqis adapts to what you need out of it.</p>
+            <h2 className="text-3xl font-semibold mb-4">{t.useCasesSection.title}</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">{t.useCasesSection.subtitle}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {USE_CASES.map((uc, i) => (
+            {t.useCasesSection.items.map((uc, i) => (
               <motion.div
                 key={uc.role}
                 initial={{ opacity: 0, y: 30 }}
@@ -375,28 +337,31 @@ export default function Home() {
             viewport={{ once: true }}
             className="mb-16 text-center"
           >
-            <h2 className="text-3xl font-semibold mb-4">Your meetings stay yours.</h2>
-            <p className="text-text-secondary max-w-2xl mx-auto">Meeting content is sensitive. Linqis is built to keep it that way.</p>
+            <h2 className="text-3xl font-semibold mb-4">{t.security.title}</h2>
+            <p className="text-text-secondary max-w-2xl mx-auto">{t.security.subtitle}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {SECURITY_POINTS.map((point, i) => (
-              <motion.div
-                key={point.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Card className="h-full p-6 border-border">
-                  <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center mb-4 border border-border">
-                    <point.icon className="w-5 h-5 text-success" />
-                  </div>
-                  <h3 className="text-base font-semibold mb-2">{point.title}</h3>
-                  <p className="text-sm text-text-secondary">{point.desc}</p>
-                </Card>
-              </motion.div>
-            ))}
+            {t.security.items.map((point, i) => {
+              const Icon = SECURITY_ICONS[i];
+              return (
+                <motion.div
+                  key={point.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <Card className="h-full p-6 border-border">
+                    <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center mb-4 border border-border">
+                      <Icon className="w-5 h-5 text-success" />
+                    </div>
+                    <h3 className="text-base font-semibold mb-2">{point.title}</h3>
+                    <p className="text-sm text-text-secondary">{point.desc}</p>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -410,11 +375,11 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-3xl font-semibold mb-12 text-center"
           >
-            Frequently asked questions
+            {t.faq.title}
           </motion.h2>
 
           <div className="flex flex-col gap-3">
-            {FAQS.map((faq) => (
+            {t.faq.items.map((faq) => (
               <details key={faq.q} className="group bg-surface border border-border rounded-lg px-5 py-4">
                 <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-text-primary">
                   {faq.q}
@@ -429,20 +394,20 @@ export default function Home() {
 
       {/* CTA Section */}
       <section id="cta" className="py-24 bg-success/5">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="max-w-[1440px] mx-auto px-6 text-center"
         >
-          <h2 className="text-5xl font-semibold mb-6">Ready to stop taking notes?</h2>
-          <p className="text-lg text-text-secondary mb-12 max-w-xl mx-auto">Join teams who use Linqis to stay aligned without the manual effort.</p>
+          <h2 className="text-5xl font-semibold mb-6">{t.cta.title}</h2>
+          <p className="text-lg text-text-secondary mb-12 max-w-xl mx-auto">{t.cta.subtitle}</p>
           <div className="flex justify-center items-center gap-4">
             <Link href="/sign-up">
-              <Button variant="primary" size="lg">Start your free trial</Button>
+              <Button variant="primary" size="lg">{t.cta.primary}</Button>
             </Link>
             <Link href="/contact">
-              <Button variant="secondary" size="lg">Contact Sales</Button>
+              <Button variant="secondary" size="lg">{t.cta.secondary}</Button>
             </Link>
           </div>
         </motion.div>

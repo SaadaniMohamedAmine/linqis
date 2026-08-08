@@ -4,6 +4,7 @@ import { Inter, Geist } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 import { TransitionLoader } from "@/components/transition-loader";
+import { LocaleProvider } from "@/lib/i18n/locale-context";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
@@ -43,10 +44,12 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${geist.variable} antialiased`}>
         <SessionProvider>
-          <Suspense fallback={null}>
-            <TransitionLoader />
-          </Suspense>
-          {children}
+          <LocaleProvider>
+            <Suspense fallback={null}>
+              <TransitionLoader />
+            </Suspense>
+            {children}
+          </LocaleProvider>
         </SessionProvider>
       </body>
     </html>
