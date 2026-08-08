@@ -7,8 +7,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { signInDictionary } from "@/lib/i18n/dictionaries/sign-in";
 
 function SignInForm() {
+  const t = useDictionary(signInDictionary);
   const router = useRouter();
   // Set when arriving from an invitation link -- send them back to
   // /invite/accept instead of the dashboard once they're signed in.
@@ -35,7 +38,7 @@ function SignInForm() {
     setError("");
 
     if (!email || !password) {
-      setError("Please fill in all fields.");
+      setError(t.fillAllFields);
       return;
     }
 
@@ -44,7 +47,7 @@ function SignInForm() {
     setIsLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError(t.invalidCredentials);
       return;
     }
     router.push(callbackUrl);
@@ -62,14 +65,14 @@ function SignInForm() {
         {/* Auth Card */}
         <div className="bg-surface/80 backdrop-blur-md rounded-xl p-6 flex flex-col gap-6 shadow-lg border border-border">
           <div className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">Welcome back</h2>
-            <p className="text-sm text-text-secondary">Sign in to access your meeting insights.</p>
+            <h2 className="text-lg font-semibold">{t.title}</h2>
+            <p className="text-sm text-text-secondary">{t.subtitle}</p>
           </div>
 
           {/* Google Login */}
-          <Button 
-            variant="secondary" 
-            className="w-full h-12 gap-3" 
+          <Button
+            variant="secondary"
+            className="w-full h-12 gap-3"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -79,13 +82,13 @@ function SignInForm() {
               <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.347 2.827.957 4.039l3.007-2.332z" fill="#FBBC05" />
               <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335" />
             </svg>
-            {isLoading ? "Signing in..." : "Continue with Google"}
+            {isLoading ? t.signingIn : t.continueWithGoogle}
           </Button>
 
           {/* Divider */}
           <div className="flex items-center gap-4">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">OR</span>
+            <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{t.or}</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
@@ -93,15 +96,15 @@ function SignInForm() {
           <form onSubmit={handleEmailSignIn} className="flex flex-col gap-4">
             {resetSuccess && (
               <p className="text-xs text-success bg-success/10 p-2 rounded">
-                Password updated. Sign in with your new password.
+                {t.resetSuccess}
               </p>
             )}
             {error && <p className="text-xs text-danger bg-danger/10 p-2 rounded">{error}</p>}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-text-secondary px-1">Email address</label>
-              <Input 
-                placeholder="name@company.com" 
-                type="email" 
+              <label className="text-xs text-text-secondary px-1">{t.emailLabel}</label>
+              <Input
+                placeholder={t.emailPlaceholder}
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -109,8 +112,8 @@ function SignInForm() {
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center px-1">
-                <label className="text-xs text-text-secondary">Password</label>
-                <Link href="/forgot-password" className="text-xs text-success hover:underline">Forgot password?</Link>
+                <label className="text-xs text-text-secondary">{t.passwordLabel}</label>
+                <Link href="/forgot-password" className="text-xs text-success hover:underline">{t.forgotPassword}</Link>
               </div>
               <PasswordInput
                 placeholder="••••••••"
@@ -120,7 +123,7 @@ function SignInForm() {
               />
             </div>
             <Button variant="primary" className="w-full h-12 mt-2" type="submit" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? t.signingIn : t.signInButton}
             </Button>
           </form>
         </div>
@@ -128,9 +131,9 @@ function SignInForm() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-sm text-text-secondary">
-            Don't have an account?{" "}
+            {t.noAccount}{" "}
             <Link href="/sign-up" className="text-success font-medium hover:underline ml-1">
-              Sign up
+              {t.signUpLink}
             </Link>
           </p>
         </div>

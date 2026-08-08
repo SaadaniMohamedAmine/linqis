@@ -7,8 +7,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { signUpDictionary } from "@/lib/i18n/dictionaries/sign-up";
 
 function SignUpForm() {
+  const t = useDictionary(signUpDictionary);
   const router = useRouter();
   // Set when arriving from an invitation link -- accepting the invite comes
   // before onboarding so they don't lose the workspace they were invited to.
@@ -34,11 +37,11 @@ function SignUpForm() {
     setError("");
 
     if (!name || !email || !password) {
-      setError("Please fill in all fields.");
+      setError(t.fillAllFields);
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(t.passwordTooShort);
       return;
     }
 
@@ -51,7 +54,7 @@ function SignUpForm() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error || "Could not create account.");
+      setError(body.error || t.couldNotCreate);
       setIsLoading(false);
       return;
     }
@@ -60,7 +63,7 @@ function SignUpForm() {
     setIsLoading(false);
 
     if (result?.error) {
-      setError("Account created, but sign-in failed. Please sign in manually.");
+      setError(t.createdButSignInFailed);
       router.push("/sign-in");
       return;
     }
@@ -79,14 +82,14 @@ function SignUpForm() {
         {/* Auth Card */}
         <div className="w-1/4 bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
           <header className="mb-8 text-center">
-            <h1 className="text-xl font-semibold mb-1">Create your account</h1>
-            <p className="text-text-secondary">Elevate your meetings with AI intelligence.</p>
+            <h1 className="text-xl font-semibold mb-1">{t.title}</h1>
+            <p className="text-text-secondary">{t.subtitle}</p>
           </header>
 
           {/* Google Login */}
-          <Button 
-            variant="secondary" 
-            className="w-full h-12 gap-3 mb-8" 
+          <Button
+            variant="secondary"
+            className="w-full h-12 gap-3 mb-8"
             onClick={handleGoogleSignUp}
             disabled={isLoading}
           >
@@ -96,7 +99,7 @@ function SignUpForm() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335" />
             </svg>
-            {isLoading ? "Creating account..." : "Continue with Google"}
+            {isLoading ? t.creatingAccount : t.continueWithGoogle}
           </Button>
 
           {/* Divider */}
@@ -105,7 +108,7 @@ function SignUpForm() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase tracking-widest">
-              <span className="bg-surface px-4 text-text-secondary">or continue with email</span>
+              <span className="bg-surface px-4 text-text-secondary">{t.orContinueWithEmail}</span>
             </div>
           </div>
 
@@ -113,26 +116,26 @@ function SignUpForm() {
           <form onSubmit={handleEmailSignUp} className="space-y-6">
             {error && <p className="text-xs text-danger bg-danger/10 p-2 rounded">{error}</p>}
             <div className="space-y-1">
-              <label className="text-sm text-text-secondary ml-1">Full name</label>
-              <Input 
-                placeholder="John Doe" 
+              <label className="text-sm text-text-secondary ml-1">{t.nameLabel}</label>
+              <Input
+                placeholder={t.namePlaceholder}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm text-text-secondary ml-1">Email address</label>
-              <Input 
-                placeholder="name@company.com" 
-                type="email" 
+              <label className="text-sm text-text-secondary ml-1">{t.emailLabel}</label>
+              <Input
+                placeholder={t.emailPlaceholder}
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-1">
-              <label className="text-sm text-text-secondary ml-1">Password</label>
+              <label className="text-sm text-text-secondary ml-1">{t.passwordLabel}</label>
               <PasswordInput
                 placeholder="••••••••"
                 value={password}
@@ -145,23 +148,23 @@ function SignUpForm() {
                 <div className={`h-1 flex-1 rounded ${/[0-9]/.test(password) ? 'bg-success' : 'bg-border'}`} />
                 <div className={`h-1 flex-1 rounded ${/[^A-Za-z0-9]/.test(password) ? 'bg-success' : 'bg-border'}`} />
               </div>
-              <p className="text-xs text-text-secondary mt-1 ml-1">At least 8 characters</p>
+              <p className="text-xs text-text-secondary mt-1 ml-1">{t.passwordHint}</p>
             </div>
             <Button variant="primary" className="w-full h-12 font-bold mt-4" type="submit" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isLoading ? t.creatingAccount : t.createAccountButton}
             </Button>
           </form>
 
           <footer className="mt-8 text-center space-y-4">
             <p className="text-sm text-text-secondary">
-              Already have an account?{" "}
-              <Link href="/sign-in" className="text-success hover:underline">Sign in</Link>
+              {t.alreadyHaveAccount}{" "}
+              <Link href="/sign-in" className="text-success hover:underline">{t.signInLink}</Link>
             </p>
             <p className="text-xs text-text-secondary leading-relaxed px-4 opacity-60">
-              By clicking Create Account, you agree to our{" "}
-              <Link href="#" className="underline hover:text-text-primary">Terms of Service</Link>{" "}
-              and{" "}
-              <Link href="#" className="underline hover:text-text-primary">Privacy Policy</Link>.
+              {t.agreementPrefix}{" "}
+              <Link href="/terms" className="underline hover:text-text-primary">{t.termsLink}</Link>{" "}
+              {t.and}{" "}
+              <Link href="/privacy" className="underline hover:text-text-primary">{t.privacyLink}</Link>.
             </p>
           </footer>
         </div>
@@ -170,11 +173,11 @@ function SignUpForm() {
         <div className="mt-12 flex items-center gap-8 opacity-40">
           <div className="flex items-center gap-1">
             <span className="text-sm"></span>
-            <span className="text-xs">Enterprise Security</span>
+            <span className="text-xs">{t.enterpriseSecurity}</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="text-sm">✨</span>
-            <span className="text-xs">AI Ready</span>
+            <span className="text-xs">{t.aiReady}</span>
           </div>
         </div>
       </main>

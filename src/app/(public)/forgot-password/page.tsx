@@ -4,8 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { forgotPasswordDictionary } from "@/lib/i18n/dictionaries/forgot-password";
 
 export default function ForgotPasswordPage() {
+  const t = useDictionary(forgotPasswordDictionary);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   // Always the generic success message, whether or not the account exists --
@@ -39,22 +42,22 @@ export default function ForgotPasswordPage() {
         {/* Auth Card */}
         <div className="bg-surface/80 backdrop-blur-md rounded-xl p-6 flex flex-col gap-6 shadow-lg border border-border">
           <div className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">Reset your password</h2>
+            <h2 className="text-lg font-semibold">{t.title}</h2>
             <p className="text-sm text-text-secondary">
-              Enter the email address on your account and we'll send you a link to reset your password.
+              {t.subtitle}
             </p>
           </div>
 
           {submitted ? (
             <p className="text-sm text-text-secondary bg-success/10 border border-success/20 rounded p-3">
-              If that email exists, we've sent a reset link. Check your inbox.
+              {t.submitted}
             </p>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-text-secondary px-1">Email address</label>
+                <label className="text-xs text-text-secondary px-1">{t.emailLabel}</label>
                 <Input
-                  placeholder="name@company.com"
+                  placeholder={t.emailPlaceholder}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -62,7 +65,7 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               <Button variant="primary" className="w-full h-12 mt-2" type="submit" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send reset link"}
+                {isLoading ? t.sending : t.sendButton}
               </Button>
             </form>
           )}
@@ -71,9 +74,9 @@ export default function ForgotPasswordPage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-sm text-text-secondary">
-            Remembered your password?{" "}
+            {t.rememberedPassword}{" "}
             <Link href="/sign-in" className="text-success font-medium hover:underline ml-1">
-              Sign in
+              {t.signInLink}
             </Link>
           </p>
         </div>
