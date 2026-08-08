@@ -16,8 +16,8 @@ router.post("/", async (req: AuthedRequest, res) => {
 
     const prisma = getPrisma();
 
-    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } });
-    if (!PLAN_LIMITS[user?.plan || "FREE"].chatEnabled) {
+    const workspace = await prisma.workspace.findUnique({ where: { id: req.workspaceId }, select: { plan: true } });
+    if (!PLAN_LIMITS[workspace?.plan || "FREE"].chatEnabled) {
       return res.status(402).json({
         error: "Asking your meetings is a Pro feature. Upgrade to chat across your meetings.",
         code: "PLAN_LIMIT_REACHED",
@@ -26,14 +26,14 @@ router.post("/", async (req: AuthedRequest, res) => {
 
     const questionEmbedding = await embedText(question);
 
-    // Only load embeddings for THIS user's meetings -- strict isolation.
+    // Only load embeddings for the active workspace's meetings -- strict isolation.
     const candidates = await prisma.meetingEmbedding.findMany({
-      where: { meeting: { userId: req.userId } },
+      where: { meeting: { workspaceId: req.workspaceId } },
       include: { meeting: { select: { id: true, title: true } } },
     });
 
     if (candidates.length === 0) {
-      return res.json({ answer: "You don't have any processed meetings yet to search through.", sources: [] });
+      return res.json({ answer: "This workspace doesn't have any processed meetings yet to search through.", sources: [] });
     }
 
     const scored = candidates

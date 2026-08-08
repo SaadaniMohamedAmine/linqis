@@ -46,11 +46,22 @@ export async function getZoomRecordings(from?: string, to?: string): Promise<Zoo
   return response.data.meetings || [];
 }
 
+/**
+ * Callers MUST validate `downloadUrl` points at Zoom first (see
+ * isZoomDownloadUrl in routes/integrations.ts) -- this request carries the
+ * account-wide Zoom OAuth token in an Authorization header, so any host it
+ * reaches receives that credential.
+ *
+ * `maxRedirects: 0` keeps that true for the whole request: without it axios
+ * would replay the Authorization header at whatever Location a zoom.us
+ * response named, which would defeat the caller's host check.
+ */
 export async function downloadZoomRecording(downloadUrl: string): Promise<Buffer> {
   const token = await getZoomAccessToken();
   const response = await axios.get(downloadUrl, {
     headers: { Authorization: `Bearer ${token}` },
     responseType: "arraybuffer",
+    maxRedirects: 0,
   });
   return Buffer.from(response.data);
 }

@@ -6,6 +6,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { CommandPalette } from "@/components/command-palette";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { UserMenu } from "@/components/user-menu";
 import { AskWidget } from "@/components/ask-widget";
 import { ProductTour } from "@/components/product-tour";
@@ -34,6 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Link href="/" className="text-xl font-bold tracking-tight text-success">Linqis</Link>
           <div className="flex items-center gap-4">
             <CommandPalette />
+            <WorkspaceSwitcher />
             <LanguageSwitcher />
             <NotificationsBell />
             <Link href="/dashboard/upload" data-tour="upload-button">

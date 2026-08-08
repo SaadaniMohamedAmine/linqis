@@ -57,4 +57,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
   },
+  events: {
+    // Fires only the very first time an account is created by the adapter
+    // (i.e. a first Google sign-in). Credentials accounts are created in
+    // api/auth/register/route.ts, which sets up their workspace itself.
+    async createUser({ user }) {
+      const prisma = getPrisma();
+      const workspace = await prisma.workspace.create({
+        data: { name: user.name ? `${user.name}'s Workspace` : "My Workspace", ownerId: user.id! },
+      });
+      await prisma.workspaceMember.create({
+        data: { workspaceId: workspace.id, userId: user.id!, role: "OWNER" },
+      });
+    },
+  },
 });

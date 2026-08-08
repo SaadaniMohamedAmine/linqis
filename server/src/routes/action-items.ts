@@ -4,14 +4,14 @@ import type { AuthedRequest } from "../middleware/auth";
 
 export const router = Router();
 
-// Action items aggregated across all of the caller's meetings, with the
-// parent meeting title so the Action Items Manager page can show "which
+// Action items aggregated across every meeting in the active workspace, with
+// the parent meeting title so the Action Items Manager page can show "which
 // meeting this came from" without a second round-trip per row.
 router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const actionItems = await prisma.actionItem.findMany({
-      where: { meeting: { userId: req.userId } },
+      where: { meeting: { workspaceId: req.workspaceId } },
       orderBy: [{ status: "asc" }, { deadline: "asc" }],
       include: {
         meeting: {
@@ -36,9 +36,9 @@ router.patch("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
     const prisma = getPrisma();
     const existing = await prisma.actionItem.findUnique({
       where: { id: req.params.id },
-      include: { meeting: { select: { userId: true } } },
+      include: { meeting: { select: { workspaceId: true } } },
     });
-    if (!existing || existing.meeting.userId !== req.userId) {
+    if (!existing || existing.meeting.workspaceId !== req.workspaceId) {
       return res.status(404).json({ error: "Action item not found" });
     }
 

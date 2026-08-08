@@ -9,7 +9,7 @@ router.get("/", async (req: AuthedRequest, res) => {
   try {
     const prisma = getPrisma();
     const meetings = await prisma.meeting.findMany({
-      where: { userId: req.userId },
+      where: { workspaceId: req.workspaceId },
       orderBy: { createdAt: "desc" },
       include: {
         participants: true,
@@ -42,9 +42,9 @@ router.get("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
         exports: true,
       },
     });
-    // 404 (not 403) whether the meeting doesn't exist or just isn't the
-    // caller's -- never reveal that an id belongs to someone else.
-    if (!meeting || meeting.userId !== req.userId) {
+    // 404 (not 403) whether the meeting doesn't exist or just isn't in the
+    // caller's workspace -- never reveal that an id belongs to someone else.
+    if (!meeting || meeting.workspaceId !== req.workspaceId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
     res.json(meeting);
@@ -59,7 +59,7 @@ router.post("/", async (req: AuthedRequest, res) => {
     const prisma = getPrisma();
     const { title, audioUrl } = req.body;
     const meeting = await prisma.meeting.create({
-      data: { title, userId: req.userId!, audioUrl, status: "PROCESSING" },
+      data: { title, userId: req.userId!, workspaceId: req.workspaceId!, audioUrl, status: "PROCESSING" },
     });
     res.status(201).json(meeting);
   } catch (error) {
@@ -75,8 +75,8 @@ router.patch("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
       return res.status(400).json({ error: "title is required" });
     }
     const prisma = getPrisma();
-    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { userId: true } });
-    if (!existing || existing.userId !== req.userId) {
+    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { workspaceId: true } });
+    if (!existing || existing.workspaceId !== req.workspaceId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
     const meeting = await prisma.meeting.update({ where: { id: req.params.id }, data: { title } });
@@ -89,8 +89,8 @@ router.patch("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
 router.patch("/:id/share", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const prisma = getPrisma();
-    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { userId: true, shareToken: true } });
-    if (!existing || existing.userId !== req.userId) {
+    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { workspaceId: true, shareToken: true } });
+    if (!existing || existing.workspaceId !== req.workspaceId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
 
@@ -110,8 +110,8 @@ router.patch("/:id/share", async (req: AuthedRequest<{ id: string }>, res) => {
 router.delete("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const prisma = getPrisma();
-    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { userId: true } });
-    if (!existing || existing.userId !== req.userId) {
+    const existing = await prisma.meeting.findUnique({ where: { id: req.params.id }, select: { workspaceId: true } });
+    if (!existing || existing.workspaceId !== req.workspaceId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
     await prisma.meeting.delete({ where: { id: req.params.id } });

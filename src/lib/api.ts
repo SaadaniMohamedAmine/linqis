@@ -40,13 +40,43 @@ async function getBackendToken(): Promise<string> {
   return token;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+// Which workspace the user is currently looking at. Sent on every backend
+// call; the server only honours it after checking the caller really is a
+// member, so a tampered value gains nothing. Server-side renders have no
+// localStorage, in which case the backend falls back to the personal workspace.
+export const ACTIVE_WORKSPACE_KEY = "linqis-active-workspace";
+
+function getActiveWorkspaceId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+}
+
+export function setActiveWorkspaceId(id: string) {
+  localStorage.setItem(ACTIVE_WORKSPACE_KEY, id);
+  cachedToken = null; // force a clean round-trip rather than mixing caches
+}
+
+/**
+ * The exact 403 the backend returns when `X-Workspace-Id` names a workspace
+ * the caller is no longer a member of (server/src/middleware/auth.ts,
+ * requireWorkspace).
+ *
+ * Matched on the message, not just the status, so the *other* 403 the backend
+ * emits -- requireWorkspaceAdmin's "Only workspace owners and admins can do
+ * this" -- is never retried. A plain member hitting that must keep failing:
+ * silently retrying without the header would fall back to a workspace they
+ * *do* own and run the admin action there instead.
+ */
+const STALE_WORKSPACE_ERROR = "You are not a member of this workspace";
+
+async function send<T>(path: string, init: RequestInit | undefined, workspaceId: string | null): Promise<T> {
   const token = await getBackendToken();
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       ...(init?.body ? { "Content-Type": "application/json" } : {}),
       Authorization: `Bearer ${token}`,
+      ...(workspaceId ? { "X-Workspace-Id": workspaceId } : {}),
       ...init?.headers,
     },
   });
@@ -58,6 +88,39 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const workspaceId = getActiveWorkspaceId();
+  try {
+    return await send<T>(path, init, workspaceId);
+  } catch (err) {
+    // Truthiness, not `!== null`, to mirror exactly when the header is sent:
+    // if no header went out there was no stale id to blame, and on the server
+    // (no localStorage) this is always false, so the cleanup below is
+    // browser-only.
+    const isStaleWorkspace =
+      !!workspaceId &&
+      err instanceof ApiError &&
+      err.status === 403 &&
+      err.message === STALE_WORKSPACE_ERROR;
+
+    if (!isStaleWorkspace) throw err;
+
+    // The pinned workspace is gone (the user was removed from it, or it was
+    // deleted) and localStorage would keep replaying it forever, hard-failing
+    // every workspace-scoped call with no way out but manually using the
+    // WorkspaceSwitcher. Drop it and retry once with no header, which makes
+    // requireWorkspace fall back to the caller's own workspace.
+    //
+    // Safe to replay even for POST/DELETE: requireWorkspace rejects before
+    // the route handler runs, so the first attempt had no side effects. This
+    // calls `send` directly rather than recursing, so a failing retry throws
+    // instead of looping.
+    localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
+    cachedToken = null; // match setActiveWorkspaceId: don't mix caches across workspaces
+    return send<T>(path, init, null);
+  }
 }
 
 export type MeetingListItem = Meeting & {
@@ -104,7 +167,13 @@ export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPu
  */
 export async function downloadMeetingPdf(id: string, filename: string): Promise<void> {
   const token = await getBackendToken();
-  const res = await fetch(`${API_URL}/api/pdf/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+  const workspaceId = getActiveWorkspaceId();
+  const res = await fetch(`${API_URL}/api/pdf/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(workspaceId ? { "X-Workspace-Id": workspaceId } : {}),
+    },
+  });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new ApiError(res.status, body.error || "Failed to generate PDF");
@@ -158,9 +227,11 @@ export function uploadMeetingFile(
     // No userId in the body -- the backend derives it from the Authorization
     // token, never from anything the client sends.
 
+    const workspaceId = getActiveWorkspaceId();
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${API_URL}/api/upload`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    if (workspaceId) xhr.setRequestHeader("X-Workspace-Id", workspaceId);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable && onUploadProgress) {
@@ -264,13 +335,78 @@ export interface UserProfile {
   emailNotifications: boolean;
   notionApiKey: string | null;
   notionDatabaseId: string | null;
+  // Billing lives on the active workspace, not on the user -- surfaced here
+  // so the settings page keeps a single profile round-trip.
   plan: "FREE" | "PRO";
   subscriptionStatus: string | null;
   currentPeriodEnd: string | null;
+  workspaceId: string | null;
+  workspaceName: string | null;
+  workspaceRole: WorkspaceRole | null;
 }
 
 export function getUser(): Promise<UserProfile> {
   return request<UserProfile>("/api/users/me");
+}
+
+export type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
+
+export interface Workspace {
+  id: string;
+  name: string;
+  role: WorkspaceRole;
+}
+
+export interface WorkspaceMember {
+  id: string;
+  workspaceId: string;
+  userId: string;
+  role: WorkspaceRole;
+  createdAt: string;
+  user: { id: string; name: string | null; email: string | null; image: string | null };
+}
+
+export function getMyWorkspaces(): Promise<Workspace[]> {
+  return request<Workspace[]>("/api/users/me/workspaces");
+}
+
+export function getWorkspaceMembers(): Promise<WorkspaceMember[]> {
+  return request<WorkspaceMember[]>("/api/workspace/members");
+}
+
+export function inviteToWorkspace(email: string, role: "ADMIN" | "MEMBER"): Promise<{ status: string }> {
+  return request("/api/workspace/invite", { method: "POST", body: JSON.stringify({ email, role }) });
+}
+
+export function removeWorkspaceMember(userId: string): Promise<{ status: string }> {
+  return request(`/api/workspace/members/${userId}`, { method: "DELETE" });
+}
+
+export interface InvitePreview {
+  workspaceName: string;
+  email: string;
+  role: WorkspaceRole;
+}
+
+/** Public (no auth): lets the invite landing page name the workspace. */
+export async function getInvitePreview(token: string): Promise<InvitePreview> {
+  const res = await fetch(`${API_URL}/api/workspace/public/invite/${token}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, body.error || "This invite is invalid or has expired");
+  }
+  return res.json();
+}
+
+/**
+ * Called once the invited user has signed in. Authenticated: the backend takes
+ * the joining user from the bearer token, so no user id is sent.
+ */
+export function acceptInvite(token: string): Promise<{ workspaceId: string }> {
+  return request<{ workspaceId: string }>("/api/workspace/invites/accept", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
 }
 
 export function updateUser(
@@ -301,6 +437,45 @@ export function getIntegrationStatus(): Promise<IntegrationStatus[]> {
 
 export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
   return request<{ authUrl: string }>("/api/integrations/google-calendar/auth-url");
+}
+
+/**
+ * Mirrors Zoom's actual cloud recordings API response (server/src/services/
+ * integrations/zoom.ts), not a flattened shape -- a single recording
+ * ("meeting" in Zoom's vocabulary) can have several recording_files (e.g. a
+ * video file and a separate audio-only file), so the caller has to pick
+ * which file to import.
+ */
+export interface ZoomRecordingFile {
+  id: string;
+  recording_type: string; // e.g. "shared_screen_with_speaker_view", "audio_only"
+  download_url: string;
+}
+
+export interface ZoomRecording {
+  id: string;
+  topic: string;
+  start_time: string;
+  duration: number; // minutes
+  recording_files: ZoomRecordingFile[];
+}
+
+export function getZoomRecordings(from: string, to: string): Promise<ZoomRecording[]> {
+  return request<ZoomRecording[]>(`/api/integrations/zoom/recordings?from=${from}&to=${to}`);
+}
+
+export interface ZoomImportParams {
+  recordingId: string;
+  title: string;
+  downloadUrl: string;
+  isAudioOnly: boolean;
+}
+
+export function importZoomRecording(params: ZoomImportParams): Promise<{ meetingId: string; jobId: string }> {
+  return request("/api/integrations/zoom/import", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
 }
 
 export interface Notification {
@@ -354,4 +529,47 @@ export interface AnalyticsData {
 
 export function getAnalytics(): Promise<AnalyticsData> {
   return request<AnalyticsData>("/api/analytics");
+}
+
+export interface ApiKeySummary {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  lastUsedAt: string | null;
+  createdAt: string;
+}
+
+export function getApiKeys(): Promise<ApiKeySummary[]> {
+  return request<ApiKeySummary[]>("/api/developers/api-keys");
+}
+
+export function createApiKey(name: string): Promise<{ key: string }> {
+  return request<{ key: string }>("/api/developers/api-keys", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function revokeApiKey(id: string): Promise<{ status: string }> {
+  return request(`/api/developers/api-keys/${id}`, { method: "DELETE" });
+}
+
+export interface WebhookSubscriptionSummary {
+  id: string;
+  url: string;
+  event: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export function getWebhooks(): Promise<WebhookSubscriptionSummary[]> {
+  return request<WebhookSubscriptionSummary[]>("/api/developers/webhooks");
+}
+
+export function createWebhook(url: string): Promise<{ id: string; url: string; secret: string }> {
+  return request("/api/developers/webhooks", { method: "POST", body: JSON.stringify({ url }) });
+}
+
+export function deleteWebhook(id: string): Promise<{ status: string }> {
+  return request(`/api/developers/webhooks/${id}`, { method: "DELETE" });
 }

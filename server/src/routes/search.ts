@@ -12,8 +12,8 @@ router.get("/", async (req: AuthedRequest, res) => {
     const prisma = getPrisma();
 
     // Searches meeting title + summary and transcript text, ranked by
-    // relevance via ts_rank. userId is filtered first so a meeting from
-    // another user is never exposed.
+    // relevance via ts_rank. workspaceId is filtered first so a meeting from
+    // another workspace is never exposed.
     const results = await prisma.$queryRaw<
       { id: string; title: string; snippet: string; rank: number }[]
     >`
@@ -27,7 +27,7 @@ router.get("/", async (req: AuthedRequest, res) => {
         ) as rank
       FROM "Meeting" m
       LEFT JOIN "Transcript" t ON t."meetingId" = m.id
-      WHERE m."userId" = ${req.userId}
+      WHERE m."workspaceId" = ${req.workspaceId}
         AND to_tsvector('english', COALESCE(m.title, '') || ' ' || COALESCE(m.summary, '') || ' ' || COALESCE(t.content, ''))
             @@ plainto_tsquery('english', ${q})
       ORDER BY m.id, rank DESC

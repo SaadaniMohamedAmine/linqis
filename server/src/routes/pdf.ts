@@ -10,19 +10,19 @@ router.get("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
   try {
     const prisma = getPrisma();
 
-    const [meeting, user] = await Promise.all([
+    const [meeting, workspace] = await Promise.all([
       prisma.meeting.findUnique({
         where: { id: req.params.id },
         include: { decisions: true, actionItems: true, participants: true },
       }),
-      prisma.user.findUnique({ where: { id: req.userId }, select: { plan: true } }),
+      prisma.workspace.findUnique({ where: { id: req.workspaceId }, select: { plan: true } }),
     ]);
 
-    if (!meeting || meeting.userId !== req.userId) {
+    if (!meeting || meeting.workspaceId !== req.workspaceId) {
       return res.status(404).json({ error: "Meeting not found" });
     }
 
-    if (!PLAN_LIMITS[user?.plan || "FREE"].pdfExportEnabled) {
+    if (!PLAN_LIMITS[workspace?.plan || "FREE"].pdfExportEnabled) {
       return res.status(402).json({
         error: "PDF export is a Pro feature. Upgrade to download meeting PDFs.",
         code: "PLAN_LIMIT_REACHED",
