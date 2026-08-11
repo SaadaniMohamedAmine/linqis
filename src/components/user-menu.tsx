@@ -5,16 +5,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { LogOut, Settings } from "lucide-react";
-
-// First letter of the first name + first letter of the last name (e.g.
-// "Mohamed Saadani" -> "MS"). Falls back to the first two letters of a
-// single-word name, then the first letter of the email.
-function getInitials(name?: string | null, email?: string | null): string {
-  const words = name?.trim().split(/\s+/).filter(Boolean) ?? [];
-  if (words.length >= 2) return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (email || "?").charAt(0).toUpperCase();
-}
+import { getInitials } from "@/lib/utils";
 
 export function UserMenu() {
   const { data: session } = useSession();
