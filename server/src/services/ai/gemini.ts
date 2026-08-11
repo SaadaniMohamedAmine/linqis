@@ -2,7 +2,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { generateJsonWithRetry } from "./json-utils";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+// "-latest" alias rather than a dated snapshot (e.g. gemini-2.0-flash, which
+// Google has since retired -- every analysis job was failing with a 404
+// until this was caught) so this doesn't silently break again next rotation.
+const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 async function complete(prompt: string): Promise<string> {
   const result = await model.generateContent(prompt);
