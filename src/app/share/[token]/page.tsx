@@ -1,3 +1,5 @@
+import { MarkdownSummary } from "@/components/markdown-summary";
+
 interface SharedMeeting {
   id: string;
   title: string;
@@ -33,7 +35,11 @@ export default async function SharedMeetingPage({ params }: { params: Promise<{ 
     <div className="min-h-screen bg-background p-8 max-w-[720px] mx-auto">
       <p className="text-xs text-success font-medium mb-2">Shared via Linqis</p>
       <h1 className="text-2xl font-semibold text-text-primary mb-4">{meeting.title}</h1>
-      <p className="text-text-secondary mb-8">{meeting.summary}</p>
+      {meeting.summary && (
+        <div className="mb-8">
+          <MarkdownSummary text={meeting.summary} />
+        </div>
+      )}
 
       <h2 className="text-lg font-semibold text-text-primary mb-3">Decisions</h2>
       <ul className="mb-8 flex flex-col gap-2">

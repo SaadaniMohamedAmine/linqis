@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ExportModal from "@/components/export-modal";
+import { MarkdownSummary } from "@/components/markdown-summary";
 import {
   getMeeting,
   updateActionItemStatus,
@@ -306,9 +307,11 @@ export default function MeetingDetailPage() {
           <div className="space-y-6">
             <Card className="p-5">
               <h3 className="text-lg font-semibold text-success mb-4">Executive Summary</h3>
-              <p className="text-text-primary leading-relaxed">
-                {meeting.summary || "Summary not available yet."}
-              </p>
+              {meeting.summary ? (
+                <MarkdownSummary text={meeting.summary} />
+              ) : (
+                <p className="text-text-primary leading-relaxed">Summary not available yet.</p>
+              )}
             </Card>
             <Card className="p-5">
               <h4 className="font-medium text-warning mb-4">Decisions</h4>
