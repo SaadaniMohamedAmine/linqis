@@ -131,6 +131,7 @@ export default function MeetingDetailPage() {
     if (!meeting) return;
     if (!confirm("Delete this meeting? This cannot be undone.")) return;
     await deleteMeeting(meeting.id);
+    router.refresh();
     router.push("/dashboard/meetings");
   };
 
