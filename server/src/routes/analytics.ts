@@ -11,18 +11,19 @@ router.get("/", async (req: AuthedRequest, res) => {
     const workspaceId = req.workspaceId;
 
     const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId }, select: { plan: true } });
-    if (!PLAN_LIMITS[workspace?.plan || "FREE"].analyticsEnabled) {
-      return res.status(402).json({
-        error: "Analytics is a Pro feature. Upgrade to see meeting trends and insights.",
-        code: "PLAN_LIMIT_REACHED",
-      });
-    }
+    // Basic usage counts (below) are available on every plan -- only the
+    // deeper insights (mood, top owners, weekly trend) are the Pro feature.
+    // Used to 402 the whole endpoint, which also blocked the dashboard
+    // home's "meetings so far" cards even though those aren't premium.
+    const analyticsEnabled = PLAN_LIMITS[workspace?.plan || "FREE"].analyticsEnabled;
 
     const [totalMeetings, meetings, actionItems, moodCounts] = await Promise.all([
       prisma.meeting.count({ where: { workspaceId } }),
       prisma.meeting.findMany({ where: { workspaceId }, select: { duration: true, createdAt: true } }),
       prisma.actionItem.findMany({ where: { meeting: { workspaceId } }, select: { status: true, owner: true } }),
-      prisma.meeting.groupBy({ by: ["mood"], where: { workspaceId, mood: { not: null } }, _count: true }),
+      analyticsEnabled
+        ? prisma.meeting.groupBy({ by: ["mood"], where: { workspaceId, mood: { not: null } }, _count: true })
+        : Promise.resolve([]),
     ]);
 
     const totalMinutes = Math.round(meetings.reduce((sum, m) => sum + (m.duration || 0), 0) / 60);
@@ -59,9 +60,12 @@ router.get("/", async (req: AuthedRequest, res) => {
       avgDurationMinutes: avgDuration,
       completionRate,
       totalActionItems: actionItems.length,
-      moodDistribution: moodCounts.map((m) => ({ mood: m.mood, count: m._count })),
-      topOwners,
-      meetingsPerWeek: weeks,
+      analyticsEnabled,
+      // Withheld (not just hidden client-side) on Free -- these are the
+      // actual paid feature, unlike the basic counts above.
+      moodDistribution: analyticsEnabled ? moodCounts.map((m) => ({ mood: m.mood, count: m._count })) : [],
+      topOwners: analyticsEnabled ? topOwners : [],
+      meetingsPerWeek: analyticsEnabled ? weeks : [],
     });
   } catch (error) {
     console.error("Analytics error:", error);
