@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Play, Pause, Headphones, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ export default function MeetingDetailPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
+  const [playerOpen, setPlayerOpen] = useState(false);
 
   const load = useCallback(() => {
     if (!meetingId) return;
@@ -283,7 +285,7 @@ export default function MeetingDetailPage() {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto p-6 pb-32">
+      <div className="flex-1 overflow-y-auto p-6">
         {activeTab === "transcript" && (
           <div className="space-y-6">
             {meeting.transcripts.length === 0 ? (
@@ -410,9 +412,10 @@ export default function MeetingDetailPage() {
         )}
       </div>
 
-      {/* Audio Player (Bottom Persistent) */}
+      {/* Audio Player (Floating) */}
       {audioUrl && (
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-surface/80 backdrop-blur-md border-t border-border px-6 flex items-center gap-6 z-30">
+        <>
+          {/* Mounted regardless of panel visibility so playback survives close/scroll. */}
           <audio
             ref={audioRef}
             src={audioUrl}
@@ -422,24 +425,35 @@ export default function MeetingDetailPage() {
             onLoadedMetadata={(e) => setAudioDuration(e.currentTarget.duration)}
             onEnded={() => setIsPlaying(false)}
           />
-          <div className="flex items-center gap-4 shrink-0">
-            <button
-              onClick={togglePlayback}
-              className="w-12 h-12 bg-success text-background rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
-            >
-              {isPlaying ? "⏸" : "▶"}
-            </button>
-          </div>
-          <div className="flex-1 flex flex-col gap-1">
-            <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
-              <div className="h-full bg-success transition-all" style={{ width: `${progressPercent}%` }} />
+
+          {playerOpen && (
+            <div className="fixed bottom-24 left-6 z-40 w-80 bg-surface border border-border rounded-xl shadow-lg p-4 flex items-center gap-4 animate-widget-in">
+              <button
+                onClick={togglePlayback}
+                className="w-12 h-12 shrink-0 bg-success text-background rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+              >
+                {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
+              </button>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
+                  <div className="h-full bg-success transition-all" style={{ width: `${progressPercent}%` }} />
+                </div>
+                <div className="flex justify-between text-[11px] text-text-secondary">
+                  <span>{formatClock(currentTime)}</span>
+                  <span>{formatClock(audioDuration)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between text-[11px] text-text-secondary">
-              <span>{formatClock(currentTime)}</span>
-              <span>{formatClock(audioDuration)}</span>
-            </div>
-          </div>
-        </div>
+          )}
+
+          <button
+            onClick={() => setPlayerOpen((v) => !v)}
+            aria-label={playerOpen ? "Close audio player" : "Open audio player"}
+            className="fixed bottom-6 left-6 z-40 h-14 w-14 rounded-full bg-success text-background shadow-lg flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"
+          >
+            {playerOpen ? <ChevronDown size={24} /> : <Headphones size={24} />}
+          </button>
+        </>
       )}
 
       <ExportModal isOpen={exportModalOpen} onClose={() => setExportModalOpen(false)} meetingId={meeting.id} />
