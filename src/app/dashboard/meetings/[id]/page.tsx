@@ -233,11 +233,11 @@ export default function MeetingDetailPage() {
                 if (e.key === "Enter") commitTitleEdit();
                 if (e.key === "Escape") setIsEditingTitle(false);
               }}
-              className="h-8 text-lg font-semibold font-geist"
+              className="h-10 text-2xl font-semibold font-geist"
             />
           ) : (
             <h1
-              className="text-lg font-semibold font-geist tracking-tight text-text-primary cursor-pointer hover:text-success transition-colors"
+              className="text-2xl font-semibold font-geist tracking-tight text-text-primary cursor-pointer hover:text-success transition-colors"
               onClick={startEditingTitle}
             >
               {meeting.title}
@@ -311,16 +311,16 @@ export default function MeetingDetailPage() {
       )}
 
       {/* Tabs Header */}
-      <div className="flex border-b border-border px-6">
+      <div className="flex items-center gap-1 border-b border-border px-6 py-2">
         {TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2.5 border-b-2 capitalize text-sm transition-colors ${
+            className={`px-3 py-1.5 rounded-md capitalize text-sm transition-colors font-medium font-geist ${
               activeTab === tab
-                ? "border-success text-text-primary"
-                : "border-transparent text-text-secondary hover:text-text-primary"
-            } font-medium font-geist`}
+                ? "bg-surface-high text-text-primary"
+                : "text-text-secondary hover:text-text-primary"
+            }`}
           >
             {tab}
           </button>
