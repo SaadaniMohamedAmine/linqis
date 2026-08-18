@@ -3,7 +3,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Play, Pause, Headphones, ChevronDown, Clock, Users, FileText, MessageSquareOff, type LucideIcon } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Headphones,
+  ChevronDown,
+  Clock,
+  Users,
+  FileText,
+  MessageSquareOff,
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle,
+  ListChecks,
+  Smile,
+  Meh,
+  Frown,
+  type LucideIcon,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,10 +43,10 @@ import {
 const TABS = ["transcript", "summary", "actions", "analysis"] as const;
 type Tab = (typeof TABS)[number];
 
-const MOOD_STYLE: Record<string, { label: string; text: string; bg: string; percent: number }> = {
-  POSITIVE: { label: "Positive", text: "text-success", bg: "bg-success", percent: 85 },
-  NEUTRAL: { label: "Neutral", text: "text-text-secondary", bg: "bg-text-secondary", percent: 50 },
-  TENSE: { label: "Tense", text: "text-danger", bg: "bg-danger", percent: 20 },
+const MOOD_STYLE: Record<string, { label: string; text: string; bg: string; percent: number; icon: LucideIcon }> = {
+  POSITIVE: { label: "Positive", text: "text-success", bg: "bg-success", percent: 85, icon: Smile },
+  NEUTRAL: { label: "Neutral", text: "text-text-secondary", bg: "bg-text-secondary", percent: 50, icon: Meh },
+  TENSE: { label: "Tense", text: "text-danger", bg: "bg-danger", percent: 20, icon: Frown },
 };
 
 const SEVERITY_BADGE: Record<string, "danger" | "warning" | "neutral"> = {
@@ -363,7 +380,10 @@ export default function MeetingDetailPage() {
         {activeTab === "summary" && (
           <div className="space-y-6">
             <Card className="p-5">
-              <h3 className="text-sm font-semibold font-geist uppercase tracking-wide text-success mb-4">Executive Summary</h3>
+              <h3 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-success mb-4">
+                <Sparkles size={14} />
+                Executive Summary
+              </h3>
               {meeting.summary ? (
                 <MarkdownSummary text={meeting.summary} />
               ) : (
@@ -371,7 +391,10 @@ export default function MeetingDetailPage() {
               )}
             </Card>
             <Card className="p-5">
-              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-warning mb-4">Decisions</h4>
+              <h4 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-warning mb-4">
+                <CheckCircle2 size={14} />
+                Decisions
+              </h4>
               {meeting.decisions.length === 0 ? (
                 <EmptyState icon={FileText} label="No decisions detected." compact />
               ) : (
@@ -397,6 +420,12 @@ export default function MeetingDetailPage() {
 
         {activeTab === "actions" && (
           <div className="space-y-2.5">
+            {meeting.actionItems.length > 0 && (
+              <h4 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-1">
+                <ListChecks size={14} />
+                Action Items · {meeting.actionItems.length}
+              </h4>
+            )}
             {meeting.actionItems.length === 0 ? (
               <EmptyState icon={FileText} label="No action items detected." />
             ) : (
@@ -440,23 +469,32 @@ export default function MeetingDetailPage() {
             <Card className="p-5">
               <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">Meeting Mood</h4>
               {meeting.mood ? (
-                <div className="flex items-center gap-4">
-                  <Badge variant={meeting.mood === "POSITIVE" ? "success" : meeting.mood === "TENSE" ? "danger" : "neutral"}>
-                    {MOOD_STYLE[meeting.mood]?.label}
-                  </Badge>
-                  <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden max-w-xs">
-                    <div
-                      className={`h-full rounded-full transition-all ${MOOD_STYLE[meeting.mood]?.bg}`}
-                      style={{ width: `${MOOD_STYLE[meeting.mood]?.percent}%` }}
-                    />
-                  </div>
-                </div>
+                (() => {
+                  const MoodIcon = MOOD_STYLE[meeting.mood].icon;
+                  return (
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center gap-1.5 ${MOOD_STYLE[meeting.mood].text}`}>
+                        <MoodIcon size={18} />
+                        <span className="font-medium font-geist">{MOOD_STYLE[meeting.mood].label}</span>
+                      </div>
+                      <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden max-w-xs">
+                        <div
+                          className={`h-full rounded-full transition-all ${MOOD_STYLE[meeting.mood].bg}`}
+                          style={{ width: `${MOOD_STYLE[meeting.mood].percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()
               ) : (
                 <p className="text-sm text-text-secondary">Not analyzed yet.</p>
               )}
             </Card>
             <Card className="p-5">
-              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">Detected Disagreements</h4>
+              <h4 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">
+                <AlertTriangle size={14} />
+                Detected Disagreements
+              </h4>
               {meeting.disagreements.length === 0 ? (
                 <EmptyState icon={MessageSquareOff} label="No disagreements detected in this meeting." compact />
               ) : (
