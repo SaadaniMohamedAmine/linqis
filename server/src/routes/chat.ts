@@ -69,9 +69,21 @@ router.post("/", async (req: AuthedRequest, res) => {
 
     const answer = await ai.answerFromContext(question, context);
 
+    // Tuning the retrieval cutoff (relevance floor, meeting count, etc.) to
+    // control what shows up in "Sources" turned out to be unreliable -- it
+    // depends on the embedding model's score distribution, which varies by
+    // question and isn't something to gamble the UI on. The prompt already
+    // asks the model to name which meeting(s) it drew from, so instead of
+    // reporting every meeting fed into the context window, only report the
+    // ones the model actually named in its answer. Falls back to the fed-in
+    // set if the model didn't literally quote a title, so sources are never
+    // empty on a real answer.
+    const allContextSources = [...new Map(scored.map((s) => [s.meeting.id, { id: s.meeting.id, title: s.meeting.title }])).values()];
+    const citedSources = allContextSources.filter((s) => answer.toLowerCase().includes(s.title.toLowerCase()));
+
     res.json({
       answer,
-      sources: [...new Map(scored.map((s) => [s.meeting.id, { id: s.meeting.id, title: s.meeting.title }])).values()],
+      sources: citedSources.length > 0 ? citedSources : allContextSources,
     });
   } catch (error) {
     console.error("Chat error:", error);
