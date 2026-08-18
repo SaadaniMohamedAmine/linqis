@@ -316,7 +316,7 @@ export default function MeetingDetailPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1.5 rounded-md capitalize text-sm transition-colors font-medium font-geist ${
+            className={`px-3 py-1.5 rounded-md capitalize text-sm transition-colors font-medium font-geist cursor-pointer ${
               activeTab === tab
                 ? "bg-surface-high text-text-primary"
                 : "text-text-secondary hover:text-text-primary"
