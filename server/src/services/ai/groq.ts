@@ -3,7 +3,11 @@ import { generateJsonWithRetry } from "./json-utils";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
-const MODEL = "llama-3.3-70b-versatile";
+// llama-3.3-70b-versatile was deprecated by Groq on 2026-06-17 and now
+// 404s on every call. gpt-oss-120b is Groq's recommended replacement and
+// handles the structured JSON extraction here (decisions/action items/mood)
+// at least as reliably.
+const MODEL = "openai/gpt-oss-120b";
 
 async function chat(prompt: string): Promise<string> {
   const response = await groq.chat.completions.create({

@@ -26,6 +26,12 @@ async function callGroqWhisper(filePath: string) {
     model: "whisper-large-v3",
     response_format: "verbose_json",
     timestamp_granularities: ["segment"],
+    // Without this, Whisper auto-detects language per segment and can drift
+    // onto a random language mid-file on silence/noise/ambiguous audio
+    // (observed: real English meetings hallucinating Welsh mid-transcript).
+    // Forcing English removes that decision entirely. Revisit if/when the
+    // product needs to support non-English meetings.
+    language: "en",
   });
 
   return transcription as unknown as { text: string; segments?: GroqVerboseSegment[] };
