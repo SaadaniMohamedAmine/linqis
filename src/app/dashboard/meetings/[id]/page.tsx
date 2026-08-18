@@ -427,7 +427,7 @@ export default function MeetingDetailPage() {
           />
 
           {playerOpen && (
-            <div className="fixed bottom-24 left-6 z-40 w-80 bg-surface border border-border rounded-xl shadow-lg p-4 flex items-center gap-4 animate-widget-in">
+            <div className="fixed bottom-44 right-6 z-40 w-80 bg-surface border border-border rounded-xl shadow-lg p-4 flex items-center gap-4 animate-widget-in">
               <button
                 onClick={togglePlayback}
                 className="w-12 h-12 shrink-0 bg-success text-background rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
@@ -449,7 +449,7 @@ export default function MeetingDetailPage() {
           <button
             onClick={() => setPlayerOpen((v) => !v)}
             aria-label={playerOpen ? "Close audio player" : "Open audio player"}
-            className="fixed bottom-6 left-6 z-40 h-14 w-14 rounded-full bg-success text-background shadow-lg flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"
+            className="fixed bottom-24 right-6 z-40 h-14 w-14 rounded-full bg-success text-background shadow-lg flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"
           >
             {playerOpen ? <ChevronDown size={24} /> : <Headphones size={24} />}
           </button>
