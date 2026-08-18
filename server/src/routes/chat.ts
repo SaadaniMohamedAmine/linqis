@@ -46,8 +46,16 @@ router.post("/", async (req: AuthedRequest, res) => {
     // only ever cited 1, even though the other meeting's embeddings existed).
     // Guarantee a diversity floor -- each meeting's single best-scoring chunk
     // gets a seat first -- then fill the rest of the budget by raw score.
+    // Only meetings whose best chunk clears a relevance bar (relative to the
+    // top match) earn a guaranteed seat -- otherwise a totally unrelated
+    // meeting gets forced into the context (and cited as a "source") just
+    // for being the least-bad chunk in an irrelevant meeting.
+    const topScore = scoredAll[0]?.score ?? 0;
+    const relevanceFloor = topScore * 0.6;
+
     const bestPerMeeting = new Map<string, (typeof scoredAll)[number]>();
     for (const c of scoredAll) {
+      if (c.score < relevanceFloor) continue;
       if (!bestPerMeeting.has(c.meeting.id)) bestPerMeeting.set(c.meeting.id, c);
     }
     const diverseFloor = [...bestPerMeeting.values()].sort((a, b) => b.score - a.score).slice(0, 6);
