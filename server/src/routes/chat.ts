@@ -75,16 +75,16 @@ router.post("/", async (req: AuthedRequest, res) => {
     // question and isn't something to gamble the UI on. The prompt already
     // asks the model to name which meeting(s) it drew from, so instead of
     // reporting every meeting fed into the context window, only report the
-    // ones the model actually named in its answer. Falls back to the fed-in
-    // set if the model didn't literally quote a title, so sources are never
-    // empty on a real answer.
+    // ones the model actually named in its answer.
+    //
+    // No fallback to the fed-in set when nothing was cited: that previously
+    // showed all 5 context meetings as "Sources" even on an honest "this
+    // isn't in any of your meetings" answer, implying relevance that wasn't
+    // there. Zero sources on an unmatched question is correct, not a bug.
     const allContextSources = [...new Map(scored.map((s) => [s.meeting.id, { id: s.meeting.id, title: s.meeting.title }])).values()];
     const citedSources = allContextSources.filter((s) => answer.toLowerCase().includes(s.title.toLowerCase()));
 
-    res.json({
-      answer,
-      sources: citedSources.length > 0 ? citedSources : allContextSources,
-    });
+    res.json({ answer, sources: citedSources });
   } catch (error) {
     console.error("Chat error:", error);
     res.status(500).json({ error: "Failed to answer question" });
