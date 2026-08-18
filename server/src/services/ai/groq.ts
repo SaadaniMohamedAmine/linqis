@@ -76,6 +76,31 @@ ${transcript}`;
   return "NEUTRAL";
 }
 
+// Named to match mood.ts's MoodAnalysis shape so the AI_PROVIDER dispatch
+// (and its rate-limit fallback, see services/ai/index.ts) can swap this in
+// for the Gemini version.
+export interface MoodAnalysis {
+  mood: "POSITIVE" | "NEUTRAL" | "TENSE";
+  confidence: number;
+  indicators: string[];
+}
+
+export async function detectMoodWithAnalysis(transcript: string): Promise<MoodAnalysis> {
+  return generateJsonWithRetry(
+    (correctionHint) => `Analyze the overall mood of this meeting. Return a JSON object with:
+- mood: "POSITIVE", "NEUTRAL", or "TENSE"
+- confidence: 0-1 number
+- indicators: array of short phrases that support the mood assessment
+
+Meeting transcript:
+${transcript}
+
+Return ONLY valid JSON, no markdown.${correctionHint ? `\n\n${correctionHint}` : ""}`,
+    chat,
+    "groq.detectMoodWithAnalysis"
+  );
+}
+
 export async function answerFromContext(question: string, context: string): Promise<string> {
   const prompt = `You are a helpful assistant answering questions about the user's past meetings, using ONLY the context below. If the answer isn't in the context, say so honestly instead of guessing.
 

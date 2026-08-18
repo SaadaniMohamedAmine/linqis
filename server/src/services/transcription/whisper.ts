@@ -1,6 +1,13 @@
 import fs from "fs";
+import Groq, { toFile } from "groq-sdk";
 
-const HF_WHISPER_ENDPOINT = "https://api-inference.huggingface.co/models/openai/whisper-large-v3";
+// Was previously HF's free Inference API (api-inference.huggingface.co),
+// which HF has since retired -- every transcription call failed at the
+// fetch() with a raw "fetch failed" (DNS no longer resolves). Groq already
+// has a configured API key in this project for the chat models, and it
+// hosts Whisper directly, so it replaces HF here as both the fix and the
+// simpler dependency (one fewer provider).
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
 
 export interface TranscriptSegment {
   speaker: string;
@@ -8,49 +15,46 @@ export interface TranscriptSegment {
   content: string;
 }
 
-async function callHuggingFaceWhisper(filePath: string): Promise<string> {
-  const audioBuffer = fs.readFileSync(filePath);
+interface GroqVerboseSegment {
+  start: number;
+  text: string;
+}
 
-  const response = await fetch(HF_WHISPER_ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-      "Content-Type": "audio/mpeg",
-    },
-    body: audioBuffer,
+async function callGroqWhisper(filePath: string) {
+  const transcription = await groq.audio.transcriptions.create({
+    file: await toFile(fs.createReadStream(filePath)),
+    model: "whisper-large-v3",
+    response_format: "verbose_json",
+    timestamp_granularities: ["segment"],
   });
 
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
-    throw new Error(`Hugging Face Whisper request failed (${response.status}): ${errorBody}`);
-  }
-
-  const data = await response.json();
-  return data.text || "";
+  return transcription as unknown as { text: string; segments?: GroqVerboseSegment[] };
 }
 
 export async function transcribeAudio(filePath: string): Promise<string> {
-  return callHuggingFaceWhisper(filePath);
+  const { text } = await callGroqWhisper(filePath);
+  return text || "";
 }
 
-// NOTE: the free Hugging Face Inference API for Whisper does not return
-// word/segment-level timestamps (unlike OpenAI's Whisper API, which the
-// original spec called for). Timestamps below are approximated at 30s per
-// sentence purely to keep the UI/reassembly pipeline working - they are not
-// accurate. Switching to a provider that returns real timestamps (OpenAI
-// Whisper, or a self-hosted faster-whisper) is a known follow-up, not fixed
-// here since it changes the cost profile of the app.
+// verbose_json gives real segment start times, unlike the old HF free tier
+// (which returned plain text only, forcing a 30s-per-sentence approximation).
 export async function transcribeWithTimestamps(filePath: string): Promise<TranscriptSegment[]> {
-  const text = await callHuggingFaceWhisper(filePath);
+  const { text, segments } = await callGroqWhisper(filePath);
+
+  if (segments?.length) {
+    return segments.map((segment) => ({
+      speaker: "Speaker",
+      timestamp: formatTimestamp(segment.start),
+      content: segment.text.trim(),
+    }));
+  }
 
   const sentences = text.split(/[.!?]+/).filter(Boolean);
-  const segments: TranscriptSegment[] = sentences.map((sentence: string, index: number) => ({
+  return sentences.map((sentence: string, index: number) => ({
     speaker: "Speaker",
     timestamp: formatTimestamp(index * 30),
     content: sentence.trim(),
   }));
-
-  return segments;
 }
 
 function formatTimestamp(seconds: number): string {

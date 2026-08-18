@@ -1,7 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+// text-embedding-004 has also been retired by Google; gemini-embedding-001
+// replaces it. Embeddings are stored as plain JSON (see MeetingEmbedding in
+// schema.prisma), not a fixed-dimension pgvector column, so there's no
+// migration to run -- this only matters for new embeddings going forward.
+const embeddingModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
 export async function embedText(text: string): Promise<number[]> {
   const result = await embeddingModel.embedContent(text);

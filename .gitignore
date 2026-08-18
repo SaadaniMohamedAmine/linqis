@@ -11,3 +11,6 @@ build/
 .vercel
 .env*
 .superpowers/
+playwright-report/
+test-results/
+uploads/

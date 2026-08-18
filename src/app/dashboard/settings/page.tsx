@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ACTIVE_WORKSPACE_KEY, getUser, updateUser, type UserProfile } from "@/lib/api";
+import { getInitials } from "@/lib/utils";
 
 const SUMMARY_LENGTHS: UserProfile["summaryLength"][] = ["CONCISE", "STANDARD", "DETAILED"];
 
@@ -37,17 +38,25 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (!session?.user?.id) return;
-    getUser().then((u) => {
-      setName(u.name || "");
-      setSummaryLength(u.summaryLength);
-      setEmailNotifications(u.emailNotifications);
-      setNotionApiKey(u.notionApiKey || "");
-      setNotionDatabaseId(u.notionDatabaseId || "");
-      setPlan(u.plan);
-      setSubscriptionStatus(u.subscriptionStatus);
-      setCurrentPeriodEnd(u.currentPeriodEnd);
-    });
-  }, [session?.user?.id]);
+    // Seed from the JWT immediately so the profile card never regresses
+    // below what the header already shows, then let the authoritative DB
+    // value overwrite it once the backend round-trip resolves.
+    setName(session.user.name || "");
+    getUser()
+      .then((u) => {
+        setName(u.name || "");
+        setSummaryLength(u.summaryLength);
+        setEmailNotifications(u.emailNotifications);
+        setNotionApiKey(u.notionApiKey || "");
+        setNotionDatabaseId(u.notionDatabaseId || "");
+        setPlan(u.plan);
+        setSubscriptionStatus(u.subscriptionStatus);
+        setCurrentPeriodEnd(u.currentPeriodEnd);
+      })
+      .catch((err) => {
+        console.error("Failed to load user profile:", err);
+      });
+  }, [session?.user?.id, session?.user?.name]);
 
   const handleManageBilling = async () => {
     setPortalLoading(true);
@@ -140,7 +149,9 @@ export default function SettingsPage() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={session.user.image} alt={session.user.name || "Profile"} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full bg-surface-high flex items-center justify-center text-text-secondary">?</div>
+                        <div className="w-full h-full bg-success-bg flex items-center justify-center text-sm font-semibold text-success">
+                          {getInitials(name || session?.user?.name, session?.user?.email)}
+                        </div>
                       )}
                     </div>
                   </div>

@@ -90,6 +90,11 @@ export default function UploadPage() {
         if (event.status === "completed") {
           setStage({ kind: "done" });
           unsubscribe();
+          // The sidebar's meeting list and the dashboard's stats are fetched
+          // by the shared layout Server Component -- router.push alone
+          // reuses that cached render across client-side navigation, so
+          // without this they'd keep showing pre-upload data indefinitely.
+          router.refresh();
           router.push(`/dashboard/meetings/${meetingId}`);
           return;
         }

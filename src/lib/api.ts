@@ -33,7 +33,22 @@ async function getBackendToken(): Promise<string> {
   if (cachedToken && cachedToken.expiresAt > Date.now() + 30_000) {
     return cachedToken.value;
   }
-  const res = await fetch("/api/auth/backend-token");
+  // A relative path only resolves in the browser, which has an implicit
+  // origin -- Node (Server Components in layout.tsx/dashboard/page.tsx) has
+  // none, so this silently failed there and got swallowed by the .catch(()
+  // => []) callers use, showing an empty dashboard despite real data existing.
+  // A server-side fetch to our own route also doesn't carry the caller's
+  // session cookie automatically -- has to be forwarded explicitly, or the
+  // route sees no session and 401s the same way.
+  let init: RequestInit | undefined;
+  let base = "";
+  if (typeof window === "undefined") {
+    base = process.env.AUTH_URL || "http://localhost:3000";
+    const { headers } = await import("next/headers");
+    const cookie = (await headers()).get("cookie");
+    if (cookie) init = { headers: { cookie } };
+  }
+  const res = await fetch(`${base}/api/auth/backend-token`, init);
   if (!res.ok) throw new ApiError(res.status, "Not authenticated");
   const { token, expiresIn } = await res.json();
   cachedToken = { value: token, expiresAt: Date.now() + expiresIn * 1000 };
@@ -343,6 +358,9 @@ export interface UserProfile {
   workspaceId: string | null;
   workspaceName: string | null;
   workspaceRole: WorkspaceRole | null;
+  meetingsThisMonth: number;
+  // null means unlimited (Pro) -- Infinity doesn't survive JSON.
+  maxMeetingsPerMonth: number | null;
 }
 
 export function getUser(): Promise<UserProfile> {
@@ -522,6 +540,9 @@ export interface AnalyticsData {
   avgDurationMinutes: number;
   completionRate: number;
   totalActionItems: number;
+  // Basic counts above are available on every plan; the fields below are
+  // the Pro feature and come back empty (not just unrendered) on Free.
+  analyticsEnabled: boolean;
   moodDistribution: { mood: string; count: number }[];
   topOwners: { owner: string; count: number }[];
   meetingsPerWeek: { week: string; count: number }[];
