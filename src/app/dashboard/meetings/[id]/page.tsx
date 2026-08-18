@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Play, Pause, Headphones, ChevronDown } from "lucide-react";
+import { Play, Pause, Headphones, ChevronDown, Clock, Users, FileText, MessageSquareOff, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ExportModal from "@/components/export-modal";
 import { MarkdownSummary } from "@/components/markdown-summary";
+import { formatDuration, formatMeetingDate } from "@/lib/utils";
 import {
   getMeeting,
   updateActionItemStatus,
@@ -25,10 +26,10 @@ import {
 const TABS = ["transcript", "summary", "actions", "analysis"] as const;
 type Tab = (typeof TABS)[number];
 
-const MOOD_LABEL: Record<string, { label: string; className: string }> = {
-  POSITIVE: { label: "Positive", className: "text-success" },
-  NEUTRAL: { label: "Neutral", className: "text-text-secondary" },
-  TENSE: { label: "Tense", className: "text-danger" },
+const MOOD_STYLE: Record<string, { label: string; text: string; bg: string; percent: number }> = {
+  POSITIVE: { label: "Positive", text: "text-success", bg: "bg-success", percent: 85 },
+  NEUTRAL: { label: "Neutral", text: "text-text-secondary", bg: "bg-text-secondary", percent: 50 },
+  TENSE: { label: "Tense", text: "text-danger", bg: "bg-danger", percent: 20 },
 };
 
 const SEVERITY_BADGE: Record<string, "danger" | "warning" | "neutral"> = {
@@ -36,6 +37,31 @@ const SEVERITY_BADGE: Record<string, "danger" | "warning" | "neutral"> = {
   MEDIUM: "warning",
   LOW: "neutral",
 };
+
+// Deterministic per-speaker color so the same speaker always gets the same
+// avatar tint across the transcript (and across reloads).
+const SPEAKER_PALETTE = ["#22C55E", "#3B82F6", "#EAB308", "#EC4899", "#8B5CF6", "#F97316"];
+
+function speakerColor(speaker: string): string {
+  let hash = 0;
+  for (let i = 0; i < speaker.length; i++) hash = (hash * 31 + speaker.charCodeAt(i)) | 0;
+  return SPEAKER_PALETTE[Math.abs(hash) % SPEAKER_PALETTE.length];
+}
+
+function speakerInitials(speaker: string): string {
+  const parts = speaker.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function EmptyState({ icon: Icon, label, compact }: { icon: LucideIcon; label: string; compact?: boolean }) {
+  return (
+    <div className={`flex flex-col items-center justify-center gap-2 text-center ${compact ? "py-6" : "py-16"}`}>
+      <Icon size={compact ? 20 : 28} className="text-text-muted" />
+      <p className="text-sm text-text-secondary">{label}</p>
+    </div>
+  );
+}
 
 function formatClock(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "00:00";
@@ -188,10 +214,14 @@ export default function MeetingDetailPage() {
 
   const audioUrl = resolveAudioUrl(meeting.audioUrl);
   const progressPercent = audioDuration > 0 ? (currentTime / audioDuration) * 100 : 0;
+  const speakerCount =
+    meeting.participants.length > 0
+      ? meeting.participants.length
+      : new Set(meeting.transcripts.map((t) => t.speaker)).size;
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-6 pt-4 flex items-center justify-between border-b border-border">
+      <div className="px-6 pt-4 pb-3 flex items-center justify-between border-b border-border">
         <div>
           {isEditingTitle ? (
             <Input
@@ -203,20 +233,33 @@ export default function MeetingDetailPage() {
                 if (e.key === "Enter") commitTitleEdit();
                 if (e.key === "Escape") setIsEditingTitle(false);
               }}
-              className="h-8 text-lg font-semibold"
+              className="h-8 text-lg font-semibold font-geist"
             />
           ) : (
             <h1
-              className="text-lg font-semibold text-text-primary cursor-pointer hover:text-success transition-colors"
+              className="text-lg font-semibold font-geist tracking-tight text-text-primary cursor-pointer hover:text-success transition-colors"
               onClick={startEditingTitle}
             >
               {meeting.title}
             </h1>
           )}
+          <div className="flex items-center gap-3 mt-1 text-xs text-text-secondary">
+            <span className="flex items-center gap-1">
+              <Clock size={12} />
+              {formatDuration(meeting.duration)}
+            </span>
+            {speakerCount > 0 && (
+              <span className="flex items-center gap-1">
+                <Users size={12} />
+                {speakerCount} speaker{speakerCount === 1 ? "" : "s"}
+              </span>
+            )}
+            <span>{formatMeetingDate(meeting.createdAt)}</span>
+          </div>
           {meeting.status === "PROCESSING" && (
-            <p className="text-xs text-warning">Still processing — this page will refresh automatically.</p>
+            <p className="text-xs text-warning mt-1">Still processing — this page will refresh automatically.</p>
           )}
-          {meeting.status === "FAILED" && <p className="text-xs text-danger">Processing failed for this meeting.</p>}
+          {meeting.status === "FAILED" && <p className="text-xs text-danger mt-1">Processing failed for this meeting.</p>}
         </div>
         <div className="flex items-center gap-3 relative">
           <Button variant="secondary" onClick={() => setShareOpen((o) => !o)}>Share</Button>
@@ -273,11 +316,11 @@ export default function MeetingDetailPage() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 border-b-2 capitalize ${
+            className={`px-4 py-2.5 border-b-2 capitalize text-sm transition-colors ${
               activeTab === tab
-                ? "border-success text-success"
+                ? "border-success text-text-primary"
                 : "border-transparent text-text-secondary hover:text-text-primary"
-            } font-medium`}
+            } font-medium font-geist`}
           >
             {tab}
           </button>
@@ -285,23 +328,34 @@ export default function MeetingDetailPage() {
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div key={activeTab} className="flex-1 overflow-y-auto p-6 animate-tab-in">
         {activeTab === "transcript" && (
-          <div className="space-y-6">
+          <div className="space-y-5 max-w-3xl">
             {meeting.transcripts.length === 0 ? (
-              <p className="text-text-secondary">No transcript available yet.</p>
+              <EmptyState icon={FileText} label="No transcript available yet." />
             ) : (
-              meeting.transcripts.map((seg) => (
-                <div key={seg.id} className="flex items-start gap-4">
-                  <div className="bg-surface-high px-2 py-1 rounded-full flex items-center gap-2 border border-border shrink-0 mt-1">
-                    <span className="text-xs font-medium text-info">{seg.speaker}</span>
+              meeting.transcripts.map((seg) => {
+                const color = speakerColor(seg.speaker);
+                return (
+                  <div key={seg.id} className="flex items-start gap-3 group">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[11px] font-semibold font-geist"
+                      style={{ backgroundColor: `${color}26`, color }}
+                    >
+                      {speakerInitials(seg.speaker)}
+                    </div>
+                    <div className="flex flex-col gap-0.5 rounded-lg -mx-2 px-2 py-1 group-hover:bg-surface transition-colors">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-medium font-geist" style={{ color }}>
+                          {seg.speaker}
+                        </span>
+                        <span className="text-[11px] text-text-muted">{seg.timestamp}</span>
+                      </div>
+                      <p className="text-text-primary leading-relaxed">{seg.content}</p>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[11px] text-text-secondary">{seg.timestamp}</span>
-                    <p className="text-text-primary">{seg.content}</p>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         )}
@@ -309,7 +363,7 @@ export default function MeetingDetailPage() {
         {activeTab === "summary" && (
           <div className="space-y-6">
             <Card className="p-5">
-              <h3 className="text-lg font-semibold text-success mb-4">Executive Summary</h3>
+              <h3 className="text-sm font-semibold font-geist uppercase tracking-wide text-success mb-4">Executive Summary</h3>
               {meeting.summary ? (
                 <MarkdownSummary text={meeting.summary} />
               ) : (
@@ -317,13 +371,13 @@ export default function MeetingDetailPage() {
               )}
             </Card>
             <Card className="p-5">
-              <h4 className="font-medium text-warning mb-4">Decisions</h4>
+              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-warning mb-4">Decisions</h4>
               {meeting.decisions.length === 0 ? (
-                <p className="text-sm text-text-secondary">No decisions detected.</p>
+                <EmptyState icon={FileText} label="No decisions detected." compact />
               ) : (
                 <ul className="space-y-2">
                   {meeting.decisions.map((d) => (
-                    <li key={d.id} className="flex items-start gap-3 p-2 bg-background/50 rounded-lg">
+                    <li key={d.id} className="flex items-start gap-3 p-3 bg-surface-low rounded-lg">
                       <span
                         className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${
                           d.status === "CONFIRMED" ? "bg-success" : "bg-warning"
@@ -342,55 +396,69 @@ export default function MeetingDetailPage() {
         )}
 
         {activeTab === "actions" && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {meeting.actionItems.length === 0 ? (
-              <p className="text-text-secondary">No action items detected.</p>
+              <EmptyState icon={FileText} label="No action items detected." />
             ) : (
-              meeting.actionItems.map((item) => (
-                <Card
-                  key={item.id}
-                  className="p-4 flex items-center justify-between hover:border-border-hover transition-all"
-                >
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="checkbox"
-                      checked={item.status === "DONE"}
-                      onChange={() => toggleActionItem(item.id, item.status)}
-                      className="w-5 h-5 rounded border-border bg-background text-success focus:ring-success cursor-pointer"
-                    />
-                    <div className={item.status === "DONE" ? "opacity-50 line-through" : ""}>
-                      <p className="font-medium text-text-primary">{item.task}</p>
-                      <p className="text-xs text-text-secondary">
-                        {item.deadline ? new Date(item.deadline).toLocaleDateString() : "No deadline"}
-                        {item.owner ? ` • ${item.owner}` : ""}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    variant={item.priority === "HIGH" ? "danger" : item.priority === "MEDIUM" ? "warning" : "neutral"}
+              meeting.actionItems.map((item) => {
+                const priorityColor =
+                  item.priority === "HIGH" ? "border-l-danger" : item.priority === "MEDIUM" ? "border-l-warning" : "border-l-border-hover";
+                return (
+                  <Card
+                    key={item.id}
+                    className={`p-4 flex items-center justify-between border-l-2 ${priorityColor} hover:border-border-hover transition-all`}
                   >
-                    {item.priority}
-                  </Badge>
-                </Card>
-              ))
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="checkbox"
+                        checked={item.status === "DONE"}
+                        onChange={() => toggleActionItem(item.id, item.status)}
+                        className="w-5 h-5 rounded border-border bg-background text-success focus:ring-success cursor-pointer"
+                      />
+                      <div className={item.status === "DONE" ? "opacity-50 line-through" : ""}>
+                        <p className="font-medium text-text-primary">{item.task}</p>
+                        <p className="text-xs text-text-secondary">
+                          {item.deadline ? new Date(item.deadline).toLocaleDateString() : "No deadline"}
+                          {item.owner ? ` • ${item.owner}` : ""}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant={item.priority === "HIGH" ? "danger" : item.priority === "MEDIUM" ? "warning" : "neutral"}
+                    >
+                      {item.priority}
+                    </Badge>
+                  </Card>
+                );
+              })
             )}
           </div>
         )}
 
         {activeTab === "analysis" && (
           <div className="space-y-6">
-            <Card className="p-5 flex items-center gap-6">
-              <div>
-                <h4 className="font-medium text-text-secondary mb-2">Meeting Mood</h4>
-                <div className={`text-2xl font-bold ${meeting.mood ? MOOD_LABEL[meeting.mood]?.className : "text-text-secondary"}`}>
-                  {meeting.mood ? MOOD_LABEL[meeting.mood]?.label : "Not analyzed yet"}
+            <Card className="p-5">
+              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">Meeting Mood</h4>
+              {meeting.mood ? (
+                <div className="flex items-center gap-4">
+                  <Badge variant={meeting.mood === "POSITIVE" ? "success" : meeting.mood === "TENSE" ? "danger" : "neutral"}>
+                    {MOOD_STYLE[meeting.mood]?.label}
+                  </Badge>
+                  <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden max-w-xs">
+                    <div
+                      className={`h-full rounded-full transition-all ${MOOD_STYLE[meeting.mood]?.bg}`}
+                      style={{ width: `${MOOD_STYLE[meeting.mood]?.percent}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <p className="text-sm text-text-secondary">Not analyzed yet.</p>
+              )}
             </Card>
             <Card className="p-5">
-              <h4 className="font-medium text-text-secondary mb-4">Detected Disagreements</h4>
+              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">Detected Disagreements</h4>
               {meeting.disagreements.length === 0 ? (
-                <p className="text-sm text-text-secondary">No disagreements detected in this meeting.</p>
+                <EmptyState icon={MessageSquareOff} label="No disagreements detected in this meeting." compact />
               ) : (
                 <div className="space-y-4">
                   {meeting.disagreements.map((d) => (
