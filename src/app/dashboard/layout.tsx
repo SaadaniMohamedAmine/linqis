@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/page-loader";
-import { RecentMeetingsNav } from "@/components/recent-meetings-nav";
+import { UploadCounter } from "@/components/upload-counter";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { CommandPalette } from "@/components/command-palette";
@@ -10,20 +10,23 @@ import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { UserMenu } from "@/components/user-menu";
 import { AskWidget } from "@/components/ask-widget";
 import { ProductTour } from "@/components/product-tour";
-import { getMeetings, type MeetingListItem } from "@/lib/api";
+import { getUser } from "@/lib/api";
 
-// Meeting data changes on every upload; never serve a stale build-time snapshot.
+// Usage data changes on every upload; never serve a stale build-time snapshot.
 export const dynamic = "force-dynamic";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Server-rendered so the sidebar has real data on first paint. Falls back
-  // to an empty list rather than crashing the whole dashboard shell if the
+  // to a zero count rather than crashing the whole dashboard shell if the
   // Express API is unreachable (e.g. cold start on Railway).
-  let recentMeetings: MeetingListItem[] = [];
+  let meetingsThisMonth = 0;
+  let maxMeetingsPerMonth: number | null = 5;
   try {
-    recentMeetings = (await getMeetings()).slice(0, 6);
+    const user = await getUser();
+    meetingsThisMonth = user.meetingsThisMonth;
+    maxMeetingsPerMonth = user.maxMeetingsPerMonth;
   } catch {
-    recentMeetings = [];
+    // keep the FREE-tier fallback above
   }
 
   return (
@@ -56,10 +59,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <h2 className="text-lg font-semibold">Meeting List</h2>
               <p className="text-sm text-text-secondary">AI-summarized sessions</p>
             </div>
+            <UploadCounter meetingsThisMonth={meetingsThisMonth} maxMeetingsPerMonth={maxMeetingsPerMonth} />
             <Link href="/dashboard/upload">
               <Button variant="primary" className="w-full gap-2">New Meeting</Button>
             </Link>
-            <RecentMeetingsNav meetings={recentMeetings} />
           </div>
         </aside>
 

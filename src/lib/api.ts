@@ -358,6 +358,9 @@ export interface UserProfile {
   workspaceId: string | null;
   workspaceName: string | null;
   workspaceRole: WorkspaceRole | null;
+  meetingsThisMonth: number;
+  // null means unlimited (Pro) -- Infinity doesn't survive JSON.
+  maxMeetingsPerMonth: number | null;
 }
 
 export function getUser(): Promise<UserProfile> {

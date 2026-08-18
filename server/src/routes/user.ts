@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
 import { resolveWorkspaceMembership } from "../middleware/auth";
+import { PLAN_LIMITS } from "../lib/plans";
 
 export const router = Router();
 
@@ -38,6 +39,20 @@ router.get("/me", async (req: AuthedRequest, res) => {
         })
       : null;
 
+    // Same monthly window as the upload route's own plan-limit check
+    // (server/src/routes/upload.ts) -- kept in sync so the sidebar counter
+    // never disagrees with the 402 a user would actually hit.
+    const limits = PLAN_LIMITS[workspace?.plan || "FREE"];
+    let meetingsThisMonth = 0;
+    if (workspace) {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+      meetingsThisMonth = await prisma.meeting.count({
+        where: { workspaceId: workspace.id, createdAt: { gte: startOfMonth } },
+      });
+    }
+
     res.json({
       ...user,
       plan: workspace?.plan ?? "FREE",
@@ -46,6 +61,9 @@ router.get("/me", async (req: AuthedRequest, res) => {
       workspaceId: workspace?.id ?? null,
       workspaceName: workspace?.name ?? null,
       workspaceRole: membership?.role ?? null,
+      meetingsThisMonth,
+      // Infinity doesn't survive JSON -- null means unlimited.
+      maxMeetingsPerMonth: limits.maxMeetingsPerMonth === Infinity ? null : limits.maxMeetingsPerMonth,
     });
   } catch (error) {
     console.error("Failed to fetch user:", error);
