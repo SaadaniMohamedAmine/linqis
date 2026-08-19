@@ -57,17 +57,32 @@ async function getBackendToken(): Promise<string> {
 
 // Which workspace the user is currently looking at. Sent on every backend
 // call; the server only honours it after checking the caller really is a
-// member, so a tampered value gains nothing. Server-side renders have no
-// localStorage, in which case the backend falls back to the personal workspace.
+// member, so a tampered value gains nothing.
+//
+// Mirrored into a cookie (not just localStorage) specifically so
+// server-rendered pages (dashboard/page.tsx and friends, which call
+// getMeetings()/getActionItems()/getAnalytics() during SSR) can see it too.
+// localStorage alone previously meant every SSR call went out with no
+// X-Workspace-Id header at all, and the backend's no-header fallback prefers
+// a workspace the caller *owns* -- so anyone who owns their own personal
+// workspace AND is a member of another (e.g. anyone who accepted a team
+// invite) had every SSR page silently show their own workspace instead of
+// whichever one was actually selected in the WorkspaceSwitcher.
 export const ACTIVE_WORKSPACE_KEY = "linqis-active-workspace";
 
-function getActiveWorkspaceId(): string | null {
-  if (typeof window === "undefined") return null;
+async function getActiveWorkspaceId(): Promise<string | null> {
+  if (typeof window === "undefined") {
+    const { cookies } = await import("next/headers");
+    return (await cookies()).get(ACTIVE_WORKSPACE_KEY)?.value ?? null;
+  }
   return localStorage.getItem(ACTIVE_WORKSPACE_KEY);
 }
 
 export function setActiveWorkspaceId(id: string) {
   localStorage.setItem(ACTIVE_WORKSPACE_KEY, id);
+  // 1 year, readable by client JS (no HttpOnly) since it's not a secret --
+  // the backend re-validates membership on every request regardless.
+  document.cookie = `${ACTIVE_WORKSPACE_KEY}=${id}; path=/; max-age=31536000; SameSite=Lax`;
   cachedToken = null; // force a clean round-trip rather than mixing caches
 }
 
@@ -106,14 +121,12 @@ async function send<T>(path: string, init: RequestInit | undefined, workspaceId:
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const workspaceId = getActiveWorkspaceId();
+  const workspaceId = await getActiveWorkspaceId();
   try {
     return await send<T>(path, init, workspaceId);
   } catch (err) {
     // Truthiness, not `!== null`, to mirror exactly when the header is sent:
-    // if no header went out there was no stale id to blame, and on the server
-    // (no localStorage) this is always false, so the cleanup below is
-    // browser-only.
+    // if no header went out there was no stale id to blame.
     const isStaleWorkspace =
       !!workspaceId &&
       err instanceof ApiError &&
@@ -121,6 +134,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       err.message === STALE_WORKSPACE_ERROR;
 
     if (!isStaleWorkspace) throw err;
+
+    // Now that the active workspace is also readable server-side (via the
+    // cookie, see getActiveWorkspaceId), a stale id can surface here during
+    // SSR too -- but localStorage/document don't exist there, and Server
+    // Components can't set cookies at all (only Server Actions/Route
+    // Handlers can). So only clear it browser-side; a stale server-side
+    // cookie just gets ignored for this one retry and cleaned up for real
+    // the next time a client-side call hits this same path.
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
+      document.cookie = `${ACTIVE_WORKSPACE_KEY}=; path=/; max-age=0`;
+    }
 
     // The pinned workspace is gone (the user was removed from it, or it was
     // deleted) and localStorage would keep replaying it forever, hard-failing
@@ -132,7 +157,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     // the route handler runs, so the first attempt had no side effects. This
     // calls `send` directly rather than recursing, so a failing retry throws
     // instead of looping.
-    localStorage.removeItem(ACTIVE_WORKSPACE_KEY);
     cachedToken = null; // match setActiveWorkspaceId: don't mix caches across workspaces
     return send<T>(path, init, null);
   }
@@ -182,7 +206,7 @@ export function toggleMeetingShare(id: string, enabled: boolean): Promise<{ isPu
  */
 export async function downloadMeetingPdf(id: string, filename: string): Promise<void> {
   const token = await getBackendToken();
-  const workspaceId = getActiveWorkspaceId();
+  const workspaceId = await getActiveWorkspaceId();
   const res = await fetch(`${API_URL}/api/pdf/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -242,7 +266,7 @@ export function uploadMeetingFile(
     // No userId in the body -- the backend derives it from the Authorization
     // token, never from anything the client sends.
 
-    const workspaceId = getActiveWorkspaceId();
+    const workspaceId = await getActiveWorkspaceId();
     const xhr = new XMLHttpRequest();
     xhr.open("POST", `${API_URL}/api/upload`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
