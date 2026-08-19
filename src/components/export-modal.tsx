@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { exportToNotion, exportToSlack, exportToEmail, ApiError } from "@/lib/api";
+import { exportToNotion, exportToSlack, exportToEmail, getUser, ApiError } from "@/lib/api";
 import { useToast } from "@/components/toast-provider";
 
 interface ExportModalProps {
@@ -27,6 +27,21 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
   const [error, setError] = useState<string | null>(null);
   const [isPlanLimit, setIsPlanLimit] = useState(false);
   const { showToast } = useToast();
+
+  // Pre-fill from the saved Settings > API Keys connection instead of
+  // always starting blank (or from the env-wide default) -- a saved value
+  // takes priority since it's what the user explicitly configured. Still
+  // fully editable below for a one-off export to a different channel.
+  useEffect(() => {
+    getUser()
+      .then((u) => {
+        if (u.slackWebhookUrl) setSlackWebhookUrl(u.slackWebhookUrl);
+        if (u.slackChannelName) setSlackChannelName(u.slackChannelName);
+      })
+      .catch(() => {
+        // Not fatal -- the fields just stay at their existing defaults.
+      });
+  }, []);
 
   if (!isOpen) return null;
 

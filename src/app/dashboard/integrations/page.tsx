@@ -28,6 +28,10 @@ export default function IntegrationsPage() {
   // database id live on the user profile (Settings > API Keys), so a
   // "Connected" badge should reflect that they're actually both set.
   const [notionConfigured, setNotionConfigured] = useState(false);
+  // Same idea as Notion: no more static "Set up per export" label now that
+  // there's an actual saved connection (Settings > API Keys) to check.
+  const [slackWebhookUrl, setSlackWebhookUrl] = useState<string | null>(null);
+  const [slackChannelName, setSlackChannelName] = useState<string | null>(null);
 
   useEffect(() => {
     if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
@@ -36,8 +40,16 @@ export default function IntegrationsPage() {
   useEffect(() => {
     if (!session?.user?.id) return;
     getUser()
-      .then((u) => setNotionConfigured(!!u.notionApiKey && !!u.notionDatabaseId))
-      .catch(() => setNotionConfigured(false));
+      .then((u) => {
+        setNotionConfigured(!!u.notionApiKey && !!u.notionDatabaseId);
+        setSlackWebhookUrl(u.slackWebhookUrl);
+        setSlackChannelName(u.slackChannelName);
+      })
+      .catch(() => {
+        setNotionConfigured(false);
+        setSlackWebhookUrl(null);
+        setSlackChannelName(null);
+      });
   }, [session?.user?.id]);
 
   useEffect(() => {
@@ -155,11 +167,9 @@ export default function IntegrationsPage() {
                 <div className="w-12 h-12 rounded-lg bg-warning-bg flex items-center justify-center text-warning">
                   <MessageSquare size={22} />
                 </div>
-                {/* No persisted Slack credential to check -- the webhook URL
-                    is typed fresh into the export modal each time, nothing
-                    saved to the DB -- so a real Connected/Not-connected state
-                    doesn't apply here the way it does for Notion. */}
-                <Badge variant="neutral">Set up per export</Badge>
+                <Badge variant={slackWebhookUrl ? "success" : "neutral"}>
+                  {slackWebhookUrl ? `Connected${slackChannelName ? ` · ${slackChannelName.startsWith("#") ? slackChannelName : `#${slackChannelName}`}` : ""}` : "Not configured"}
+                </Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Slack</h3>
               <p className="text-sm text-text-secondary mb-6">Push summaries to designated channels and tag participants.</p>

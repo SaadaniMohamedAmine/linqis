@@ -39,6 +39,8 @@ function SettingsPageContent() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [notionApiKey, setNotionApiKey] = useState("");
   const [notionDatabaseId, setNotionDatabaseId] = useState("");
+  const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
+  const [slackChannelName, setSlackChannelName] = useState("");
   const [plan, setPlan] = useState<UserProfile["plan"]>("FREE");
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
@@ -60,6 +62,8 @@ function SettingsPageContent() {
         setEmailNotifications(u.emailNotifications);
         setNotionApiKey(u.notionApiKey || "");
         setNotionDatabaseId(u.notionDatabaseId || "");
+        setSlackWebhookUrl(u.slackWebhookUrl || "");
+        setSlackChannelName(u.slackChannelName || "");
         setPlan(u.plan);
         setSubscriptionStatus(u.subscriptionStatus);
         setCurrentPeriodEnd(u.currentPeriodEnd);
@@ -89,7 +93,15 @@ function SettingsPageContent() {
     setSaving(true);
     setSaved(false);
     try {
-      await updateUser({ name, summaryLength, emailNotifications, notionApiKey, notionDatabaseId });
+      await updateUser({
+        name,
+        summaryLength,
+        emailNotifications,
+        notionApiKey,
+        notionDatabaseId,
+        slackWebhookUrl,
+        slackChannelName,
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       showToast(activeTab === "api-keys" ? "Notion integration saved." : "Settings saved.");
@@ -294,6 +306,47 @@ function SettingsPageContent() {
                       onChange={(e) => setNotionDatabaseId(e.target.value)}
                       placeholder="3ac0b40b15f58068bd31f9ec426efec5"
                     />
+                  </div>
+                </Card>
+              </section>
+
+              <section className="space-y-6">
+                <div>
+                  <h3 className="text-2xl font-semibold">Slack Integration</h3>
+                  <p className="text-text-secondary">Save a default webhook so exports pre-fill instead of asking every time.</p>
+                </div>
+                <Card className="p-6 space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-xs text-text-secondary uppercase tracking-wider">Slack Webhook URL</label>
+                    <PasswordInput
+                      value={slackWebhookUrl}
+                      onChange={(e) => setSlackWebhookUrl(e.target.value)}
+                      placeholder="https://hooks.slack.com/services/..."
+                    />
+                    <p className="text-xs text-text-secondary">
+                      <Link
+                        href="https://api.slack.com/messaging/webhooks"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-success hover:underline"
+                      >
+                        How to create a Slack incoming webhook?
+                      </Link>
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs text-text-secondary uppercase tracking-wider">Channel Name</label>
+                    <Input
+                      value={slackChannelName}
+                      onChange={(e) => setSlackChannelName(e.target.value)}
+                      placeholder="#général"
+                    />
+                    {/* Display-only -- Slack's webhook API returns no channel
+                        metadata, so this just labels the saved connection and
+                        names the channel in the export confirmation toast. */}
+                    <p className="text-xs text-text-secondary">
+                      Display only -- the webhook itself is already bound to a channel when you create it in Slack.
+                    </p>
                   </div>
                 </Card>
               </section>

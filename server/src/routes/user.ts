@@ -24,6 +24,8 @@ router.get("/me", async (req: AuthedRequest, res) => {
         emailNotifications: true,
         notionApiKey: true,
         notionDatabaseId: true,
+        slackWebhookUrl: true,
+        slackChannelName: true,
       },
     });
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -88,7 +90,15 @@ router.get("/me/workspaces", async (req: AuthedRequest, res) => {
 
 router.patch("/me", async (req: AuthedRequest, res) => {
   try {
-    const { name, summaryLength, emailNotifications, notionApiKey, notionDatabaseId } = req.body;
+    const {
+      name,
+      summaryLength,
+      emailNotifications,
+      notionApiKey,
+      notionDatabaseId,
+      slackWebhookUrl,
+      slackChannelName,
+    } = req.body;
     const prisma = getPrisma();
     const user = await prisma.user.update({
       where: { id: req.userId },
@@ -98,6 +108,8 @@ router.patch("/me", async (req: AuthedRequest, res) => {
         ...(emailNotifications !== undefined && { emailNotifications }),
         ...(notionApiKey !== undefined && { notionApiKey }),
         ...(notionDatabaseId !== undefined && { notionDatabaseId }),
+        ...(slackWebhookUrl !== undefined && { slackWebhookUrl }),
+        ...(slackChannelName !== undefined && { slackChannelName }),
       },
     });
     res.json(user);

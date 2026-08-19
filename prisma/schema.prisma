@@ -22,6 +22,8 @@ model User {
   emailNotifications Boolean       @default(true)
   notionApiKey       String?
   notionDatabaseId   String?
+  slackWebhookUrl    String?
+  slackChannelName   String?
 
   onboardingCompleted Boolean @default(false)
   tourCompleted       Boolean @default(false)

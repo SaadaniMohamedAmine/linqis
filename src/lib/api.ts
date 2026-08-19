@@ -374,6 +374,8 @@ export interface UserProfile {
   emailNotifications: boolean;
   notionApiKey: string | null;
   notionDatabaseId: string | null;
+  slackWebhookUrl: string | null;
+  slackChannelName: string | null;
   // Billing lives on the active workspace, not on the user -- surfaced here
   // so the settings page keeps a single profile round-trip.
   plan: "FREE" | "PRO";
@@ -452,7 +454,18 @@ export function acceptInvite(token: string): Promise<{ workspaceId: string }> {
 }
 
 export function updateUser(
-  data: Partial<Pick<UserProfile, "name" | "summaryLength" | "emailNotifications" | "notionApiKey" | "notionDatabaseId">>
+  data: Partial<
+    Pick<
+      UserProfile,
+      | "name"
+      | "summaryLength"
+      | "emailNotifications"
+      | "notionApiKey"
+      | "notionDatabaseId"
+      | "slackWebhookUrl"
+      | "slackChannelName"
+    >
+  >
 ): Promise<UserProfile> {
   return request<UserProfile>("/api/users/me", {
     method: "PATCH",
