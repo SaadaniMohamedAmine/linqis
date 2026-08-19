@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, Check } from "lucide-react";
 import { ACTIVE_WORKSPACE_KEY, getMyWorkspaces, setActiveWorkspaceId, type Workspace } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { workspaceSwitcherDictionary } from "@/lib/i18n/dictionaries/workspace-switcher";
 
 export function WorkspaceSwitcher() {
+  const t = useDictionary(workspaceSwitcherDictionary);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -35,10 +38,10 @@ export function WorkspaceSwitcher() {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          aria-label="Switch workspace"
+          aria-label={t.ariaLabel}
           className="flex items-center gap-1.5 px-2 py-1.5 rounded-md border border-border text-text-secondary hover:border-border-hover hover:text-text-primary transition-colors cursor-pointer text-sm"
         >
-          {active?.name || "Workspace"}
+          {active?.name || t.fallbackName}
           <ChevronDown size={12} />
         </button>
       </DropdownMenu.Trigger>
@@ -64,7 +67,7 @@ export function WorkspaceSwitcher() {
               className="flex items-center justify-between gap-2 px-3 py-2 text-sm rounded-md cursor-pointer outline-none data-[highlighted]:bg-background text-text-primary"
             >
               <span>
-                {ws.name} <span className="text-text-secondary text-xs">· {ws.role.toLowerCase()}</span>
+                {ws.name} <span className="text-text-secondary text-xs">· {t.roleLabel[ws.role.toLowerCase() as "owner" | "admin" | "member"]}</span>
               </span>
               {ws.id === activeId && <Check size={14} className="text-success" />}
             </DropdownMenu.Item>
