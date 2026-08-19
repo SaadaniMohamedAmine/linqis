@@ -40,21 +40,35 @@ import {
   ApiError,
   type MeetingDetail,
 } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { meetingDetailDictionary, type MeetingDetailDictionary } from "@/lib/i18n/dictionaries/meeting-detail";
 
 const TABS = ["transcript", "summary", "actions", "analysis"] as const;
 type Tab = (typeof TABS)[number];
 
-const MOOD_STYLE: Record<string, { label: string; text: string; bg: string; percent: number; icon: LucideIcon }> = {
-  POSITIVE: { label: "Positive", text: "text-success", bg: "bg-success", percent: 85, icon: Smile },
-  NEUTRAL: { label: "Neutral", text: "text-text-secondary", bg: "bg-text-secondary", percent: 50, icon: Meh },
-  TENSE: { label: "Tense", text: "text-danger", bg: "bg-danger", percent: 20, icon: Frown },
+const MOOD_STYLE: Record<string, { text: string; bg: string; percent: number; icon: LucideIcon }> = {
+  POSITIVE: { text: "text-success", bg: "bg-success", percent: 85, icon: Smile },
+  NEUTRAL: { text: "text-text-secondary", bg: "bg-text-secondary", percent: 50, icon: Meh },
+  TENSE: { text: "text-danger", bg: "bg-danger", percent: 20, icon: Frown },
 };
+
+function moodLabel(mood: string, t: MeetingDetailDictionary): string {
+  if (mood === "POSITIVE") return t.moodLabel.positive;
+  if (mood === "TENSE") return t.moodLabel.tense;
+  return t.moodLabel.neutral;
+}
 
 const SEVERITY_BADGE: Record<string, "danger" | "warning" | "neutral"> = {
   HIGH: "danger",
   MEDIUM: "warning",
   LOW: "neutral",
 };
+
+function priorityLabel(priority: string, t: MeetingDetailDictionary): string {
+  if (priority === "HIGH") return t.priorityLabel.high;
+  if (priority === "MEDIUM") return t.priorityLabel.medium;
+  return t.priorityLabel.low;
+}
 
 // Deterministic per-speaker color so the same speaker always gets the same
 // avatar tint across the transcript (and across reloads).
@@ -89,6 +103,7 @@ function formatClock(seconds: number): string {
 }
 
 export default function MeetingDetailPage() {
+  const t = useDictionary(meetingDetailDictionary);
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const meetingId = params.id;
@@ -118,8 +133,9 @@ export default function MeetingDetailPage() {
     setLoading(true);
     getMeeting(meetingId)
       .then(setMeeting)
-      .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load meeting."))
+      .catch((err) => setError(err instanceof ApiError ? err.message : t.loadFailed))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meetingId]);
 
   useEffect(() => {
@@ -175,7 +191,7 @@ export default function MeetingDetailPage() {
 
   const handleDelete = async () => {
     if (!meeting) return;
-    if (!confirm("Delete this meeting? This cannot be undone.")) return;
+    if (!confirm(t.deleteConfirm)) return;
     await deleteMeeting(meeting.id);
     router.refresh();
     router.push("/dashboard/meetings");
@@ -208,7 +224,7 @@ export default function MeetingDetailPage() {
     try {
       await downloadMeetingPdf(meeting.id, meeting.title);
     } catch (err) {
-      setPdfError(err instanceof ApiError ? err.message : "Failed to download PDF.");
+      setPdfError(err instanceof ApiError ? err.message : t.downloadPdfFailed);
       setPdfIsPlanLimit(err instanceof ApiError && err.status === 402);
     } finally {
       setPdfLoading(false);
@@ -223,11 +239,11 @@ export default function MeetingDetailPage() {
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-text-secondary">Loading meeting...</div>;
+    return <div className="p-12 text-center text-text-secondary">{t.loadingMeeting}</div>;
   }
 
   if (error || !meeting) {
-    return <div className="p-12 text-center text-danger">{error || "Meeting not found."}</div>;
+    return <div className="p-12 text-center text-danger">{error || t.meetingNotFound}</div>;
   }
 
   const audioUrl = resolveAudioUrl(meeting.audioUrl);
@@ -269,28 +285,28 @@ export default function MeetingDetailPage() {
             {speakerCount > 0 && (
               <span className="flex items-center gap-1">
                 <Users size={12} />
-                {speakerCount} speaker{speakerCount === 1 ? "" : "s"}
+                {t.speakerCount(speakerCount)}
               </span>
             )}
             <span>{formatMeetingDate(meeting.createdAt)}</span>
             {meeting.calendarEventTitle && (
               <span className="flex items-center gap-1 text-info">
                 <CalendarClock size={12} />
-                From calendar: {meeting.calendarEventTitle}
+                {t.fromCalendar} {meeting.calendarEventTitle}
               </span>
             )}
           </div>
           {meeting.status === "PROCESSING" && (
-            <p className="text-xs text-warning mt-1">Still processing — this page will refresh automatically.</p>
+            <p className="text-xs text-warning mt-1">{t.stillProcessing}</p>
           )}
-          {meeting.status === "FAILED" && <p className="text-xs text-danger mt-1">Processing failed for this meeting.</p>}
+          {meeting.status === "FAILED" && <p className="text-xs text-danger mt-1">{t.processingFailed}</p>}
         </div>
         <div className="flex items-center gap-3 relative">
-          <Button variant="secondary" onClick={() => setShareOpen((o) => !o)}>Share</Button>
+          <Button variant="secondary" onClick={() => setShareOpen((o) => !o)}>{t.share}</Button>
           {shareOpen && (
             <div className="absolute top-full right-0 mt-2 w-[320px] bg-surface-high border border-border rounded-xl shadow-lg p-4 z-20 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-text-primary">Public link</span>
+                <span className="text-sm font-medium text-text-primary">{t.publicLink}</span>
                 <button
                   onClick={handleToggleShare}
                   disabled={shareLoading}
@@ -311,26 +327,26 @@ export default function MeetingDetailPage() {
                     className="text-xs h-9"
                   />
                   <Button variant="secondary" size="sm" onClick={handleCopyShareLink}>
-                    {copied ? "Copied!" : "Copy"}
+                    {copied ? t.copied : t.copy}
                   </Button>
                 </div>
               )}
               {!meeting.isPublic && (
-                <p className="text-xs text-text-secondary">Anyone with the link can view the summary, decisions and action items -- no login required.</p>
+                <p className="text-xs text-text-secondary">{t.shareDescription}</p>
               )}
             </div>
           )}
-          <Button variant="secondary" data-tour="export-button" onClick={() => setExportModalOpen(true)}>Export</Button>
+          <Button variant="secondary" data-tour="export-button" onClick={() => setExportModalOpen(true)}>{t.export}</Button>
           <Button variant="secondary" onClick={handleDownloadPdf} disabled={pdfLoading}>
-            {pdfLoading ? "Generating..." : "Download PDF"}
+            {pdfLoading ? t.generatingPdf : t.downloadPdf}
           </Button>
-          <Button variant="danger" onClick={handleDelete}>Delete</Button>
+          <Button variant="danger" onClick={handleDelete}>{t.deleteMeeting}</Button>
         </div>
       </div>
       {pdfError && (
         <div className="px-6 py-2 flex items-center gap-2">
           <p className="text-xs text-danger">{pdfError}</p>
-          {pdfIsPlanLimit && <Link href="/pricing" className="text-xs text-success hover:underline">Upgrade to Pro →</Link>}
+          {pdfIsPlanLimit && <Link href="/pricing" className="text-xs text-success hover:underline">{t.upgradeToPro}</Link>}
         </div>
       )}
 
@@ -346,7 +362,7 @@ export default function MeetingDetailPage() {
                 : "text-text-secondary hover:text-text-primary"
             }`}
           >
-            {tab}
+            {t.tabs[tab]}
           </button>
         ))}
       </div>
@@ -356,7 +372,7 @@ export default function MeetingDetailPage() {
         {activeTab === "transcript" && (
           <div className="space-y-5 max-w-3xl">
             {meeting.transcripts.length === 0 ? (
-              <EmptyState icon={FileText} label="No transcript available yet." />
+              <EmptyState icon={FileText} label={t.noTranscript} />
             ) : (
               meeting.transcripts.map((seg) => {
                 const color = speakerColor(seg.speaker);
@@ -389,21 +405,21 @@ export default function MeetingDetailPage() {
             <Card className="p-5">
               <h3 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-success mb-4">
                 <Sparkles size={14} />
-                Executive Summary
+                {t.executiveSummary}
               </h3>
               {meeting.summary ? (
                 <MarkdownSummary text={meeting.summary} />
               ) : (
-                <p className="text-text-primary leading-relaxed">Summary not available yet.</p>
+                <p className="text-text-primary leading-relaxed">{t.summaryNotAvailable}</p>
               )}
             </Card>
             <Card className="p-5">
               <h4 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-warning mb-4">
                 <CheckCircle2 size={14} />
-                Decisions
+                {t.decisions}
               </h4>
               {meeting.decisions.length === 0 ? (
-                <EmptyState icon={FileText} label="No decisions detected." compact />
+                <EmptyState icon={FileText} label={t.noDecisions} compact />
               ) : (
                 <ul className="space-y-2">
                   {meeting.decisions.map((d) => (
@@ -430,11 +446,11 @@ export default function MeetingDetailPage() {
             {meeting.actionItems.length > 0 && (
               <h4 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-1">
                 <ListChecks size={14} />
-                Action Items · {meeting.actionItems.length}
+                {t.actionItemsTitle(meeting.actionItems.length)}
               </h4>
             )}
             {meeting.actionItems.length === 0 ? (
-              <EmptyState icon={FileText} label="No action items detected." />
+              <EmptyState icon={FileText} label={t.noActionItems} />
             ) : (
               meeting.actionItems.map((item) => {
                 const priorityColor =
@@ -454,7 +470,7 @@ export default function MeetingDetailPage() {
                       <div className={item.status === "DONE" ? "opacity-50 line-through" : ""}>
                         <p className="font-medium text-text-primary"><InlineMarkdown text={item.task} /></p>
                         <p className="text-xs text-text-secondary">
-                          {item.deadline ? new Date(item.deadline).toLocaleDateString() : "No deadline"}
+                          {item.deadline ? new Date(item.deadline).toLocaleDateString() : t.noDeadline}
                           {item.owner ? ` • ${item.owner}` : ""}
                         </p>
                       </div>
@@ -462,7 +478,7 @@ export default function MeetingDetailPage() {
                     <Badge
                       variant={item.priority === "HIGH" ? "danger" : item.priority === "MEDIUM" ? "warning" : "neutral"}
                     >
-                      {item.priority}
+                      {priorityLabel(item.priority, t)}
                     </Badge>
                   </Card>
                 );
@@ -474,7 +490,7 @@ export default function MeetingDetailPage() {
         {activeTab === "analysis" && (
           <div className="space-y-6">
             <Card className="p-5">
-              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">Meeting Mood</h4>
+              <h4 className="text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">{t.meetingMood}</h4>
               {meeting.mood ? (
                 (() => {
                   const MoodIcon = MOOD_STYLE[meeting.mood].icon;
@@ -482,7 +498,7 @@ export default function MeetingDetailPage() {
                     <div className="flex items-center gap-4">
                       <div className={`flex items-center gap-1.5 ${MOOD_STYLE[meeting.mood].text}`}>
                         <MoodIcon size={18} />
-                        <span className="font-medium font-geist">{MOOD_STYLE[meeting.mood].label}</span>
+                        <span className="font-medium font-geist">{moodLabel(meeting.mood, t)}</span>
                       </div>
                       <div className="flex-1 h-1.5 bg-border rounded-full overflow-hidden max-w-xs">
                         <div
@@ -494,23 +510,23 @@ export default function MeetingDetailPage() {
                   );
                 })()
               ) : (
-                <p className="text-sm text-text-secondary">Not analyzed yet.</p>
+                <p className="text-sm text-text-secondary">{t.notAnalyzedYet}</p>
               )}
             </Card>
             <Card className="p-5">
               <h4 className="flex items-center gap-2 text-sm font-semibold font-geist uppercase tracking-wide text-text-secondary mb-4">
                 <AlertTriangle size={14} />
-                Detected Disagreements
+                {t.detectedDisagreements}
               </h4>
               {meeting.disagreements.length === 0 ? (
-                <EmptyState icon={MessageSquareOff} label="No disagreements detected in this meeting." compact />
+                <EmptyState icon={MessageSquareOff} label={t.noDisagreements} compact />
               ) : (
                 <div className="space-y-4">
                   {meeting.disagreements.map((d) => (
                     <div key={d.id} className="flex flex-col gap-1 bg-surface-low p-4 rounded-lg border-l-2 border-warning">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-text-primary">{d.topic}</span>
-                        <Badge variant={SEVERITY_BADGE[d.severity] || "neutral"}>{d.severity}</Badge>
+                        <Badge variant={SEVERITY_BADGE[d.severity] || "neutral"}>{priorityLabel(d.severity, t)}</Badge>
                       </div>
                       <p className="text-text-secondary italic text-sm">&ldquo;{d.quote}&rdquo;</p>
                       {d.participants.length > 0 && (
@@ -561,7 +577,7 @@ export default function MeetingDetailPage() {
 
           <button
             onClick={() => setPlayerOpen((v) => !v)}
-            aria-label={playerOpen ? "Close audio player" : "Open audio player"}
+            aria-label={playerOpen ? t.closeAudioPlayer : t.openAudioPlayer}
             className="fixed bottom-24 right-6 z-40 h-14 w-14 rounded-full bg-success text-background shadow-lg flex items-center justify-center hover:bg-accent transition-colors cursor-pointer"
           >
             {playerOpen ? <ChevronDown size={24} /> : <Headphones size={24} />}
