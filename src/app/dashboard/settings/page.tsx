@@ -5,10 +5,14 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { User, SlidersHorizontal, KeyRound, CreditCard, AlertTriangle } from "lucide-react";
+import { SiNotion } from "react-icons/si";
+import { FaSlack } from "react-icons/fa";
+import { RiOpenaiFill } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/toast-provider";
 import { ACTIVE_WORKSPACE_KEY, getUser, updateUser, type UserProfile } from "@/lib/api";
 import { getInitials } from "@/lib/utils";
@@ -51,6 +55,11 @@ function SettingsPageContent() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Which API Keys card's setup modal is open, if any -- each card now
+  // configures its own integration instead of one big always-visible form.
+  const [activeModal, setActiveModal] = useState<"notion" | "slack" | null>(null);
+  const [notionSaving, setNotionSaving] = useState(false);
+  const [slackSaving, setSlackSaving] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -99,36 +108,60 @@ function SettingsPageContent() {
     setSaving(true);
     setSaved(false);
     try {
-      await updateUser({
-        name,
-        summaryLength,
-        emailNotifications,
-        notionApiKey,
-        notionDatabaseId,
-        slackWebhookUrl,
-        slackChannelName,
-      });
+      await updateUser({ name, summaryLength, emailNotifications });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-
-      if (activeTab === "api-keys") {
-        const notionChanged = notionApiKey !== savedNotion.apiKey || notionDatabaseId !== savedNotion.databaseId;
-        const slackChanged = slackWebhookUrl !== savedSlack.webhookUrl || slackChannelName !== savedSlack.channelName;
-        if (notionChanged && slackChanged) showToast("Notion and Slack integrations saved.");
-        else if (slackChanged) showToast("Slack integration saved.");
-        else if (notionChanged) showToast("Notion integration saved.");
-        else showToast("Settings saved.");
-        setSavedNotion({ apiKey: notionApiKey, databaseId: notionDatabaseId });
-        setSavedSlack({ webhookUrl: slackWebhookUrl, channelName: slackChannelName });
-      } else {
-        showToast("Settings saved.");
-      }
+      showToast("Settings saved.");
     } finally {
       setSaving(false);
     }
   };
 
-  const showSaveBar = activeTab === "profile" || activeTab === "preferences" || activeTab === "api-keys";
+  // Each API Keys card now saves itself from its own modal instead of
+  // sharing the bottom Save bar, so its payload only ever touches its own
+  // fields -- opening Notion's modal can no longer clobber an unsaved Slack
+  // edit sitting in the other field, and vice versa.
+  const closeNotionModal = () => {
+    setNotionApiKey(savedNotion.apiKey);
+    setNotionDatabaseId(savedNotion.databaseId);
+    setActiveModal(null);
+  };
+  const closeSlackModal = () => {
+    setSlackWebhookUrl(savedSlack.webhookUrl);
+    setSlackChannelName(savedSlack.channelName);
+    setActiveModal(null);
+  };
+
+  const handleSaveNotion = async () => {
+    if (!session?.user?.id) return;
+    setNotionSaving(true);
+    try {
+      await updateUser({ notionApiKey, notionDatabaseId });
+      setSavedNotion({ apiKey: notionApiKey, databaseId: notionDatabaseId });
+      showToast("Notion integration saved.");
+      setActiveModal(null);
+    } finally {
+      setNotionSaving(false);
+    }
+  };
+
+  const handleSaveSlack = async () => {
+    if (!session?.user?.id) return;
+    setSlackSaving(true);
+    try {
+      await updateUser({ slackWebhookUrl, slackChannelName });
+      setSavedSlack({ webhookUrl: slackWebhookUrl, channelName: slackChannelName });
+      showToast("Slack integration saved.");
+      setActiveModal(null);
+    } finally {
+      setSlackSaving(false);
+    }
+  };
+
+  const notionConnected = !!savedNotion.apiKey && !!savedNotion.databaseId;
+  const slackConnected = !!savedSlack.webhookUrl;
+
+  const showSaveBar = activeTab === "profile" || activeTab === "preferences";
 
   return (
     <div className="min-h-screen bg-background text-text-primary">
@@ -269,106 +302,69 @@ function SettingsPageContent() {
           )}
 
           {activeTab === "api-keys" && (
-            <>
-              <section className="space-y-6">
-                <div>
-                  <h3 className="text-2xl font-semibold">API Keys</h3>
-                  <p className="text-text-secondary">Connect your own AI models for custom processing.</p>
-                </div>
-                <Card className="p-6 space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-background border border-border rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 flex items-center justify-center bg-text-primary/5 rounded-lg border border-border">
-                        <KeyRound size={18} className="text-text-secondary" />
+            <section className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-semibold">API Keys</h3>
+                <p className="text-text-secondary">Connect your own AI models and export destinations.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* OpenAI -- not wired to a real field yet, shown for parity
+                    with the Integrations page but intentionally inert. */}
+                <Card className="p-5 flex flex-col justify-between min-h-[220px] opacity-60">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-text-primary/5 flex items-center justify-center text-text-secondary">
+                        <RiOpenaiFill size={22} />
                       </div>
-                      <div>
-                        <p className="font-medium text-text-primary">OpenAI Key</p>
-                        <p className="text-sm text-text-secondary">sk-••••••••••••••••••••••••4jK2</p>
-                      </div>
+                      <Badge variant="neutral">Not configured</Badge>
                     </div>
+                    <h4 className="text-lg font-semibold mb-1">OpenAI Key</h4>
+                    <p className="text-sm text-text-secondary mb-6">Bring your own key for custom AI processing.</p>
                   </div>
-                  <Button variant="secondary" className="w-full border-dashed gap-2">
-                    Add New Secret Key
+                  <Button variant="secondary" className="w-full" disabled>Coming soon</Button>
+                </Card>
+
+                {/* Notion */}
+                <Card className="p-5 flex flex-col justify-between min-h-[220px] hover:border-border-hover transition-all">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-surface-high flex items-center justify-center text-text-primary">
+                        <SiNotion size={20} />
+                      </div>
+                      <Badge variant={notionConnected ? "success" : "neutral"}>
+                        {notionConnected ? "Connected" : "Not configured"}
+                      </Badge>
+                    </div>
+                    <h4 className="text-lg font-semibold mb-1">Notion</h4>
+                    <p className="text-sm text-text-secondary mb-6">Export meeting summaries to your own Notion workspace.</p>
+                  </div>
+                  <Button variant="secondary" className="w-full" onClick={() => setActiveModal("notion")}>
+                    {notionConnected ? "Update connection" : "Set up integration"}
                   </Button>
                 </Card>
-              </section>
 
-              <section className="space-y-6">
-                <div>
-                  <h3 className="text-2xl font-semibold">Notion Integration</h3>
-                  <p className="text-text-secondary">Export meeting summaries to your own Notion workspace instead of the shared default.</p>
-                </div>
-                <Card className="p-6 space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-xs text-text-secondary uppercase tracking-wider">Notion API Key</label>
-                    <PasswordInput
-                      value={notionApiKey}
-                      onChange={(e) => setNotionApiKey(e.target.value)}
-                      placeholder="ntn_..."
-                    />
-                    <p className="text-xs text-text-secondary">
-                      <Link
-                        href="https://developers.notion.com/docs/create-a-notion-integration"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-success hover:underline"
-                      >
-                        How to get your Notion API key?
-                      </Link>
-                    </p>
+                {/* Slack */}
+                <Card className="p-5 flex flex-col justify-between min-h-[220px] hover:border-border-hover transition-all">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-warning-bg flex items-center justify-center text-warning">
+                        <FaSlack size={20} />
+                      </div>
+                      <Badge variant={slackConnected ? "success" : "neutral"}>
+                        {slackConnected
+                          ? `Connected${savedSlack.channelName ? ` · ${savedSlack.channelName.startsWith("#") ? savedSlack.channelName : `#${savedSlack.channelName}`}` : ""}`
+                          : "Not configured"}
+                      </Badge>
+                    </div>
+                    <h4 className="text-lg font-semibold mb-1">Slack</h4>
+                    <p className="text-sm text-text-secondary mb-6">Save a default webhook so exports pre-fill automatically.</p>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs text-text-secondary uppercase tracking-wider">Notion Database ID</label>
-                    <Input
-                      value={notionDatabaseId}
-                      onChange={(e) => setNotionDatabaseId(e.target.value)}
-                      placeholder="3ac0b40b15f58068bd31f9ec426efec5"
-                    />
-                  </div>
+                  <Button variant="secondary" className="w-full" onClick={() => setActiveModal("slack")}>
+                    {slackConnected ? "Update connection" : "Set up integration"}
+                  </Button>
                 </Card>
-              </section>
-
-              <section className="space-y-6">
-                <div>
-                  <h3 className="text-2xl font-semibold">Slack Integration</h3>
-                  <p className="text-text-secondary">Save a default webhook so exports pre-fill instead of asking every time.</p>
-                </div>
-                <Card className="p-6 space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-xs text-text-secondary uppercase tracking-wider">Slack Webhook URL</label>
-                    <PasswordInput
-                      value={slackWebhookUrl}
-                      onChange={(e) => setSlackWebhookUrl(e.target.value)}
-                      placeholder="https://hooks.slack.com/services/..."
-                    />
-                    <p className="text-xs text-text-secondary">
-                      <Link
-                        href="https://api.slack.com/messaging/webhooks"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-success hover:underline"
-                      >
-                        How to create a Slack incoming webhook?
-                      </Link>
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs text-text-secondary uppercase tracking-wider">Channel Name</label>
-                    <Input
-                      value={slackChannelName}
-                      onChange={(e) => setSlackChannelName(e.target.value)}
-                      placeholder="#général"
-                    />
-                    {/* Display-only -- Slack's webhook API returns no channel
-                        metadata, so this just labels the saved connection and
-                        names the channel in the export confirmation toast. */}
-                    <p className="text-xs text-text-secondary">
-                      Display only -- the webhook itself is already bound to a channel when you create it in Slack.
-                    </p>
-                  </div>
-                </Card>
-              </section>
-            </>
+              </div>
+            </section>
           )}
 
           {activeTab === "billing" && (
@@ -437,6 +433,108 @@ function SettingsPageContent() {
           </div>
         )}
       </main>
+
+      {activeModal === "notion" && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-[420px] bg-surface-high border border-border rounded-xl shadow-lg flex flex-col overflow-hidden">
+            <div className="p-6 border-b border-border flex justify-between items-start">
+              <div>
+                <h2 className="text-lg font-semibold text-text-primary mb-1">Notion Integration</h2>
+                <p className="text-sm text-text-secondary">Export meeting summaries to your own Notion workspace instead of the shared default.</p>
+              </div>
+              <button onClick={closeNotionModal} className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer">✕</button>
+            </div>
+            <div className="p-6 flex flex-col gap-6">
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider">Notion API Key</label>
+                <PasswordInput
+                  value={notionApiKey}
+                  onChange={(e) => setNotionApiKey(e.target.value)}
+                  placeholder="ntn_..."
+                />
+                <p className="text-xs text-text-secondary">
+                  <Link
+                    href="https://developers.notion.com/docs/create-a-notion-integration"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-success hover:underline"
+                  >
+                    How to get your Notion API key?
+                  </Link>
+                </p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider">Notion Database ID</label>
+                <Input
+                  value={notionDatabaseId}
+                  onChange={(e) => setNotionDatabaseId(e.target.value)}
+                  placeholder="3ac0b40b15f58068bd31f9ec426efec5"
+                />
+              </div>
+            </div>
+            <div className="p-6 bg-surface-low border-t border-border flex gap-4">
+              <Button variant="secondary" className="flex-1" onClick={closeNotionModal} disabled={notionSaving}>Cancel</Button>
+              <Button variant="primary" className="flex-1" onClick={handleSaveNotion} disabled={notionSaving}>
+                {notionSaving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === "slack" && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="w-full max-w-[420px] bg-surface-high border border-border rounded-xl shadow-lg flex flex-col overflow-hidden">
+            <div className="p-6 border-b border-border flex justify-between items-start">
+              <div>
+                <h2 className="text-lg font-semibold text-text-primary mb-1">Slack Integration</h2>
+                <p className="text-sm text-text-secondary">Save a default webhook so exports pre-fill instead of asking every time.</p>
+              </div>
+              <button onClick={closeSlackModal} className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer">✕</button>
+            </div>
+            <div className="p-6 flex flex-col gap-6">
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider">Slack Webhook URL</label>
+                <PasswordInput
+                  value={slackWebhookUrl}
+                  onChange={(e) => setSlackWebhookUrl(e.target.value)}
+                  placeholder="https://hooks.slack.com/services/..."
+                />
+                <p className="text-xs text-text-secondary">
+                  <Link
+                    href="https://api.slack.com/messaging/webhooks"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-success hover:underline"
+                  >
+                    How to create a Slack incoming webhook?
+                  </Link>
+                </p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider">Channel Name</label>
+                <Input
+                  value={slackChannelName}
+                  onChange={(e) => setSlackChannelName(e.target.value)}
+                  placeholder="#général"
+                />
+                {/* Display-only -- Slack's webhook API returns no channel
+                    metadata, so this just labels the saved connection and
+                    names the channel in the export confirmation toast. */}
+                <p className="text-xs text-text-secondary">
+                  Display only -- the webhook itself is already bound to a channel when you create it in Slack.
+                </p>
+              </div>
+            </div>
+            <div className="p-6 bg-surface-low border-t border-border flex gap-4">
+              <Button variant="secondary" className="flex-1" onClick={closeSlackModal} disabled={slackSaving}>Cancel</Button>
+              <Button variant="primary" className="flex-1" onClick={handleSaveSlack} disabled={slackSaving}>
+                {slackSaving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
