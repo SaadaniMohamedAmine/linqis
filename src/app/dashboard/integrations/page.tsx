@@ -7,7 +7,10 @@ import { Webhook, ShieldCheck } from "lucide-react";
 // Real brand marks for the four integration cards instead of generic Lucide
 // glyphs -- Custom Webhooks / Enterprise Security stay on Lucide since they
 // describe a capability, not a specific product with its own logo.
-import { SiGooglecalendar, SiZoom, SiNotion, SiSlack } from "react-icons/si";
+import { SiGooglecalendar, SiZoom, SiNotion } from "react-icons/si";
+// Simple Icons dropped Slack's mark (trademark request), so its logo comes
+// from Font Awesome's brand set instead.
+import { FaSlack } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -169,7 +172,7 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-warning-bg flex items-center justify-center text-warning">
-                  <SiSlack size={20} />
+                  <FaSlack size={20} />
                 </div>
                 <Badge variant={slackWebhookUrl ? "success" : "neutral"}>
                   {slackWebhookUrl ? `Connected${slackChannelName ? ` · ${slackChannelName.startsWith("#") ? slackChannelName : `#${slackChannelName}`}` : ""}` : "Not configured"}
