@@ -2,7 +2,7 @@ import { Router } from "express";
 import fs from "fs";
 import path from "path";
 import { getZoomRecordings, downloadZoomRecording } from "../services/integrations/zoom";
-import { getGoogleAuthUrl, getGoogleCalendarEvents, exchangeGoogleCode } from "../services/integrations/google-calendar";
+import { getGoogleAuthUrl, getGoogleCalendarEvents, exchangeGoogleCode, getValidAccessToken } from "../services/integrations/google-calendar";
 import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../services/media";
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
@@ -144,17 +144,26 @@ router.get("/google-calendar/auth-url", (req, res) => {
   }
 });
 
-router.get("/google-calendar/events", async (req, res) => {
+// The frontend never sees a raw Google access token -- it only knows
+// "connected or not". The token itself stays server-side, read from this
+// user's stored Integration row and refreshed transparently if expired.
+router.get("/google-calendar/events", async (req: AuthedRequest, res) => {
   try {
-    const { accessToken, timeMin, timeMax } = req.query;
+    const accessToken = await getValidAccessToken(req.userId!);
     if (!accessToken) {
-      return res.status(400).json({ error: "Access token required" });
+      return res.status(404).json({ error: "Google Calendar is not connected" });
     }
 
+    const { timeMin, timeMax } = req.query;
+    // Default window: now through +7 days -- "what's coming up", not a full
+    // calendar browser. The caller can still narrow/widen it explicitly.
+    const now = new Date();
+    const weekOut = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
     const events = await getGoogleCalendarEvents(
-      accessToken as string,
-      timeMin as string,
-      timeMax as string
+      accessToken,
+      (timeMin as string) || now.toISOString(),
+      (timeMax as string) || weekOut.toISOString()
     );
     res.json(events);
   } catch (error) {

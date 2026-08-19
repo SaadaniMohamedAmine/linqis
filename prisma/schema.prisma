@@ -303,6 +303,12 @@ model Meeting {
   isPublic   Boolean @default(false)
   shareToken String? @unique
 
+  // Set when this meeting was linked to a Google Calendar event, either at
+  // upload time (picker) or later. calendarEventTitle is denormalized so the
+  // UI can show it without a live Calendar API call on every meeting page.
+  calendarEventId    String?
+  calendarEventTitle String?
+
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   participants  Participant[]

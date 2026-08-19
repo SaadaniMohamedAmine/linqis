@@ -257,7 +257,8 @@ export interface UploadResponse {
  */
 export function uploadMeetingFile(
   file: File,
-  onUploadProgress?: (percent: number) => void
+  onUploadProgress?: (percent: number) => void,
+  calendarLink?: { eventId: string; title: string }
 ): Promise<UploadResponse> {
   return new Promise(async (resolve, reject) => {
     const token = await getBackendToken();
@@ -265,6 +266,10 @@ export function uploadMeetingFile(
     formData.append("file", file);
     // No userId in the body -- the backend derives it from the Authorization
     // token, never from anything the client sends.
+    if (calendarLink) {
+      formData.append("calendarEventId", calendarLink.eventId);
+      formData.append("calendarEventTitle", calendarLink.title);
+    }
 
     const workspaceId = await getActiveWorkspaceId();
     const xhr = new XMLHttpRequest();
@@ -492,6 +497,22 @@ export function getIntegrationStatus(): Promise<IntegrationStatus[]> {
 
 export function getGoogleCalendarAuthUrl(): Promise<{ authUrl: string }> {
   return request<{ authUrl: string }>("/api/integrations/google-calendar/auth-url");
+}
+
+export interface CalendarEventSummary {
+  id: string;
+  summary: string;
+  description?: string | null;
+  location?: string | null;
+  start: string;
+  end: string;
+  attendees?: string[];
+  meetingUrl: string | null;
+}
+
+/** Upcoming events (now -> +7 days by default) from the connected Google Calendar. */
+export function getUpcomingCalendarEvents(): Promise<CalendarEventSummary[]> {
+  return request<CalendarEventSummary[]>("/api/integrations/google-calendar/events");
 }
 
 /**

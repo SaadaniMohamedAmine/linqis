@@ -19,6 +19,7 @@ import {
   Smile,
   Meh,
   Frown,
+  CalendarClock,
   type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -272,6 +273,12 @@ export default function MeetingDetailPage() {
               </span>
             )}
             <span>{formatMeetingDate(meeting.createdAt)}</span>
+            {meeting.calendarEventTitle && (
+              <span className="flex items-center gap-1 text-info">
+                <CalendarClock size={12} />
+                From calendar: {meeting.calendarEventTitle}
+              </span>
+            )}
           </div>
           {meeting.status === "PROCESSING" && (
             <p className="text-xs text-warning mt-1">Still processing — this page will refresh automatically.</p>

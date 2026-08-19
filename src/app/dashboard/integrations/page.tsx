@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Webhook, ShieldCheck } from "lucide-react";
+import { Webhook, ShieldCheck, CalendarClock, Link2 } from "lucide-react";
 // Real brand marks for the four integration cards instead of generic Lucide
 // glyphs -- Custom Webhooks / Enterprise Security stay on Lucide since they
 // describe a capability, not a specific product with its own logo.
@@ -20,10 +20,21 @@ import {
   getGoogleCalendarAuthUrl,
   getMyWorkspaces,
   getUser,
+  getUpcomingCalendarEvents,
   ACTIVE_WORKSPACE_KEY,
   type IntegrationStatus,
   type WorkspaceRole,
+  type CalendarEventSummary,
 } from "@/lib/api";
+
+function formatEventTime(startIso: string, endIso: string): string {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  const day = start.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  const startTime = start.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const endTime = end.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  return `${day} · ${startTime} – ${endTime}`;
+}
 
 export default function IntegrationsPage() {
   const { data: session } = useSession();
@@ -39,10 +50,27 @@ export default function IntegrationsPage() {
   // there's an actual saved connection (Settings > API Keys) to check.
   const [slackWebhookUrl, setSlackWebhookUrl] = useState<string | null>(null);
   const [slackChannelName, setSlackChannelName] = useState<string | null>(null);
+  const [upcomingEvents, setUpcomingEvents] = useState<CalendarEventSummary[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
 
   useEffect(() => {
     if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
   }, [session?.user?.id]);
+
+  // Only the connect flow existed before -- once Google Calendar is actually
+  // linked, this is what gives that connection a visible effect instead of
+  // just flipping a badge to "Active" and doing nothing else.
+  useEffect(() => {
+    if (!integrations.some((i) => i.provider === "google-calendar")) {
+      setUpcomingEvents([]);
+      return;
+    }
+    setEventsLoading(true);
+    getUpcomingCalendarEvents()
+      .then(setUpcomingEvents)
+      .catch(() => setUpcomingEvents([]))
+      .finally(() => setEventsLoading(false));
+  }, [integrations]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -186,6 +214,39 @@ export default function IntegrationsPage() {
             </Link>
           </Card>
         </div>
+
+        {/* Upcoming from Google Calendar -- only once actually connected */}
+        {isConnected("google-calendar") && (
+          <section className="mt-12 animate-fade-in-up [animation-delay:220ms]">
+            <div className="flex items-center gap-2 mb-4">
+              <CalendarClock size={16} className="text-text-secondary" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Upcoming from Google Calendar</h2>
+            </div>
+            <Card className="p-0 divide-y divide-border overflow-hidden">
+              {eventsLoading && <p className="p-6 text-sm text-text-secondary">Loading events…</p>}
+              {!eventsLoading && upcomingEvents.length === 0 && (
+                <p className="p-6 text-sm text-text-secondary">No events in the next 7 days.</p>
+              )}
+              {upcomingEvents.map((event) => (
+                <div key={event.id} className="p-5 flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{event.summary}</p>
+                    <p className="text-sm text-text-secondary">{formatEventTime(event.start, event.end)}</p>
+                  </div>
+                  {event.meetingUrl && (
+                    <Badge variant="info" className="shrink-0 flex items-center gap-1">
+                      <Link2 size={12} />
+                      Meeting link detected
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </Card>
+            <p className="text-xs text-text-secondary mt-3">
+              Pick any of these when uploading a recording to auto-fill its title -- see the Upload page.
+            </p>
+          </section>
+        )}
 
         {/* Developer / API Section */}
         <section className="mt-12 mb-8 animate-fade-in-up [animation-delay:300ms]">
