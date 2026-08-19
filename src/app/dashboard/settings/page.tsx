@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/components/toast-provider";
 import { ACTIVE_WORKSPACE_KEY, getUser, updateUser, type UserProfile } from "@/lib/api";
 import { getInitials } from "@/lib/utils";
 
@@ -44,6 +45,7 @@ function SettingsPageContent() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -90,6 +92,7 @@ function SettingsPageContent() {
       await updateUser({ name, summaryLength, emailNotifications, notionApiKey, notionDatabaseId });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+      showToast(activeTab === "api-keys" ? "Notion integration saved." : "Settings saved.");
     } finally {
       setSaving(false);
     }
