@@ -31,3 +31,23 @@ export function MarkdownSummary({ text }: { text: string }) {
     </div>
   );
 }
+
+// Same source problem, smaller surface: decision statements and action item
+// tasks are short AI-generated phrases rendered inline (next to a status dot,
+// a checkbox, a badge) rather than as a standalone block, so MarkdownSummary's
+// <div>/<p> wrapper would break that layout. This renders the same **bold**
+// syntax without introducing block-level elements.
+export function InlineMarkdown({ text }: { text: string }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <>{children}</>,
+        strong: ({ children }) => <strong className="font-semibold text-text-primary">{children}</strong>,
+        em: ({ children }) => <em>{children}</em>,
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  );
+}

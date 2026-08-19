@@ -3,6 +3,7 @@ import PDFDocument from "pdfkit";
 import { getPrisma } from "../db";
 import type { AuthedRequest } from "../middleware/auth";
 import { PLAN_LIMITS } from "../lib/plans";
+import { stripMarkdown } from "../lib/markdown";
 
 export const router = Router();
 
@@ -41,20 +42,20 @@ router.get("/:id", async (req: AuthedRequest<{ id: string }>, res) => {
     doc.moveDown(1.5);
 
     doc.fontSize(14).fillColor("#000").text("Summary");
-    doc.fontSize(11).fillColor("#333").text(meeting.summary || "No summary available.");
+    doc.fontSize(11).fillColor("#333").text(meeting.summary ? stripMarkdown(meeting.summary) : "No summary available.");
     doc.moveDown(1.5);
 
     doc.fontSize(14).fillColor("#000").text("Decisions");
     if (meeting.decisions.length === 0) doc.fontSize(11).fillColor("#333").text("No decisions recorded.");
     for (const d of meeting.decisions) {
-      doc.fontSize(11).fillColor("#333").text(`• ${d.statement} (${d.status})`);
+      doc.fontSize(11).fillColor("#333").text(`• ${stripMarkdown(d.statement)} (${d.status})`);
     }
     doc.moveDown(1.5);
 
     doc.fontSize(14).fillColor("#000").text("Action Items");
     if (meeting.actionItems.length === 0) doc.fontSize(11).fillColor("#333").text("No action items recorded.");
     for (const a of meeting.actionItems) {
-      doc.fontSize(11).fillColor("#333").text(`• ${a.task} — ${a.owner || "Unassigned"} (${a.priority})`);
+      doc.fontSize(11).fillColor("#333").text(`• ${stripMarkdown(a.task)} — ${a.owner || "Unassigned"} (${a.priority})`);
     }
 
     doc.end();

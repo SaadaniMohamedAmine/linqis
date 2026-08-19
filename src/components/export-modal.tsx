@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { exportToNotion, exportToSlack, exportToEmail, ApiError } from "@/lib/api";
+import { useToast } from "@/components/toast-provider";
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -17,10 +18,15 @@ type Status = "idle" | "exporting" | "success" | "error";
 export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalProps) {
   const [selectedTarget, setSelectedTarget] = useState<Target>("notion");
   const [slackWebhookUrl, setSlackWebhookUrl] = useState(process.env.NEXT_PUBLIC_DEFAULT_SLACK_WEBHOOK || "");
+  // Display-only: Slack's webhook API returns no channel metadata, so this
+  // isn't used in the export call itself -- it only lets the confirmation
+  // toast name the channel instead of saying "exported to Slack" blindly.
+  const [slackChannelName, setSlackChannelName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [isPlanLimit, setIsPlanLimit] = useState(false);
+  const { showToast } = useToast();
 
   if (!isOpen) return null;
 
@@ -42,12 +48,20 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
     try {
       if (selectedTarget === "notion") {
         await exportToNotion(meetingId);
+        showToast("Your meeting info was exported to Notion.");
       } else if (selectedTarget === "slack") {
         if (!slackWebhookUrl) throw new Error("Enter a Slack webhook URL.");
         await exportToSlack(meetingId, slackWebhookUrl);
+        const channel = slackChannelName.trim();
+        showToast(
+          channel
+            ? `Your meeting info was exported to Slack — ${channel.startsWith("#") ? channel : `#${channel}`}`
+            : "Your meeting info was exported to Slack."
+        );
       } else {
         if (!email) throw new Error("Enter a recipient email.");
         await exportToEmail(meetingId, email);
+        showToast(`Your meeting info was exported to ${email}.`);
       }
       setStatus("success");
       setTimeout(handleClose, 1200);
@@ -84,12 +98,20 @@ export default function ExportModal({ isOpen, onClose, meetingId }: ExportModalP
             <span className="font-medium text-text-primary">Slack</span>
           </label>
           {selectedTarget === "slack" && (
-            <input
-              value={slackWebhookUrl}
-              onChange={(e) => setSlackWebhookUrl(e.target.value)}
-              placeholder="https://hooks.slack.com/services/..."
-              className="ml-7 w-[calc(100%-1.75rem)] bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none"
-            />
+            <div className="ml-7 w-[calc(100%-1.75rem)] flex flex-col gap-2">
+              <input
+                value={slackWebhookUrl}
+                onChange={(e) => setSlackWebhookUrl(e.target.value)}
+                placeholder="https://hooks.slack.com/services/..."
+                className="w-full bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none"
+              />
+              <input
+                value={slackChannelName}
+                onChange={(e) => setSlackChannelName(e.target.value)}
+                placeholder="Channel name (optional, e.g. #général)"
+                className="w-full bg-background border border-border rounded-lg py-3 px-4 text-sm text-text-primary outline-none"
+              />
+            </div>
           )}
 
           <label className="flex items-center gap-2 cursor-pointer">
