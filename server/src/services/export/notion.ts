@@ -1,4 +1,7 @@
 import { Client } from "@notionhq/client";
+import { markdownToRichText, truncate } from "../../lib/markdown";
+
+const SUMMARY_PROPERTY_MAX_CHARS = 300;
 
 export interface NotionExport {
   meetingId: string;
@@ -27,8 +30,12 @@ export async function exportToNotion(data: NotionExport, credentials: NotionCred
       Date: {
         date: { start: new Date().toISOString() },
       },
+      // Table column, not the document itself -- the AI summary can run to
+      // several paragraphs, which made this cell unreadable in the database
+      // view. Trim it to a scannable preview; the full text is in the page
+      // body below regardless.
       Summary: {
-        rich_text: [{ text: { content: data.summary } }],
+        rich_text: markdownToRichText(truncate(data.summary, SUMMARY_PROPERTY_MAX_CHARS)),
       },
     },
     children: [
@@ -43,7 +50,10 @@ export async function exportToNotion(data: NotionExport, credentials: NotionCred
         object: "block",
         type: "paragraph",
         paragraph: {
-          rich_text: [{ text: { content: data.summary } }],
+          // Was inserting the raw **bold** markdown as literal text; Notion's
+          // rich_text supports real bold via `annotations`, so convert it
+          // instead of just stripping it like the PDF export has to.
+          rich_text: markdownToRichText(data.summary),
         },
       },
       {
@@ -57,7 +67,7 @@ export async function exportToNotion(data: NotionExport, credentials: NotionCred
         object: "block",
         type: "to_do",
         to_do: {
-          rich_text: [{ text: { content: d.statement } }],
+          rich_text: markdownToRichText(d.statement),
           checked: d.status === "CONFIRMED",
         },
       })),
@@ -72,7 +82,10 @@ export async function exportToNotion(data: NotionExport, credentials: NotionCred
         object: "block",
         type: "to_do",
         to_do: {
-          rich_text: [{ text: { content: `${a.task} (${a.owner || "Unassigned"})` } }],
+          rich_text: [
+            ...markdownToRichText(a.task),
+            { type: "text" as const, text: { content: ` (${a.owner || "Unassigned"})` } },
+          ],
           checked: false,
         },
       })),

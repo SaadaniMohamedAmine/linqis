@@ -24,3 +24,33 @@ export function stripMarkdown(text: string): string {
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^[-*]\s+/gm, "");
 }
+
+interface NotionRichText {
+  type: "text";
+  text: { content: string };
+  annotations?: { bold?: boolean };
+}
+
+// Unlike PDF/Slack, Notion's rich_text arrays support real bold via an
+// `annotations` object, so this doesn't need to strip/reformat **markers**
+// -- it splits on them and marks the enclosed segment bold instead of
+// dropping the emphasis entirely.
+export function markdownToRichText(text: string): NotionRichText[] {
+  const parts = text.split(/(\*\*.+?\*\*)/g).filter((p) => p.length > 0);
+  if (parts.length === 0) return [{ type: "text", text: { content: "" } }];
+  return parts.map((part) => {
+    const bold = part.match(/^\*\*(.+)\*\*$/);
+    return bold
+      ? { type: "text", text: { content: bold[1] }, annotations: { bold: true } }
+      : { type: "text", text: { content: part } };
+  });
+}
+
+// The Summary *property* is a table column meant for a quick scan across
+// rows, but it was receiving the full multi-paragraph executive summary --
+// unreadable in the database view. The full text still goes in the page
+// body below; this just keeps the property itself glanceable.
+export function truncate(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  return text.slice(0, maxChars).trimEnd() + "…";
+}
