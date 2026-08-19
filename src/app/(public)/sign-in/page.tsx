@@ -120,6 +120,8 @@ function SignInForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                showLabel={t.showPassword}
+                hideLabel={t.hidePassword}
               />
             </div>
             <Button variant="primary" className="w-full h-12 mt-2" type="submit" disabled={isLoading}>

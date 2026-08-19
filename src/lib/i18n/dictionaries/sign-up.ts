@@ -25,6 +25,8 @@ export interface SignUpDictionary {
   privacyLink: string;
   enterpriseSecurity: string;
   aiReady: string;
+  showPassword: string;
+  hidePassword: string;
 }
 
 export const signUpDictionary: Record<LocaleCode, SignUpDictionary> = {
@@ -53,6 +55,8 @@ export const signUpDictionary: Record<LocaleCode, SignUpDictionary> = {
     privacyLink: "Privacy Policy",
     enterpriseSecurity: "Enterprise Security",
     aiReady: "AI Ready",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
   },
   fr: {
     title: "Créez votre compte",
@@ -79,5 +83,7 @@ export const signUpDictionary: Record<LocaleCode, SignUpDictionary> = {
     privacyLink: "Politique de confidentialité",
     enterpriseSecurity: "Sécurité entreprise",
     aiReady: "Prêt pour l'IA",
+    showPassword: "Afficher le mot de passe",
+    hidePassword: "Masquer le mot de passe",
   },
 };

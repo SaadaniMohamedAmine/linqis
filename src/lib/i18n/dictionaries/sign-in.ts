@@ -16,6 +16,8 @@ export interface SignInDictionary {
   signInButton: string;
   noAccount: string;
   signUpLink: string;
+  showPassword: string;
+  hidePassword: string;
 }
 
 export const signInDictionary: Record<LocaleCode, SignInDictionary> = {
@@ -35,6 +37,8 @@ export const signInDictionary: Record<LocaleCode, SignInDictionary> = {
     signInButton: "Sign In",
     noAccount: "Don't have an account?",
     signUpLink: "Sign up",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
   },
   fr: {
     title: "Content de vous revoir",
@@ -52,5 +56,7 @@ export const signInDictionary: Record<LocaleCode, SignInDictionary> = {
     signInButton: "Se connecter",
     noAccount: "Pas encore de compte ?",
     signUpLink: "S'inscrire",
+    showPassword: "Afficher le mot de passe",
+    hidePassword: "Masquer le mot de passe",
   },
 };
