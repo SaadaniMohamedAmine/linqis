@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ACTIVE_WORKSPACE_KEY } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { pricingDictionary } from "@/lib/i18n/dictionaries/pricing";
 
 interface PricingActionsProps {
   isLoggedIn: boolean;
@@ -12,23 +14,25 @@ interface PricingActionsProps {
 }
 
 export function FreeCardAction({ isLoggedIn, currentPlan }: PricingActionsProps) {
+  const t = useDictionary(pricingDictionary).actions;
   if (isLoggedIn && currentPlan === "FREE") {
-    return <Button variant="secondary" disabled className="w-full">Current plan</Button>;
+    return <Button variant="secondary" disabled className="w-full">{t.currentPlan}</Button>;
   }
   return (
     <Link href="/sign-up">
-      <Button variant="secondary" className="w-full">Get Started</Button>
+      <Button variant="secondary" className="w-full">{t.getStarted}</Button>
     </Link>
   );
 }
 
 export function ProCardAction({ isLoggedIn, currentPlan }: PricingActionsProps) {
+  const t = useDictionary(pricingDictionary).actions;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (isLoggedIn && currentPlan === "PRO") {
-    return <Button variant="secondary" disabled className="w-full font-bold">Current plan</Button>;
+    return <Button variant="secondary" disabled className="w-full font-bold">{t.currentPlan}</Button>;
   }
 
   const handleUpgrade = async () => {
@@ -47,13 +51,13 @@ export function ProCardAction({ isLoggedIn, currentPlan }: PricingActionsProps) 
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body.url) {
-        setError(body.error || "Could not start checkout.");
+        setError(body.error || t.couldNotStartCheckout);
         setLoading(false);
         return;
       }
       window.location.href = body.url;
     } catch {
-      setError("Could not start checkout.");
+      setError(t.couldNotStartCheckout);
       setLoading(false);
     }
   };
@@ -61,7 +65,7 @@ export function ProCardAction({ isLoggedIn, currentPlan }: PricingActionsProps) 
   return (
     <div className="flex flex-col gap-2">
       <Button variant="primary" className="w-full font-bold" onClick={handleUpgrade} disabled={loading}>
-        {loading ? "Redirecting..." : "Upgrade to Pro"}
+        {loading ? t.redirecting : t.upgradeToPro}
       </Button>
       {error && <p className="text-xs text-danger text-center">{error}</p>}
     </div>
