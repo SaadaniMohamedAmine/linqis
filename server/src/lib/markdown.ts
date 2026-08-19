@@ -56,7 +56,12 @@ function escapeHtml(text: string): string {
 }
 
 export function markdownToHtml(text: string): string {
-  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  // Also convert newlines to <br> -- HTML collapses them otherwise, which is
+  // what glued the AI's own "**Executive Summary**\n\n..." lead-in directly
+  // onto the following paragraph with no visual break in the sent email.
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n/g, "<br>");
 }
 
 // The Summary *property* is a table column meant for a quick scan across
