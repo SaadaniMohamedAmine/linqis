@@ -127,7 +127,7 @@ export default function IntegrationsPage() {
               <h3 className="text-lg font-semibold mb-1">Notion</h3>
               <p className="text-sm text-text-secondary mb-6">Sync meeting summaries and action items to your workspace databases.</p>
             </div>
-            <Link href="/dashboard/settings" className="relative z-10">
+            <Link href="/dashboard/settings?tab=api-keys" className="relative z-10">
               <Button variant="secondary" className="w-full">Configure in Settings</Button>
             </Link>
           </Card>
@@ -145,7 +145,7 @@ export default function IntegrationsPage() {
               <h3 className="text-lg font-semibold mb-1">Slack</h3>
               <p className="text-sm text-text-secondary mb-6">Push summaries to designated channels and tag participants.</p>
             </div>
-            <Link href="/dashboard/settings" className="relative z-10">
+            <Link href="/dashboard/settings?tab=api-keys" className="relative z-10">
               <Button variant="secondary" className="w-full">Configure in Settings</Button>
             </Link>
           </Card>

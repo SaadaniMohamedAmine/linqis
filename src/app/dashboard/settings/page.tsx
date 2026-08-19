@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { User, SlidersHorizontal, KeyRound, CreditCard, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,9 +22,16 @@ const TABS: { id: TabId; label: string; icon: typeof User }[] = [
   { id: "billing", label: "Billing", icon: CreditCard },
 ];
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<TabId>("profile");
+  // Integrations page links here with ?tab=api-keys so "Configure in
+  // Settings" lands directly on the Notion/Slack fields instead of dumping
+  // the user on Profile and making them find the right tab themselves.
+  const searchParams = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<TabId>(
+    TABS.some((t) => t.id === requestedTab) ? (requestedTab as TabId) : "profile"
+  );
   const [name, setName] = useState("");
   const [summaryLength, setSummaryLength] = useState<UserProfile["summaryLength"]>("STANDARD");
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -356,5 +364,13 @@ export default function SettingsPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <SettingsPageContent />
+    </Suspense>
   );
 }
