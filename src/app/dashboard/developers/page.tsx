@@ -6,6 +6,7 @@ import { KeyRound, Webhook as WebhookIcon, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   ApiError,
   getMyWorkspaces,
@@ -177,7 +178,7 @@ export default function DevelopersPage() {
         </div>
       </div>
 
-      <div className="max-w-[800px] mx-auto p-8 flex flex-col gap-12">
+      <div className="max-w-[1200px] mx-auto p-8 flex flex-col gap-12">
         {error && <p className="text-sm text-danger bg-danger/10 p-3 rounded-lg">{error}</p>}
 
         {/* API Keys */}
@@ -200,40 +201,45 @@ export default function DevelopersPage() {
 
           {revealedKey && <RevealBanner label="API key" value={revealedKey} />}
 
-          <Card className="p-0 divide-y divide-border overflow-hidden">
-            {loading && <p className="p-6 text-sm text-text-secondary">Loading keys…</p>}
-            {!loading && keys.length === 0 && (
-              <div className="p-10 flex flex-col items-center text-center gap-2">
-                <div className="w-11 h-11 rounded-full bg-success-bg flex items-center justify-center text-success">
-                  <KeyRound size={18} />
-                </div>
-                <p className="text-sm text-text-secondary">No API keys yet.</p>
+          {loading && <p className="text-sm text-text-secondary">Loading keys…</p>}
+
+          {!loading && keys.length === 0 && (
+            <Card className="p-10 flex flex-col items-center text-center gap-2">
+              <div className="w-11 h-11 rounded-full bg-success-bg flex items-center justify-center text-success">
+                <KeyRound size={18} />
               </div>
-            )}
-            {keys.map((key) => (
-              <div key={key.id} className="p-5 flex items-center justify-between gap-4 hover:bg-background/50 transition-colors">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-success-bg flex items-center justify-center text-success shrink-0">
-                    <KeyRound size={18} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{key.name}</p>
-                    <p className="text-sm text-text-secondary font-mono">
-                      {key.keyPrefix}••••••••
-                    </p>
-                    <p className="text-xs text-text-secondary">
+              <p className="text-sm text-text-secondary">No API keys yet.</p>
+            </Card>
+          )}
+
+          {keys.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {keys.map((key) => (
+                <Card key={key.id} className="p-5 flex flex-col justify-between min-h-[190px] hover:border-border-hover transition-all">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-success-bg flex items-center justify-center text-success">
+                        <KeyRound size={20} />
+                      </div>
+                      <Badge variant={key.lastUsedAt ? "success" : "neutral"}>
+                        {key.lastUsedAt ? "Active" : "Unused"}
+                      </Badge>
+                    </div>
+                    <h4 className="text-lg font-semibold mb-1 truncate">{key.name}</h4>
+                    <p className="text-sm text-text-secondary font-mono mb-2">{key.keyPrefix}••••••••</p>
+                    <p className="text-xs text-text-secondary mb-6">
                       Created {formatDate(key.createdAt)} · Last used {formatDate(key.lastUsedAt)}
                     </p>
                   </div>
-                </div>
-                {canManage && (
-                  <Button variant="danger" size="sm" onClick={() => handleRevokeKey(key.id)} className="shrink-0">
-                    Revoke
-                  </Button>
-                )}
-              </div>
-            ))}
-          </Card>
+                  {canManage && (
+                    <Button variant="danger" size="sm" className="w-full" onClick={() => handleRevokeKey(key.id)}>
+                      Revoke
+                    </Button>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Webhooks */}
@@ -255,37 +261,43 @@ export default function DevelopersPage() {
 
           {revealedSecret && <RevealBanner label="signing secret" value={revealedSecret} />}
 
-          <Card className="p-0 divide-y divide-border overflow-hidden">
-            {loading && <p className="p-6 text-sm text-text-secondary">Loading webhooks…</p>}
-            {!loading && hooks.length === 0 && (
-              <div className="p-10 flex flex-col items-center text-center gap-2">
-                <div className="w-11 h-11 rounded-full bg-info-bg flex items-center justify-center text-info">
-                  <WebhookIcon size={18} />
-                </div>
-                <p className="text-sm text-text-secondary">No webhooks yet.</p>
+          {loading && <p className="text-sm text-text-secondary">Loading webhooks…</p>}
+
+          {!loading && hooks.length === 0 && (
+            <Card className="p-10 flex flex-col items-center text-center gap-2">
+              <div className="w-11 h-11 rounded-full bg-info-bg flex items-center justify-center text-info">
+                <WebhookIcon size={18} />
               </div>
-            )}
-            {hooks.map((hook) => (
-              <div key={hook.id} className="p-5 flex items-center justify-between gap-4 hover:bg-background/50 transition-colors">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-info-bg flex items-center justify-center text-info shrink-0">
-                    <WebhookIcon size={18} />
+              <p className="text-sm text-text-secondary">No webhooks yet.</p>
+            </Card>
+          )}
+
+          {hooks.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {hooks.map((hook) => (
+                <Card key={hook.id} className="p-5 flex flex-col justify-between min-h-[190px] hover:border-border-hover transition-all">
+                  <div>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-info-bg flex items-center justify-center text-info">
+                        <WebhookIcon size={20} />
+                      </div>
+                      <Badge variant={hook.active ? "success" : "neutral"}>
+                        {hook.active ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
+                    <h4 className="text-lg font-semibold mb-1 truncate" title={hook.url}>{hook.url}</h4>
+                    <p className="text-sm text-text-secondary font-mono mb-2">{hook.event}</p>
+                    <p className="text-xs text-text-secondary mb-6">Created {formatDate(hook.createdAt)}</p>
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-medium truncate">{hook.url}</p>
-                    <p className="text-xs text-text-secondary">
-                      {hook.event} · {hook.active ? "Active" : "Inactive"} · Created {formatDate(hook.createdAt)}
-                    </p>
-                  </div>
-                </div>
-                {canManage && (
-                  <Button variant="danger" size="sm" onClick={() => handleDeleteHook(hook.id)} className="shrink-0">
-                    Remove
-                  </Button>
-                )}
-              </div>
-            ))}
-          </Card>
+                  {canManage && (
+                    <Button variant="danger" size="sm" className="w-full" onClick={() => handleDeleteHook(hook.id)}>
+                      Remove
+                    </Button>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
