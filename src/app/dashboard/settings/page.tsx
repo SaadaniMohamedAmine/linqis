@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { User, SlidersHorizontal, KeyRound, CreditCard, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Card } from "@/components/ui/card";
 import { ACTIVE_WORKSPACE_KEY, getUser, updateUser, type UserProfile } from "@/lib/api";
 import { getInitials } from "@/lib/utils";
@@ -267,10 +268,9 @@ function SettingsPageContent() {
                 <Card className="p-6 space-y-6">
                   <div className="space-y-2">
                     <label className="text-xs text-text-secondary uppercase tracking-wider">Notion API Key</label>
-                    <Input
+                    <PasswordInput
                       value={notionApiKey}
                       onChange={(e) => setNotionApiKey(e.target.value)}
-                      type="password"
                       placeholder="ntn_..."
                     />
                     <p className="text-xs text-text-secondary">
