@@ -208,7 +208,10 @@ function SettingsPageContent() {
       </div>
 
       {/* Tab panel */}
-      <main className="max-w-[800px] mx-auto p-8 lg:p-12">
+      {/* API Keys renders a card grid like the Integrations page, which
+          needs real room to breathe -- the other tabs are narrow forms and
+          stay at the original width. */}
+      <main className={`mx-auto p-8 lg:p-12 ${activeTab === "api-keys" ? "max-w-[1100px]" : "max-w-[800px]"}`}>
         <div key={activeTab} className="space-y-6 animate-tab-in">
           {activeTab === "profile" && (
             <section className="space-y-6">
