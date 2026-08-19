@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { X } from "lucide-react";
 import { getNotifications, markAllNotificationsRead, type Notification } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { notificationsDictionary, type NotificationsDictionary } from "@/lib/i18n/dictionaries/notifications";
 
 interface NotificationsPanelProps {
   isOpen: boolean;
@@ -12,18 +14,19 @@ interface NotificationsPanelProps {
 
 const CLOSE_ANIMATION_MS = 200;
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, t: NotificationsDictionary): string {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (seconds < 60) return "just now";
+  if (seconds < 60) return t.justNow;
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} min${minutes > 1 ? "s" : ""} ago`;
+  if (minutes < 60) return t.minutesAgo(minutes);
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  if (hours < 24) return t.hoursAgo(hours);
   const days = Math.floor(hours / 24);
-  return `${days} day${days > 1 ? "s" : ""} ago`;
+  return t.daysAgo(days);
 }
 
 export default function NotificationsPanel({ isOpen, onClose }: NotificationsPanelProps) {
+  const t = useDictionary(notificationsDictionary);
   const { data: session } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [shouldRender, setShouldRender] = useState(isOpen);
@@ -82,9 +85,9 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
             {unread.length > 0 && (
               <span className="bg-success text-background text-[10px] px-1.5 py-0.5 rounded-full font-bold">{unread.length}</span>
             )}
-            <button onClick={markAllRead} className="text-success text-sm hover:opacity-80 transition-opacity cursor-pointer">Mark all read</button>
+            <button onClick={markAllRead} className="text-success text-sm hover:opacity-80 transition-opacity cursor-pointer">{t.markAllRead}</button>
           </div>
-          <button onClick={onClose} aria-label="Close notifications" className="text-text-secondary hover:text-text-primary cursor-pointer">
+          <button onClick={onClose} aria-label={t.closeAriaLabel} className="text-text-secondary hover:text-text-primary cursor-pointer">
             <X size={20} />
           </button>
         </div>
@@ -92,12 +95,12 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
         {/* Notification List */}
         <div className="flex-1 overflow-y-auto py-4">
           {notifications.length === 0 && (
-            <p className="text-sm text-text-secondary text-center px-6 py-8">No notifications yet.</p>
+            <p className="text-sm text-text-secondary text-center px-6 py-8">{t.noNotifications}</p>
           )}
 
           {unread.length > 0 && (
             <div className="px-4 mb-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-text-secondary px-4 mb-4">Unread</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-text-secondary px-4 mb-4">{t.unread}</p>
               {unread.map((notification) => (
                 <div key={notification.id} className="p-4 rounded-xl cursor-pointer transition-all flex gap-4 relative hover:bg-surface/50">
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-success rounded-full"></div>
@@ -109,7 +112,7 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
                   <div className="flex-1 pr-6">
                     <p className="font-medium leading-tight">{notification.title}</p>
                     <p className="text-sm text-text-secondary mt-1 line-clamp-2">{notification.message}</p>
-                    <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt)}</p>
+                    <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt, t)}</p>
                   </div>
                 </div>
               ))}
@@ -118,14 +121,14 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
 
           {earlier.length > 0 && (
             <div className="px-4">
-              <p className="text-xs font-bold uppercase tracking-widest text-text-secondary px-4 mb-4">Earlier</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-text-secondary px-4 mb-4">{t.earlier}</p>
               {earlier.map((notification) => (
                 <div key={notification.id} className="p-4 rounded-xl cursor-pointer transition-all flex gap-4 opacity-80 hover:bg-surface/50">
                   <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center text-text-secondary shrink-0" />
                   <div className="flex-1">
                     <p className="font-medium leading-tight">{notification.title}</p>
                     <p className="text-sm text-text-secondary mt-1">{notification.message}</p>
-                    <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt)}</p>
+                    <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt, t)}</p>
                   </div>
                 </div>
               ))}
