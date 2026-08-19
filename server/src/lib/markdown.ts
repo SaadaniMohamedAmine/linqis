@@ -46,6 +46,19 @@ export function markdownToRichText(text: string): NotionRichText[] {
   });
 }
 
+// Email export HTML: like Notion, HTML supports real bold, so convert
+// **markers** into <strong> instead of stripping them like the PDF export
+// has to. Escapes the surrounding text first since this gets interpolated
+// directly into an HTML string (data.summary etc. are AI-generated, not
+// user-authored HTML, but escaping costs nothing and closes the XSS door).
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export function markdownToHtml(text: string): string {
+  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+
 // The Summary *property* is a table column meant for a quick scan across
 // rows, but it was receiving the full multi-paragraph executive summary --
 // unreadable in the database view. The full text still goes in the page

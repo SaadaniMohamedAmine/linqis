@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { markdownToHtml } from "../../lib/markdown";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
@@ -28,7 +29,7 @@ export async function exportToEmail(data: EmailExport): Promise<void> {
       
       <div style="background: #141414; border: 1px solid #1F1F1F; border-radius: 8px; padding: 20px; margin: 20px 0;">
         <h2 style="color: #FAFAFA; font-size: 18px; margin: 0 0 12px 0;">Executive Summary</h2>
-        <p style="color: #A1A1AA; font-size: 14px; line-height: 1.6;">${data.summary}</p>
+        <p style="color: #A1A1AA; font-size: 14px; line-height: 1.6;">${markdownToHtml(data.summary)}</p>
       </div>
       
       <div style="display: flex; gap: 16px; margin: 20px 0;">
@@ -48,12 +49,12 @@ export async function exportToEmail(data: EmailExport): Promise<void> {
       
       <h3 style="color: #FAFAFA; font-size: 16px;">Decisions</h3>
       <ul style="color: #A1A1AA; font-size: 14px;">
-        ${data.decisions.map((d: any) => `<li>${d.statement}</li>`).join("")}
+        ${data.decisions.map((d: any) => `<li>${markdownToHtml(d.statement)}</li>`).join("")}
       </ul>
       
       <h3 style="color: #FAFAFA; font-size: 16px;">Action Items</h3>
       <ul style="color: #A1A1AA; font-size: 14px;">
-        ${data.actionItems.map((a: any) => `<li>${a.task} (${a.owner || "Unassigned"})</li>`).join("")}
+        ${data.actionItems.map((a: any) => `<li>${markdownToHtml(a.task)} (${a.owner || "Unassigned"})</li>`).join("")}
       </ul>
     </div>
   `;

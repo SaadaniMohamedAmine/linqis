@@ -127,7 +127,8 @@ router.post("/slack", async (req: AuthedRequest, res) => {
     res.json({ status: "completed" });
   } catch (error) {
     console.error("Slack export error:", error);
-    res.status(500).json({ error: "Export to Slack failed" });
+    const detail = error instanceof Error ? error.message : undefined;
+    res.status(500).json({ error: detail ? `Export to Slack failed: ${detail}` : "Export to Slack failed" });
   }
 });
 
@@ -174,6 +175,12 @@ router.post("/email", async (req: AuthedRequest, res) => {
     res.json({ status: "completed" });
   } catch (error) {
     console.error("Email export error:", error);
-    res.status(500).json({ error: "Export to Email failed" });
+    // Same reasoning as the Notion route: a generic "failed" message can't
+    // distinguish bad SMTP credentials from a rejected recipient from a
+    // network timeout. Surface the real error (nodemailer throws with a
+    // readable .message, e.g. "Invalid login: 535-5.7.8 Username and
+    // Password not accepted" for Gmail without an app password).
+    const detail = error instanceof Error ? error.message : undefined;
+    res.status(500).json({ error: detail ? `Export to Email failed: ${detail}` : "Export to Email failed" });
   }
 });
