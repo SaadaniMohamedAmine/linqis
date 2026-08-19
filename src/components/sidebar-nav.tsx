@@ -6,28 +6,31 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { LayoutDashboard, Video, CheckSquare, Plug, BarChart3, Users, Code2, Settings } from "lucide-react";
 import { getMyWorkspaces, ACTIVE_WORKSPACE_KEY, type WorkspaceRole } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { sidebarNavDictionary, type SidebarNavDictionary } from "@/lib/i18n/dictionaries/sidebar-nav";
 
 interface NavLink {
   href: string;
-  label: string;
+  labelKey: keyof SidebarNavDictionary;
   icon: typeof LayoutDashboard;
   dataTour?: string;
 }
 
 const LINKS: NavLink[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/meetings", label: "Meetings", icon: Video, dataTour: "meetings-nav" },
-  { href: "/dashboard/action-items", label: "Action Items", icon: CheckSquare, dataTour: "action-items-nav" },
-  { href: "/dashboard/team", label: "Team", icon: Users },
-  { href: "/dashboard/integrations", label: "Integrations", icon: Plug },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", labelKey: "dashboard", icon: LayoutDashboard },
+  { href: "/dashboard/meetings", labelKey: "meetings", icon: Video, dataTour: "meetings-nav" },
+  { href: "/dashboard/action-items", labelKey: "actionItems", icon: CheckSquare, dataTour: "action-items-nav" },
+  { href: "/dashboard/team", labelKey: "team", icon: Users },
+  { href: "/dashboard/integrations", labelKey: "integrations", icon: Plug },
+  { href: "/dashboard/analytics", labelKey: "analytics", icon: BarChart3 },
+  { href: "/dashboard/settings", labelKey: "settings", icon: Settings },
 ];
 
 // Kept out of LINKS so it can be filtered by role before rendering.
-const DEVELOPERS_LINK: NavLink = { href: "/dashboard/developers", label: "Developers", icon: Code2 };
+const DEVELOPERS_LINK: NavLink = { href: "/dashboard/developers", labelKey: "developers", icon: Code2 };
 
 export function SidebarNav() {
+  const t = useDictionary(sidebarNavDictionary);
   const pathname = usePathname();
   const { data: session } = useSession();
   const [myRole, setMyRole] = useState<WorkspaceRole | null>(null);
@@ -48,7 +51,7 @@ export function SidebarNav() {
 
   return (
     <nav className="flex flex-col gap-1">
-      {links.map(({ href, label, icon: Icon, dataTour }) => {
+      {links.map(({ href, labelKey, icon: Icon, dataTour }) => {
         const isActive = href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href);
         return (
           <Link
@@ -60,7 +63,7 @@ export function SidebarNav() {
             }`}
           >
             <Icon size={18} />
-            <span className="font-medium">{label}</span>
+            <span className="font-medium">{t[labelKey]}</span>
           </Link>
         );
       })}
