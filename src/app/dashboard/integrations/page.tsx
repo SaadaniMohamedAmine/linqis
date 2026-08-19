@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Calendar, Video, FileText, MessageSquare, Webhook, ShieldCheck } from "lucide-react";
+import { Webhook, ShieldCheck } from "lucide-react";
+// Real brand marks for the four integration cards instead of generic Lucide
+// glyphs -- Custom Webhooks / Enterprise Security stay on Lucide since they
+// describe a capability, not a specific product with its own logo.
+import { SiGooglecalendar, SiZoom, SiNotion, SiSlack } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -103,7 +107,7 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-success-bg flex items-center justify-center text-success">
-                  <Calendar size={22} />
+                  <SiGooglecalendar size={20} />
                 </div>
                 <Badge variant={isConnected("google-calendar") ? "success" : "neutral"}>
                   {isConnected("google-calendar") ? "Active" : "Not Linked"}
@@ -125,7 +129,7 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-info-bg flex items-center justify-center text-info">
-                  <Video size={22} />
+                  <SiZoom size={20} />
                 </div>
                 <Badge variant={zoomConfigured ? "success" : "neutral"}>
                   {zoomConfigured ? "Configured via environment" : "Not configured"}
@@ -145,7 +149,7 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-surface-high flex items-center justify-center text-text-primary">
-                  <FileText size={22} />
+                  <SiNotion size={20} />
                 </div>
                 <Badge variant={notionConfigured ? "success" : "neutral"}>
                   {notionConfigured ? "Connected" : "Not configured"}
@@ -165,7 +169,7 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-warning-bg flex items-center justify-center text-warning">
-                  <MessageSquare size={22} />
+                  <SiSlack size={20} />
                 </div>
                 <Badge variant={slackWebhookUrl ? "success" : "neutral"}>
                   {slackWebhookUrl ? `Connected${slackChannelName ? ` · ${slackChannelName.startsWith("#") ? slackChannelName : `#${slackChannelName}`}` : ""}` : "Not configured"}
