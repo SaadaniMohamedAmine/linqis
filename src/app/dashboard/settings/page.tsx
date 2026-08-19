@@ -41,6 +41,10 @@ function SettingsPageContent() {
   const [notionDatabaseId, setNotionDatabaseId] = useState("");
   const [slackWebhookUrl, setSlackWebhookUrl] = useState("");
   const [slackChannelName, setSlackChannelName] = useState("");
+  // Last-saved snapshot of the API Keys tab, so handleSave can tell which
+  // integration(s) actually changed instead of always announcing "Notion".
+  const [savedNotion, setSavedNotion] = useState({ apiKey: "", databaseId: "" });
+  const [savedSlack, setSavedSlack] = useState({ webhookUrl: "", channelName: "" });
   const [plan, setPlan] = useState<UserProfile["plan"]>("FREE");
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
@@ -64,6 +68,8 @@ function SettingsPageContent() {
         setNotionDatabaseId(u.notionDatabaseId || "");
         setSlackWebhookUrl(u.slackWebhookUrl || "");
         setSlackChannelName(u.slackChannelName || "");
+        setSavedNotion({ apiKey: u.notionApiKey || "", databaseId: u.notionDatabaseId || "" });
+        setSavedSlack({ webhookUrl: u.slackWebhookUrl || "", channelName: u.slackChannelName || "" });
         setPlan(u.plan);
         setSubscriptionStatus(u.subscriptionStatus);
         setCurrentPeriodEnd(u.currentPeriodEnd);
@@ -104,7 +110,19 @@ function SettingsPageContent() {
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      showToast(activeTab === "api-keys" ? "Notion integration saved." : "Settings saved.");
+
+      if (activeTab === "api-keys") {
+        const notionChanged = notionApiKey !== savedNotion.apiKey || notionDatabaseId !== savedNotion.databaseId;
+        const slackChanged = slackWebhookUrl !== savedSlack.webhookUrl || slackChannelName !== savedSlack.channelName;
+        if (notionChanged && slackChanged) showToast("Notion and Slack integrations saved.");
+        else if (slackChanged) showToast("Slack integration saved.");
+        else if (notionChanged) showToast("Notion integration saved.");
+        else showToast("Settings saved.");
+        setSavedNotion({ apiKey: notionApiKey, databaseId: notionDatabaseId });
+        setSavedSlack({ webhookUrl: slackWebhookUrl, channelName: slackChannelName });
+      } else {
+        showToast("Settings saved.");
+      }
     } finally {
       setSaving(false);
     }
