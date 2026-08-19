@@ -19,6 +19,7 @@ import {
   Smile,
   Meh,
   Frown,
+  CalendarClock,
   type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -26,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ExportModal from "@/components/export-modal";
-import { MarkdownSummary } from "@/components/markdown-summary";
+import { MarkdownSummary, InlineMarkdown } from "@/components/markdown-summary";
 import { formatDuration, formatMeetingDate } from "@/lib/utils";
 import {
   getMeeting,
@@ -272,6 +273,12 @@ export default function MeetingDetailPage() {
               </span>
             )}
             <span>{formatMeetingDate(meeting.createdAt)}</span>
+            {meeting.calendarEventTitle && (
+              <span className="flex items-center gap-1 text-info">
+                <CalendarClock size={12} />
+                From calendar: {meeting.calendarEventTitle}
+              </span>
+            )}
           </div>
           {meeting.status === "PROCESSING" && (
             <p className="text-xs text-warning mt-1">Still processing — this page will refresh automatically.</p>
@@ -407,7 +414,7 @@ export default function MeetingDetailPage() {
                         }`}
                       />
                       <div>
-                        <span className="text-sm">{d.statement}</span>
+                        <span className="text-sm"><InlineMarkdown text={d.statement} /></span>
                         {d.proposer && <span className="text-xs text-text-secondary block">— {d.proposer}</span>}
                       </div>
                     </li>
@@ -445,7 +452,7 @@ export default function MeetingDetailPage() {
                         className="w-5 h-5 rounded border-border bg-background text-success focus:ring-success cursor-pointer"
                       />
                       <div className={item.status === "DONE" ? "opacity-50 line-through" : ""}>
-                        <p className="font-medium text-text-primary">{item.task}</p>
+                        <p className="font-medium text-text-primary"><InlineMarkdown text={item.task} /></p>
                         <p className="text-xs text-text-secondary">
                           {item.deadline ? new Date(item.deadline).toLocaleDateString() : "No deadline"}
                           {item.owner ? ` • ${item.owner}` : ""}

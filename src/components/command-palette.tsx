@@ -184,12 +184,13 @@ export function CommandPalette({ className }: { className?: string }) {
             {meetingItems.length > 0 && (
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary px-3 py-2">Meetings</p>
-                {meetingItems.map((item, i) => (
-                  <CommandRow
-                    key={item.id}
-                    item={item}
+                {meetingResults.map((result, i) => (
+                  <MeetingResultRow
+                    key={result.id}
+                    result={result}
                     active={filteredNavCommands.length + i === highlighted}
                     onHover={() => setHighlighted(filteredNavCommands.length + i)}
+                    onClick={meetingItems[i].action}
                   />
                 ))}
               </div>
@@ -217,6 +218,52 @@ function CommandRow({ item, active, onHover }: { item: CommandItem; active: bool
     >
       <Icon size={16} />
       <span className="truncate">{item.label}</span>
+    </button>
+  );
+}
+
+// The backend wraps matched terms in <b>...</b> (Postgres ts_headline). Parsed
+// into JSX <mark> spans instead of dangerouslySetInnerHTML so the rest of the
+// snippet (real transcript/summary text, not sanitized upstream) is rendered
+// as plain text and auto-escaped by React rather than as raw HTML.
+function renderSnippet(snippet: string) {
+  return snippet.split(/(<b>.*?<\/b>)/g).map((part, i) => {
+    const match = part.match(/^<b>(.*)<\/b>$/);
+    if (!match) return part || null;
+    return (
+      <mark key={i} className="bg-success/20 text-success rounded px-0.5">
+        {match[1]}
+      </mark>
+    );
+  });
+}
+
+function MeetingResultRow({
+  result,
+  active,
+  onHover,
+  onClick,
+}: {
+  result: SearchResult;
+  active: boolean;
+  onHover: () => void;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={onHover}
+      className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-sm text-left cursor-pointer transition-colors ${
+        active ? "bg-success/10 text-success" : "text-text-primary hover:bg-background"
+      }`}
+    >
+      <Video size={16} className="mt-0.5 shrink-0" />
+      <span className="min-w-0">
+        <span className="block truncate">{result.title}</span>
+        {result.snippet && (
+          <span className="block truncate text-xs text-text-secondary">{renderSnippet(result.snippet)}</span>
+        )}
+      </span>
     </button>
   );
 }

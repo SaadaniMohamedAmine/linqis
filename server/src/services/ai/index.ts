@@ -49,6 +49,10 @@ export const ai = {
   generateExecutiveSummary: withFallback(primary.generateExecutiveSummary, secondary.generateExecutiveSummary),
   extractDecisions: withFallback(primary.extractDecisions, secondary.extractDecisions),
   extractActionItems: withFallback(primary.extractActionItems, secondary.extractActionItems),
+  // Was missing entirely -- chat.ts calls ai.answerFromContext(...), which
+  // was undefined here even though both providers implement it, so every
+  // "Ask your meetings" request threw and fell into the generic 500.
+  answerFromContext: withFallback(primary.answerFromContext, secondary.answerFromContext),
 };
 
 export const detectDisagreements = withFallback(primary.detectDisagreements, secondary.detectDisagreements);

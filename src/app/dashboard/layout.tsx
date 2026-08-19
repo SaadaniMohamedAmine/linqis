@@ -10,6 +10,7 @@ import { WorkspaceSwitcher } from "@/components/workspace-switcher";
 import { UserMenu } from "@/components/user-menu";
 import { AskWidget } from "@/components/ask-widget";
 import { ProductTour } from "@/components/product-tour";
+import { ToastProvider } from "@/components/toast-provider";
 import { getUser } from "@/lib/api";
 
 // Usage data changes on every upload; never serve a stale build-time snapshot.
@@ -30,6 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   return (
+    <ToastProvider>
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
       <PageLoader />
       {/* TopNavBar */}
@@ -75,5 +77,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <ProductTour />
       <AskWidget />
     </div>
+    </ToastProvider>
   );
 }

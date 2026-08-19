@@ -79,13 +79,23 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
       }
     }
 
+    // Optional link to a Google Calendar event, set when the user picked one
+    // from the "Link to calendar event" selector on the upload page. Only the
+    // id + a denormalized title cross the wire -- the id is later used to
+    // re-fetch fresh event details if ever needed, never trusted for anything
+    // authorization-related since it's arbitrary client input.
+    const calendarEventId = typeof req.body.calendarEventId === "string" ? req.body.calendarEventId : undefined;
+    const calendarEventTitle = typeof req.body.calendarEventTitle === "string" ? req.body.calendarEventTitle : undefined;
+
     const meeting = await prisma.meeting.create({
       data: {
-        title: req.file.originalname,
+        title: calendarEventTitle || req.file.originalname,
         userId: req.userId!, // who uploaded it -- from the verified token, never the body
         workspaceId: req.workspaceId!, // access scope
         audioUrl: `/uploads/${req.file.filename}`,
         status: "PROCESSING",
+        ...(calendarEventId && { calendarEventId }),
+        ...(calendarEventTitle && { calendarEventTitle }),
       },
     });
 

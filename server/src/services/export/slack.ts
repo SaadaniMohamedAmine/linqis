@@ -1,4 +1,5 @@
 import { IncomingWebhook } from "@slack/webhook";
+import { toSlackMrkdwn } from "../../lib/markdown";
 
 export interface SlackExport {
   meetingId: string;
@@ -25,7 +26,7 @@ export async function exportToSlack(data: SlackExport): Promise<void> {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Summary*\n${data.summary}`,
+        text: `*Summary*\n${toSlackMrkdwn(data.summary)}`,
       },
     },
     {
@@ -52,14 +53,14 @@ export async function exportToSlack(data: SlackExport): Promise<void> {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Decisions*\n${data.decisions.map((d: any) => `• ${d.statement}`).join("\n")}`,
+        text: `*Decisions*\n${data.decisions.map((d: any) => `• ${toSlackMrkdwn(d.statement)}`).join("\n")}`,
       },
     },
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Action Items*\n${data.actionItems.map((a: any) => `• ${a.task} (${a.owner || "Unassigned"})`).join("\n")}`,
+        text: `*Action Items*\n${data.actionItems.map((a: any) => `• ${toSlackMrkdwn(a.task)} (${a.owner || "Unassigned"})`).join("\n")}`,
       },
     },
     {

@@ -1,17 +1,35 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Upload, AlertCircle, Sparkles } from "lucide-react";
+import { Upload, AlertCircle, Sparkles, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   uploadMeetingFile,
   subscribeToUploadProgress,
+  getUpcomingCalendarEvents,
   ApiError,
   type ProcessingProgressEvent,
+  type CalendarEventSummary,
 } from "@/lib/api";
+
+/**
+ * Picks the event most likely to be "the meeting you're about to upload":
+ * one currently in progress, or failing that the soonest upcoming one within
+ * the next 30 minutes. Anything further out isn't a confident enough guess,
+ * so the field is left blank rather than pre-selecting the wrong meeting.
+ */
+function guessCurrentEvent(events: CalendarEventSummary[]): string | null {
+  const now = Date.now();
+  const ongoing = events.find((e) => new Date(e.start).getTime() <= now && now <= new Date(e.end).getTime());
+  if (ongoing) return ongoing.id;
+  const soon = events
+    .filter((e) => new Date(e.start).getTime() > now && new Date(e.start).getTime() - now <= 30 * 60 * 1000)
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  return soon[0]?.id ?? null;
+}
 
 const ACCEPTED_EXTENSIONS = [".mp3", ".mp4", ".wav", ".m4a", ".mov", ".webm"];
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // matches the multer limit on the backend
@@ -36,6 +54,20 @@ export default function UploadPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [stage, setStage] = useState<Stage>({ kind: "idle" });
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEventSummary[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string>("");
+
+  // Silently no-ops when Google Calendar isn't connected (404) -- this picker
+  // just doesn't appear rather than showing an error for an optional feature.
+  useEffect(() => {
+    getUpcomingCalendarEvents()
+      .then((events) => {
+        setCalendarEvents(events);
+        const guess = guessCurrentEvent(events);
+        if (guess) setSelectedEventId(guess);
+      })
+      .catch(() => {});
+  }, []);
 
   const validateAndSetFile = useCallback((file: File) => {
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
@@ -74,10 +106,17 @@ export default function UploadPage() {
 
     setStage({ kind: "uploading", percent: 0 });
 
+    const linkedEvent = calendarEvents.find((e) => e.id === selectedEventId);
+    const calendarLink = linkedEvent ? { eventId: linkedEvent.id, title: linkedEvent.summary } : undefined;
+
     try {
-      const { meetingId, jobId } = await uploadMeetingFile(selectedFile, (percent) => {
-        setStage({ kind: "uploading", percent });
-      });
+      const { meetingId, jobId } = await uploadMeetingFile(
+        selectedFile,
+        (percent) => {
+          setStage({ kind: "uploading", percent });
+        },
+        calendarLink
+      );
 
       setStage({ kind: "processing", label: STAGE_LABELS.connected, percent: 0 });
 
@@ -109,7 +148,7 @@ export default function UploadPage() {
       const isPlanLimit = err instanceof ApiError && err.status === 402;
       setStage({ kind: "error", message, isPlanLimit });
     }
-  }, [selectedFile, router]);
+  }, [selectedFile, router, calendarEvents, selectedEventId]);
 
   const handleCancel = () => {
     setSelectedFile(null);
@@ -170,6 +209,31 @@ export default function UploadPage() {
               </div>
               <p className="text-xs text-text-secondary opacity-60">Max file size: 100MB</p>
             </div>
+
+            {calendarEvents.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-xs text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <CalendarClock size={12} />
+                  Link to calendar event (optional)
+                </label>
+                <select
+                  value={selectedEventId}
+                  onChange={(e) => setSelectedEventId(e.target.value)}
+                  disabled={isBusy}
+                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm text-text-primary outline-none disabled:opacity-60"
+                >
+                  <option value="">None</option>
+                  {calendarEvents.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.summary} — {new Date(event.start).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-text-secondary">
+                  Pre-fills the meeting title from the event and keeps them linked.
+                </p>
+              </div>
+            )}
 
             {stage.kind === "uploading" && (
               <div className="bg-surface-low border border-border rounded-lg p-4 flex flex-col gap-3">

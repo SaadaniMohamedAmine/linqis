@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Calendar, Video, FileText, MessageSquare, Webhook, ShieldCheck } from "lucide-react";
+import { Webhook, ShieldCheck, CalendarClock, Link2 } from "lucide-react";
+// Real brand marks for the four integration cards instead of generic Lucide
+// glyphs -- Custom Webhooks / Enterprise Security stay on Lucide since they
+// describe a capability, not a specific product with its own logo.
+import { SiGooglecalendar, SiZoom, SiNotion } from "react-icons/si";
+// Simple Icons dropped Slack's mark (trademark request), so its logo comes
+// from Font Awesome's brand set instead.
+import { FaSlack } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,19 +19,72 @@ import {
   getIntegrationStatus,
   getGoogleCalendarAuthUrl,
   getMyWorkspaces,
+  getUser,
+  getUpcomingCalendarEvents,
   ACTIVE_WORKSPACE_KEY,
   type IntegrationStatus,
   type WorkspaceRole,
+  type CalendarEventSummary,
 } from "@/lib/api";
+
+function formatEventTime(startIso: string, endIso: string): string {
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  const day = start.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  const startTime = start.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const endTime = end.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  return `${day} · ${startTime} – ${endTime}`;
+}
 
 export default function IntegrationsPage() {
   const { data: session } = useSession();
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
   const [myRole, setMyRole] = useState<WorkspaceRole | null>(null);
+  // Was a hardcoded "Configured via export" badge regardless of whether the
+  // user had actually saved anything -- misleading. This card's own key/
+  // database id live on the user profile (Settings > API Keys), so a
+  // "Connected" badge should reflect that they're actually both set.
+  const [notionConfigured, setNotionConfigured] = useState(false);
+  // Same idea as Notion: no more static "Set up per export" label now that
+  // there's an actual saved connection (Settings > API Keys) to check.
+  const [slackWebhookUrl, setSlackWebhookUrl] = useState<string | null>(null);
+  const [slackChannelName, setSlackChannelName] = useState<string | null>(null);
+  const [upcomingEvents, setUpcomingEvents] = useState<CalendarEventSummary[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(false);
 
   useEffect(() => {
     if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
+  }, [session?.user?.id]);
+
+  // Only the connect flow existed before -- once Google Calendar is actually
+  // linked, this is what gives that connection a visible effect instead of
+  // just flipping a badge to "Active" and doing nothing else.
+  useEffect(() => {
+    if (!integrations.some((i) => i.provider === "google-calendar")) {
+      setUpcomingEvents([]);
+      return;
+    }
+    setEventsLoading(true);
+    getUpcomingCalendarEvents()
+      .then(setUpcomingEvents)
+      .catch(() => setUpcomingEvents([]))
+      .finally(() => setEventsLoading(false));
+  }, [integrations]);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    getUser()
+      .then((u) => {
+        setNotionConfigured(!!u.notionApiKey && !!u.notionDatabaseId);
+        setSlackWebhookUrl(u.slackWebhookUrl);
+        setSlackChannelName(u.slackChannelName);
+      })
+      .catch(() => {
+        setNotionConfigured(false);
+        setSlackWebhookUrl(null);
+        setSlackChannelName(null);
+      });
   }, [session?.user?.id]);
 
   useEffect(() => {
@@ -71,14 +131,14 @@ export default function IntegrationsPage() {
 
       <main className="p-8 max-w-[1440px] mx-auto">
         {/* Integration Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up [animation-delay:150ms]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up [animation-delay:150ms]">
           {/* Google Calendar */}
           <Card className="p-5 relative overflow-hidden group hover:border-border-hover transition-all flex flex-col justify-between min-h-[220px]">
             <div className="absolute right-[-20%] top-[-30%] w-32 h-32 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-colors" />
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-success-bg flex items-center justify-center text-success">
-                  <Calendar size={22} />
+                  <SiGooglecalendar size={20} />
                 </div>
                 <Badge variant={isConnected("google-calendar") ? "success" : "neutral"}>
                   {isConnected("google-calendar") ? "Active" : "Not Linked"}
@@ -100,7 +160,7 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-info-bg flex items-center justify-center text-info">
-                  <Video size={22} />
+                  <SiZoom size={20} />
                 </div>
                 <Badge variant={zoomConfigured ? "success" : "neutral"}>
                   {zoomConfigured ? "Configured via environment" : "Not configured"}
@@ -120,14 +180,16 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-surface-high flex items-center justify-center text-text-primary">
-                  <FileText size={22} />
+                  <SiNotion size={20} />
                 </div>
-                <Badge variant="neutral">Configured via export</Badge>
+                <Badge variant={notionConfigured ? "success" : "neutral"}>
+                  {notionConfigured ? "Connected" : "Not configured"}
+                </Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Notion</h3>
               <p className="text-sm text-text-secondary mb-6">Sync meeting summaries and action items to your workspace databases.</p>
             </div>
-            <Link href="/dashboard/settings" className="relative z-10">
+            <Link href="/dashboard/settings?tab=api-keys" className="relative z-10">
               <Button variant="secondary" className="w-full">Configure in Settings</Button>
             </Link>
           </Card>
@@ -138,18 +200,53 @@ export default function IntegrationsPage() {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-lg bg-warning-bg flex items-center justify-center text-warning">
-                  <MessageSquare size={22} />
+                  <FaSlack size={20} />
                 </div>
-                <Badge variant="neutral">Configured via export</Badge>
+                <Badge variant={slackWebhookUrl ? "success" : "neutral"}>
+                  {slackWebhookUrl ? `Connected${slackChannelName ? ` · ${slackChannelName.startsWith("#") ? slackChannelName : `#${slackChannelName}`}` : ""}` : "Not configured"}
+                </Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Slack</h3>
               <p className="text-sm text-text-secondary mb-6">Push summaries to designated channels and tag participants.</p>
             </div>
-            <Link href="/dashboard/settings" className="relative z-10">
+            <Link href="/dashboard/settings?tab=api-keys" className="relative z-10">
               <Button variant="secondary" className="w-full">Configure in Settings</Button>
             </Link>
           </Card>
         </div>
+
+        {/* Upcoming from Google Calendar -- only once actually connected */}
+        {isConnected("google-calendar") && (
+          <section className="mt-12 animate-fade-in-up [animation-delay:220ms]">
+            <div className="flex items-center gap-2 mb-4">
+              <CalendarClock size={16} className="text-text-secondary" />
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Upcoming from Google Calendar</h2>
+            </div>
+            <Card className="p-0 divide-y divide-border overflow-hidden">
+              {eventsLoading && <p className="p-6 text-sm text-text-secondary">Loading events…</p>}
+              {!eventsLoading && upcomingEvents.length === 0 && (
+                <p className="p-6 text-sm text-text-secondary">No events in the next 7 days.</p>
+              )}
+              {upcomingEvents.map((event) => (
+                <div key={event.id} className="p-5 flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{event.summary}</p>
+                    <p className="text-sm text-text-secondary">{formatEventTime(event.start, event.end)}</p>
+                  </div>
+                  {event.meetingUrl && (
+                    <Badge variant="info" className="shrink-0 flex items-center gap-1">
+                      <Link2 size={12} />
+                      Meeting link detected
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </Card>
+            <p className="text-xs text-text-secondary mt-3">
+              Pick any of these when uploading a recording to auto-fill its title -- see the Upload page.
+            </p>
+          </section>
+        )}
 
         {/* Developer / API Section */}
         <section className="mt-12 mb-8 animate-fade-in-up [animation-delay:300ms]">
