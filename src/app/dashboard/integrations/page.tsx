@@ -12,6 +12,7 @@ import {
   getIntegrationStatus,
   getGoogleCalendarAuthUrl,
   getMyWorkspaces,
+  getUser,
   ACTIVE_WORKSPACE_KEY,
   type IntegrationStatus,
   type WorkspaceRole,
@@ -22,9 +23,21 @@ export default function IntegrationsPage() {
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
   const [myRole, setMyRole] = useState<WorkspaceRole | null>(null);
+  // Was a hardcoded "Configured via export" badge regardless of whether the
+  // user had actually saved anything -- misleading. This card's own key/
+  // database id live on the user profile (Settings > API Keys), so a
+  // "Connected" badge should reflect that they're actually both set.
+  const [notionConfigured, setNotionConfigured] = useState(false);
 
   useEffect(() => {
     if (session?.user?.id) getIntegrationStatus().then(setIntegrations);
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    getUser()
+      .then((u) => setNotionConfigured(!!u.notionApiKey && !!u.notionDatabaseId))
+      .catch(() => setNotionConfigured(false));
   }, [session?.user?.id]);
 
   useEffect(() => {
@@ -71,7 +84,7 @@ export default function IntegrationsPage() {
 
       <main className="p-8 max-w-[1440px] mx-auto">
         {/* Integration Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up [animation-delay:150ms]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up [animation-delay:150ms]">
           {/* Google Calendar */}
           <Card className="p-5 relative overflow-hidden group hover:border-border-hover transition-all flex flex-col justify-between min-h-[220px]">
             <div className="absolute right-[-20%] top-[-30%] w-32 h-32 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-colors" />
@@ -122,7 +135,9 @@ export default function IntegrationsPage() {
                 <div className="w-12 h-12 rounded-lg bg-surface-high flex items-center justify-center text-text-primary">
                   <FileText size={22} />
                 </div>
-                <Badge variant="neutral">Configured via export</Badge>
+                <Badge variant={notionConfigured ? "success" : "neutral"}>
+                  {notionConfigured ? "Connected" : "Not configured"}
+                </Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Notion</h3>
               <p className="text-sm text-text-secondary mb-6">Sync meeting summaries and action items to your workspace databases.</p>
@@ -140,7 +155,11 @@ export default function IntegrationsPage() {
                 <div className="w-12 h-12 rounded-lg bg-warning-bg flex items-center justify-center text-warning">
                   <MessageSquare size={22} />
                 </div>
-                <Badge variant="neutral">Configured via export</Badge>
+                {/* No persisted Slack credential to check -- the webhook URL
+                    is typed fresh into the export modal each time, nothing
+                    saved to the DB -- so a real Connected/Not-connected state
+                    doesn't apply here the way it does for Notion. */}
+                <Badge variant="neutral">Set up per export</Badge>
               </div>
               <h3 className="text-lg font-semibold mb-1">Slack</h3>
               <p className="text-sm text-text-secondary mb-6">Push summaries to designated channels and tag participants.</p>
