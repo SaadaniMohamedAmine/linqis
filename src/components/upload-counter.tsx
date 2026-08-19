@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { uploadCounterDictionary } from "@/lib/i18n/dictionaries/upload-counter";
 
 export function UploadCounter({
   meetingsThisMonth,
@@ -8,11 +12,13 @@ export function UploadCounter({
   meetingsThisMonth: number;
   maxMeetingsPerMonth: number | null;
 }) {
+  const t = useDictionary(uploadCounterDictionary);
+
   // null == unlimited (Pro) -- see UserProfile.maxMeetingsPerMonth.
   if (maxMeetingsPerMonth === null) {
     return (
       <p className="text-xs text-text-secondary px-1">
-        {meetingsThisMonth} meeting{meetingsThisMonth === 1 ? "" : "s"} this month · Unlimited on Pro
+        {t.unlimitedStatus(meetingsThisMonth)}
       </p>
     );
   }
@@ -24,7 +30,7 @@ export function UploadCounter({
     <div className="flex flex-col gap-1.5 px-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-text-secondary">
-          {meetingsThisMonth}/{maxMeetingsPerMonth} meetings this month
+          {t.limitedStatus(meetingsThisMonth, maxMeetingsPerMonth)}
         </span>
       </div>
       <div className="h-1.5 w-full bg-background rounded-full overflow-hidden">
@@ -36,7 +42,7 @@ export function UploadCounter({
       {atLimit && (
         <Link href="/pricing" className="flex items-center gap-1 text-xs text-success hover:underline">
           <Sparkles size={12} />
-          Upgrade to Pro for unlimited
+          {t.upgradeForUnlimited}
         </Link>
       )}
     </div>
