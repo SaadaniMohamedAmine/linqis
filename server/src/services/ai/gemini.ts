@@ -7,6 +7,20 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 // until this was caught) so this doesn't silently break again next rotation.
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
+export interface Decision {
+  statement: string;
+  status?: "confirmed" | "pending" | string;
+  timestamp?: string;
+  proposer?: string;
+}
+
+export interface ActionItem {
+  task: string;
+  owner?: string;
+  deadline?: string | null;
+  priority?: "high" | "medium" | "low" | string;
+}
+
 async function complete(prompt: string): Promise<string> {
   const result = await model.generateContent(prompt);
   const response = await result.response;
@@ -24,7 +38,7 @@ Summary:`;
   return complete(prompt);
 }
 
-export async function extractDecisions(transcript: string) {
+export async function extractDecisions(transcript: string): Promise<Decision[]> {
   return generateJsonWithRetry(
     (correctionHint) => `Extract all decisions made in this meeting. Return a JSON array of objects with: statement, status (confirmed/pending), timestamp, proposer.
 
@@ -37,7 +51,7 @@ Return ONLY valid JSON, no markdown.${correctionHint ? `\n\n${correctionHint}` :
   );
 }
 
-export async function extractActionItems(transcript: string) {
+export async function extractActionItems(transcript: string): Promise<ActionItem[]> {
   return generateJsonWithRetry(
     (correctionHint) => `Extract all action items from this meeting. Return a JSON array of objects with: task, owner, deadline (ISO date or null), priority (high/medium/low).
 

@@ -1,4 +1,5 @@
 import { Client } from "@notionhq/client";
+import type { BlockObjectRequest } from "@notionhq/client";
 import { markdownToRichText, truncate } from "../../lib/markdown";
 
 const SUMMARY_PROPERTY_MAX_CHARS = 300;
@@ -19,6 +20,69 @@ export interface NotionCredentials {
 
 export async function exportToNotion(data: NotionExport, credentials: NotionCredentials): Promise<string> {
   const notion = new Client({ auth: credentials.apiKey });
+
+  // Declared as its own explicitly-typed const (rather than inline in the
+  // create() call) so the BlockObjectRequest annotation applies as the
+  // contextual type for every entry -- including the ones produced by
+  // .map() -- letting "block"/"heading_2"/"to_do" etc. stay literal types
+  // instead of widening to `string`.
+  const children: BlockObjectRequest[] = [
+    {
+      object: "block",
+      type: "heading_2",
+      heading_2: {
+        rich_text: [{ text: { content: "Executive Summary" } }],
+      },
+    },
+    {
+      object: "block",
+      type: "paragraph",
+      paragraph: {
+        // Was inserting the raw **bold** markdown as literal text; Notion's
+        // rich_text supports real bold via `annotations`, so convert it
+        // instead of just stripping it like the PDF export has to.
+        rich_text: markdownToRichText(data.summary),
+      },
+    },
+    {
+      object: "block",
+      type: "heading_2",
+      heading_2: {
+        rich_text: [{ text: { content: "Decisions" } }],
+      },
+    },
+    ...data.decisions.map(
+      (d): BlockObjectRequest => ({
+        object: "block",
+        type: "to_do",
+        to_do: {
+          rich_text: markdownToRichText(d.statement),
+          checked: d.status === "CONFIRMED",
+        },
+      })
+    ),
+    {
+      object: "block",
+      type: "heading_2",
+      heading_2: {
+        rich_text: [{ text: { content: "Action Items" } }],
+      },
+    },
+    ...data.actionItems.map(
+      (a): BlockObjectRequest => ({
+        object: "block",
+        type: "to_do",
+        to_do: {
+          rich_text: [
+            ...markdownToRichText(a.task),
+            { type: "text" as const, text: { content: ` (${a.owner || "Unassigned"})` } },
+          ],
+          checked: false,
+        },
+      })
+    ),
+  ];
+
   const response = await notion.pages.create({
     parent: {
       database_id: credentials.databaseId,
@@ -38,58 +102,7 @@ export async function exportToNotion(data: NotionExport, credentials: NotionCred
         rich_text: markdownToRichText(truncate(data.summary, SUMMARY_PROPERTY_MAX_CHARS)),
       },
     },
-    children: [
-      {
-        object: "block",
-        type: "heading_2",
-        heading_2: {
-          rich_text: [{ text: { content: "Executive Summary" } }],
-        },
-      },
-      {
-        object: "block",
-        type: "paragraph",
-        paragraph: {
-          // Was inserting the raw **bold** markdown as literal text; Notion's
-          // rich_text supports real bold via `annotations`, so convert it
-          // instead of just stripping it like the PDF export has to.
-          rich_text: markdownToRichText(data.summary),
-        },
-      },
-      {
-        object: "block",
-        type: "heading_2",
-        heading_2: {
-          rich_text: [{ text: { content: "Decisions" } }],
-        },
-      },
-      ...data.decisions.map((d) => ({
-        object: "block",
-        type: "to_do",
-        to_do: {
-          rich_text: markdownToRichText(d.statement),
-          checked: d.status === "CONFIRMED",
-        },
-      })),
-      {
-        object: "block",
-        type: "heading_2",
-        heading_2: {
-          rich_text: [{ text: { content: "Action Items" } }],
-        },
-      },
-      ...data.actionItems.map((a) => ({
-        object: "block",
-        type: "to_do",
-        to_do: {
-          rich_text: [
-            ...markdownToRichText(a.task),
-            { type: "text" as const, text: { content: ` (${a.owner || "Unassigned"})` } },
-          ],
-          checked: false,
-        },
-      })),
-    ],
+    children,
   });
 
   return response.id;

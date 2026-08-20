@@ -14,6 +14,6 @@ export const meetingQueue = new Queue("meeting-processing", {
       delay: 1000,
     },
     removeOnComplete: { age: 3600 },
-    removeOnFailed: false,
+    removeOnFail: false,
   },
 });

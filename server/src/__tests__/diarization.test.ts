@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { diarizeSpeakers, type TranscriptSegment } from "../services/transcription/diarization";
+import { diarizeSpeakers } from "../services/transcription/diarization";
+import type { TranscriptSegment } from "../services/transcription/whisper";
 
 function seg(timestamp: string, content: string): TranscriptSegment {
   return { speaker: "Speaker", timestamp, content };

@@ -1,8 +1,9 @@
-export interface TranscriptSegment {
-  speaker: string;
-  timestamp: string;
-  content: string;
-}
+// Canonical definition lives in whisper.ts -- this used to redeclare an
+// identically-shaped interface, but transcription/index.ts barrel-exports
+// both files (`export * from "./whisper"` + `export * from "./diarization"`),
+// and two same-named exports from the same barrel is a TS2308 ambiguity
+// error. Import instead; it's still re-exported to callers via whisper.ts.
+import type { TranscriptSegment } from "./whisper";
 
 export async function diarizeSpeakers(
   segments: TranscriptSegment[]

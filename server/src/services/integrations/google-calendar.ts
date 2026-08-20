@@ -48,7 +48,22 @@ export function getGoogleAuthUrl(): string {
   });
 }
 
-export async function exchangeGoogleCode(code: string) {
+// Hand-written rather than reusing googleapis' own Credentials type: that
+// type is re-exported through google-auth-library's internal package path,
+// which TS refuses to name in an exported function's inferred return type
+// (TS2742 "cannot be named without a reference to ... which is not
+// portable"). This local shape covers the fields this codebase actually
+// reads off the result.
+export interface GoogleTokens {
+  access_token?: string | null;
+  refresh_token?: string | null;
+  expiry_date?: number | null;
+  scope?: string;
+  token_type?: string | null;
+  id_token?: string | null;
+}
+
+export async function exchangeGoogleCode(code: string): Promise<GoogleTokens> {
   const oauth2Client = buildOAuthClient();
   const { tokens } = await oauth2Client.getToken(code);
   return tokens; // { access_token, refresh_token, expiry_date, ... }

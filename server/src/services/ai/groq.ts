@@ -1,7 +1,26 @@
 import Groq from "groq-sdk";
 import { generateJsonWithRetry } from "./json-utils";
+import type { Disagreement } from "./disagreement";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+
+// Structurally identical to gemini.ts's Decision/ActionItem -- declared
+// independently rather than imported so gemini.ts and groq.ts stay
+// self-contained providers, matching how MoodAnalysis is already done on
+// both sides (see mood.ts vs. this file's MoodAnalysis below).
+export interface Decision {
+  statement: string;
+  status?: "confirmed" | "pending" | string;
+  timestamp?: string;
+  proposer?: string;
+}
+
+export interface ActionItem {
+  task: string;
+  owner?: string;
+  deadline?: string | null;
+  priority?: "high" | "medium" | "low" | string;
+}
 
 // llama-3.3-70b-versatile was deprecated by Groq on 2026-06-17 and now
 // 404s on every call. gpt-oss-120b is Groq's recommended replacement and
@@ -29,7 +48,7 @@ ${transcript}`;
   return chat(prompt);
 }
 
-export async function extractDecisions(transcript: string) {
+export async function extractDecisions(transcript: string): Promise<Decision[]> {
   return generateJsonWithRetry(
     (correctionHint) => `Extract all decisions made in this meeting. Return a JSON array of objects with: statement, status (confirmed/pending), timestamp, proposer.
 
@@ -42,7 +61,7 @@ Return ONLY valid JSON.${correctionHint ? `\n\n${correctionHint}` : ""}`,
   );
 }
 
-export async function extractActionItems(transcript: string) {
+export async function extractActionItems(transcript: string): Promise<ActionItem[]> {
   return generateJsonWithRetry(
     (correctionHint) => `Extract all action items from this meeting. Return a JSON array of objects with: task, owner, deadline (ISO date or null), priority (high/medium/low).
 
@@ -55,7 +74,7 @@ Return ONLY valid JSON.${correctionHint ? `\n\n${correctionHint}` : ""}`,
   );
 }
 
-export async function detectDisagreements(transcript: string) {
+export async function detectDisagreements(transcript: string): Promise<Disagreement[]> {
   return generateJsonWithRetry(
     (correctionHint) => `Identify topics where there was disagreement or tension in this meeting. Return a JSON array of objects with: topic, quote (relevant snippet), severity (low/medium/high).
 
