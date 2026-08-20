@@ -67,13 +67,28 @@ export const worker = new Worker<MeetingJob>(
 
     await publishProgress(job.id, { status: "analyzing", progress: 45 });
 
-    // AI analysis
-    const [decisions, actionItems, disagreements, moodAnalysis] = await Promise.all([
+    // AI analysis. allSettled rather than all: these 4 calls fire at once, so
+    // when Gemini's quota is exhausted they all fall back to Groq at the same
+    // moment -- if Groq's own free-tier limit then rejects just one of them,
+    // Promise.all would fail the entire meeting over a single secondary
+    // enrichment. Each is non-critical on its own (unlike the summary below),
+    // so a lone failure degrades to an empty/neutral default instead.
+    const [decisionsResult, actionItemsResult, disagreementsResult, moodResult] = await Promise.allSettled([
       ai.extractDecisions(fullTranscript),
       ai.extractActionItems(fullTranscript),
       detectDisagreements(fullTranscript),
       detectMoodWithAnalysis(fullTranscript),
     ]);
+
+    if (decisionsResult.status === "rejected") console.error("extractDecisions failed (non-blocking):", decisionsResult.reason);
+    if (actionItemsResult.status === "rejected") console.error("extractActionItems failed (non-blocking):", actionItemsResult.reason);
+    if (disagreementsResult.status === "rejected") console.error("detectDisagreements failed (non-blocking):", disagreementsResult.reason);
+    if (moodResult.status === "rejected") console.error("detectMoodWithAnalysis failed (non-blocking):", moodResult.reason);
+
+    const decisions = decisionsResult.status === "fulfilled" ? decisionsResult.value : [];
+    const actionItems = actionItemsResult.status === "fulfilled" ? actionItemsResult.value : [];
+    const disagreements = disagreementsResult.status === "fulfilled" ? disagreementsResult.value : [];
+    const moodAnalysis = moodResult.status === "fulfilled" ? moodResult.value : { mood: "NEUTRAL" as const, confidence: 0, indicators: [] };
 
     await publishProgress(job.id, { status: "saving", progress: 90 });
 
