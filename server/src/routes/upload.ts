@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { extractAudio, needsChunking, chunkAudio, getAudioDuration } from "../services/media";
+import type { ChunkInfo } from "../services/media";
 import { meetingQueue } from "../queue/config";
 import { getPrisma } from "../db";
 import { subscribeToProgress } from "../services/sse";
@@ -122,7 +123,7 @@ router.post("/", upload.single("file"), async (req: AuthedRequest, res) => {
       data: { duration: Math.round(duration) },
     });
 
-    let chunks = [];
+    let chunks: ChunkInfo[] = [];
     if (shouldChunk) {
       chunks = await chunkAudio(audioPath, duration);
     }
