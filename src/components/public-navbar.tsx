@@ -56,7 +56,7 @@ export function PublicNavbar() {
           {t.dashboard}
         </Button>
       </Link>
-      <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => { closeMenu(); signOut({ callbackUrl: "/" }); }}>
+      <Button variant="ghost" size="sm" className="gap-1.5 border border-success" onClick={() => { closeMenu(); signOut({ callbackUrl: "/" }); }}>
         <LogOut size={16} />
         {t.signOut}
       </Button>
@@ -120,7 +120,7 @@ export function PublicNavbar() {
               <CommandPalette />
               <LanguageSwitcher />
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-row items-center gap-3">
               {authActions}
             </div>
           </div>
