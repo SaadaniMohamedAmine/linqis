@@ -266,12 +266,12 @@ function SettingsPageContent() {
                 <p className="text-text-secondary">{t.preferences.subtitle}</p>
               </div>
               <Card className="p-0 divide-y divide-border">
-                <div className="p-6 flex items-center justify-between">
+                <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <p className="text-lg font-semibold">{t.preferences.summaryLengthTitle}</p>
                     <p className="text-sm text-text-secondary">{t.preferences.summaryLengthDesc}</p>
                   </div>
-                  <div className="flex bg-background p-1 rounded-lg border border-border">
+                  <div className="flex bg-background p-1 rounded-lg border border-border w-fit">
                     {SUMMARY_LENGTHS.map((length) => (
                       <button
                         key={length}
@@ -287,14 +287,14 @@ function SettingsPageContent() {
                     ))}
                   </div>
                 </div>
-                <div className="p-6 flex items-center justify-between">
+                <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <p className="text-lg font-semibold">{t.preferences.emailNotifTitle}</p>
                     <p className="text-sm text-text-secondary">{t.preferences.emailNotifDesc}</p>
                   </div>
                   <button
                     onClick={() => setEmailNotifications(!emailNotifications)}
-                    className={`w-12 h-6 rounded-full relative transition-colors cursor-pointer ${emailNotifications ? "bg-success" : "bg-border"}`}
+                    className={`w-12 h-6 rounded-full relative transition-colors cursor-pointer shrink-0 ${emailNotifications ? "bg-success" : "bg-border"}`}
                   >
                     <span
                       className={`absolute top-1 w-4 h-4 bg-background rounded-full transition-all ${
@@ -379,7 +379,7 @@ function SettingsPageContent() {
                 <h3 className="text-2xl font-semibold">{t.billing.title}</h3>
                 <p className="text-text-secondary">{t.billing.subtitle}</p>
               </div>
-              <Card className="p-6 flex items-center justify-between">
+              <Card className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-lg font-semibold text-text-primary">
                     {plan === "PRO" ? t.billing.proPlan : t.billing.freePlan}
