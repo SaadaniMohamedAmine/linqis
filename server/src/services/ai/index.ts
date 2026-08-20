@@ -23,13 +23,11 @@ const services = {
 const primary = services[PROVIDER];
 const secondary = services[PROVIDER === "gemini" ? "groq" : "gemini"];
 
-function isRateLimitError(err: unknown): boolean {
-  return typeof err === "object" && err !== null && (err as { status?: unknown }).status === 429;
-}
-
-// A quota-exhausted provider (what actually happened tonight: Gemini's
-// free-tier daily cap) shouldn't fail the whole meeting when the other
-// provider is perfectly able to serve the same call.
+// Any primary-provider failure (rate limit, 503 overload, timeout, whatever)
+// shouldn't fail the whole meeting when the other provider can serve the
+// same call -- narrowing this to specific status codes meant a Gemini 503
+// (seen in practice, high-demand overload) fell straight through to the user
+// instead of failing over to Groq.
 function withFallback<Args extends unknown[], R>(
   primaryFn: (...args: Args) => Promise<R>,
   fallbackFn: (...args: Args) => Promise<R>
@@ -38,8 +36,10 @@ function withFallback<Args extends unknown[], R>(
     try {
       return await primaryFn(...args);
     } catch (err) {
-      if (!isRateLimitError(err)) throw err;
-      console.warn(`AI provider rate-limited, falling back to ${PROVIDER === "gemini" ? "groq" : "gemini"}`);
+      console.warn(
+        `AI provider (${PROVIDER}) failed, falling back to ${PROVIDER === "gemini" ? "groq" : "gemini"}:`,
+        err instanceof Error ? err.message : err
+      );
       return fallbackFn(...args);
     }
   };
