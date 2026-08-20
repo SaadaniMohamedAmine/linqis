@@ -50,14 +50,7 @@ export function DashboardChrome({ children, meetingsThisMonth, maxMeetingsPerMon
           <SidebarNav />
 
           <div className="flex flex-col gap-4 pt-4 border-t border-border mt-auto">
-            <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-semibold">{t.meetingList}</h2>
-              <p className="text-sm text-text-secondary">{t.meetingListSubtitle}</p>
-            </div>
             <UploadCounter meetingsThisMonth={meetingsThisMonth} maxMeetingsPerMonth={maxMeetingsPerMonth} />
-            <Link href="/dashboard/upload">
-              <Button variant="primary" className="w-full gap-2">{t.newMeeting}</Button>
-            </Link>
           </div>
         </aside>
 

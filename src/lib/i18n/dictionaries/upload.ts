@@ -20,6 +20,10 @@ export interface UploadDictionary {
   processingFailed: string;
   uploadFailed: string;
   stageLabels: { connected: string; transcribing: string; analyzing: string; saving: string };
+  stepSelect: string;
+  stepLink: string;
+  stepProcess: string;
+  stepDone: string;
 }
 
 export const uploadDictionary: Record<LocaleCode, UploadDictionary> = {
@@ -48,6 +52,10 @@ export const uploadDictionary: Record<LocaleCode, UploadDictionary> = {
       analyzing: "Extracting decisions, action items & mood...",
       saving: "Saving results...",
     },
+    stepSelect: "Select",
+    stepLink: "Link event",
+    stepProcess: "Process",
+    stepDone: "Done",
   },
   fr: {
     title: "Ingestion de données de réunion",
@@ -74,5 +82,9 @@ export const uploadDictionary: Record<LocaleCode, UploadDictionary> = {
       analyzing: "Extraction des décisions, actions et ambiance...",
       saving: "Enregistrement des résultats...",
     },
+    stepSelect: "Sélection",
+    stepLink: "Lier l'événement",
+    stepProcess: "Traitement",
+    stepDone: "Terminé",
   },
 };

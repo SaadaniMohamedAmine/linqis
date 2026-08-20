@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Upload, AlertCircle, Sparkles, CalendarClock } from "lucide-react";
+import { Upload, AlertCircle, Sparkles, CalendarClock, CheckCircle2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { UploadStepper, type StepStatus } from "@/components/upload-stepper";
 import {
   uploadMeetingFile,
   subscribeToUploadProgress,
@@ -43,6 +45,26 @@ type Stage =
   | { kind: "error"; message: string; isPlanLimit?: boolean }
   | { kind: "done" };
 
+/**
+ * Derives the 4-step progress indicator's status from the current stage.
+ * The pipeline is fully automatic (no manual "Next"), so this only ever
+ * reflects state that already happened -- it never drives navigation itself.
+ * `hasAttemptedProcess` disambiguates the error case: a rejected file (bad
+ * extension/too large) fails before a file is ever accepted, while an
+ * upload/processing failure happens after steps 1-2 are already done.
+ */
+function getStepStatuses(stage: Stage, hasFile: boolean, hasAttemptedProcess: boolean): [StepStatus, StepStatus, StepStatus, StepStatus] {
+  if (stage.kind === "done") return ["complete", "complete", "complete", "complete"];
+  if (stage.kind === "uploading" || stage.kind === "processing") return ["complete", "complete", "active", "upcoming"];
+  if (stage.kind === "error") {
+    if (hasAttemptedProcess) return ["complete", "complete", "error", "upcoming"];
+    if (hasFile) return ["complete", "error", "upcoming", "upcoming"];
+    return ["error", "upcoming", "upcoming", "upcoming"];
+  }
+  // idle
+  return hasFile ? ["complete", "active", "upcoming", "upcoming"] : ["active", "upcoming", "upcoming", "upcoming"];
+}
+
 export default function UploadPage() {
   const t = useDictionary(uploadDictionary);
   const STAGE_LABELS: Record<string, string> = t.stageLabels;
@@ -53,6 +75,7 @@ export default function UploadPage() {
   const [stage, setStage] = useState<Stage>({ kind: "idle" });
   const [calendarEvents, setCalendarEvents] = useState<CalendarEventSummary[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const [hasAttemptedProcess, setHasAttemptedProcess] = useState(false);
 
   // Silently no-ops when Google Calendar isn't connected (404) -- this picker
   // just doesn't appear rather than showing an error for an optional feature.
@@ -102,6 +125,7 @@ export default function UploadPage() {
   const handleProcess = useCallback(async () => {
     if (!selectedFile) return;
 
+    setHasAttemptedProcess(true);
     setStage({ kind: "uploading", percent: 0 });
 
     const linkedEvent = calendarEvents.find((e) => e.id === selectedEventId);
@@ -152,9 +176,17 @@ export default function UploadPage() {
   const handleCancel = () => {
     setSelectedFile(null);
     setStage({ kind: "idle" });
+    setHasAttemptedProcess(false);
   };
 
   const isBusy = stage.kind === "uploading" || stage.kind === "processing";
+  const stepStatuses = getStepStatuses(stage, !!selectedFile, hasAttemptedProcess);
+  const steps = [
+    { label: t.stepSelect, icon: Upload, status: stepStatuses[0] },
+    { label: t.stepLink, icon: CalendarClock, status: stepStatuses[1] },
+    { label: t.stepProcess, icon: Sparkles, status: stepStatuses[2] },
+    { label: t.stepDone, icon: CheckCircle2, status: stepStatuses[3] },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
@@ -167,11 +199,15 @@ export default function UploadPage() {
 
         <div className="container max-w-[720px] px-6 z-10 animate-fade-in-up">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold mb-2">{t.title}</h1>
+            <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-text-primary to-text-primary/70 bg-clip-text">{t.title}</h1>
             <p className="text-text-secondary">{t.subtitle}</p>
           </div>
 
-          <Card className="p-6 flex flex-col gap-6">
+          <div className="mb-8 px-2">
+            <UploadStepper steps={steps} />
+          </div>
+
+          <Card className="p-8 flex flex-col gap-8 border-border/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.35)]">
             <input
               ref={fileInputRef}
               type="file"
@@ -189,24 +225,32 @@ export default function UploadPage() {
               }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={isBusy ? undefined : handleDrop}
-              className={`border-2 border-dashed rounded-lg h-56 flex flex-col items-center justify-center gap-3 transition-colors group ${
-                isBusy ? "opacity-60 cursor-not-allowed border-border" : "cursor-pointer hover:bg-surface/50 border-border"
-              } ${isDragging ? "border-success bg-success/5" : ""}`}
+              className={`group flex h-60 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed transition-all duration-300 ${
+                isBusy
+                  ? "cursor-not-allowed border-border/60 opacity-60"
+                  : "cursor-pointer border-border/60 hover:border-success/50 hover:bg-success/[0.03]"
+              } ${isDragging ? "border-success bg-success/[0.06] shadow-[0_0_0_4px_rgba(34,197,94,0.1)]" : ""}`}
             >
-              <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-text-secondary group-hover:bg-success/20 group-hover:text-success transition-all">
-                <Upload size={20} />
+              <div
+                className={`flex h-16 w-16 items-center justify-center rounded-2xl border transition-all duration-300 group-hover:scale-105 group-hover:border-success/40 group-hover:bg-success/15 group-hover:text-success ${
+                  isDragging || selectedFile
+                    ? "border-success/40 bg-success/15 text-success"
+                    : "border-success/15 bg-success/5 text-success/80"
+                }`}
+              >
+                <Upload size={24} />
               </div>
-              <div className="text-center">
-                <p className="font-medium text-text-primary">
+              <div className="text-center px-6">
+                <p className="font-semibold text-text-primary">
                   {selectedFile ? selectedFile.name : t.dropZoneHint}
                 </p>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-text-secondary mt-1">
                   {selectedFile
                     ? `${(selectedFile.size / 1024 / 1024).toFixed(1)} MB`
                     : t.clickToBrowse}
                 </p>
               </div>
-              <p className="text-xs text-text-secondary opacity-60">{t.maxFileSize}</p>
+              <Badge variant="neutral" className="text-[11px]">{t.maxFileSize}</Badge>
             </div>
 
             {calendarEvents.length > 0 && (
@@ -215,19 +259,22 @@ export default function UploadPage() {
                   <CalendarClock size={12} />
                   {t.linkCalendarLabel}
                 </label>
-                <select
-                  value={selectedEventId}
-                  onChange={(e) => setSelectedEventId(e.target.value)}
-                  disabled={isBusy}
-                  className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm text-text-primary outline-none disabled:opacity-60"
-                >
-                  <option value="">{t.none}</option>
-                  {calendarEvents.map((event) => (
-                    <option key={event.id} value={event.id}>
-                      {event.summary} — {new Date(event.start).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedEventId}
+                    onChange={(e) => setSelectedEventId(e.target.value)}
+                    disabled={isBusy}
+                    className="w-full cursor-pointer appearance-none rounded-[var(--radius-sm)] border border-border bg-background py-3 pl-3 pr-10 text-sm text-text-primary outline-none transition-colors focus-visible:border-success focus-visible:ring-1 focus-visible:ring-success disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">{t.none}</option>
+                    {calendarEvents.map((event) => (
+                      <option key={event.id} value={event.id}>
+                        {event.summary} — {new Date(event.start).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+                </div>
                 <p className="text-xs text-text-secondary">
                   {t.linkCalendarHint}
                 </p>
@@ -235,7 +282,7 @@ export default function UploadPage() {
             )}
 
             {stage.kind === "uploading" && (
-              <div className="bg-surface-low border border-border rounded-lg p-4 flex flex-col gap-3">
+              <div className="bg-surface-low border border-border rounded-xl p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-text-primary">{t.uploading}</span>
                   <span className="text-xs text-text-secondary">{stage.percent}%</span>
@@ -247,7 +294,7 @@ export default function UploadPage() {
             )}
 
             {stage.kind === "processing" && (
-              <div className="bg-surface-low border border-border rounded-lg p-4 flex flex-col gap-3">
+              <div className="bg-surface-low border border-border rounded-xl p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-text-primary">{stage.label}</span>
                   <span className="text-xs text-text-secondary">{stage.percent}%</span>
@@ -260,7 +307,7 @@ export default function UploadPage() {
             )}
 
             {stage.kind === "error" && (
-              <div className="bg-danger-bg border border-danger/30 rounded-lg p-4 flex gap-3">
+              <div className="bg-danger-bg border border-danger/30 rounded-xl p-4 flex gap-3">
                 <AlertCircle size={16} className="text-danger shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm text-danger">{stage.message}</p>
@@ -274,11 +321,18 @@ export default function UploadPage() {
               </div>
             )}
 
-            <div className="border-t border-border/30 pt-6 flex justify-end items-center gap-4">
-              <Button variant="secondary" onClick={handleCancel} disabled={isBusy || !selectedFile}>
+            <div className="border-t border-border/40 pt-6 flex justify-end items-center gap-3">
+              <Button variant="ghost" onClick={handleCancel} disabled={isBusy || !selectedFile}>
                 {t.cancel}
               </Button>
-              <Button variant="primary" onClick={handleProcess} disabled={isBusy || !selectedFile}>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleProcess}
+                disabled={isBusy || !selectedFile}
+                className="gap-2 shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)]"
+              >
+                {!isBusy && <Sparkles size={16} />}
                 {isBusy ? t.processing : t.processMeeting}
               </Button>
             </div>
