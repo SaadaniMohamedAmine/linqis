@@ -80,17 +80,17 @@ export function PublicNavbar() {
             Linqis
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {navLinks}
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <CommandPalette />
             <LanguageSwitcher />
             {authActions}
           </div>
 
-          <div className="md:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2">
             <LanguageSwitcher />
             <button
               type="button"
@@ -107,12 +107,12 @@ export function PublicNavbar() {
       {shouldRender && (
         <>
           <div
-            className={`md:hidden fixed top-16 inset-x-0 bottom-0 z-40 bg-black/40 ${closing ? "animate-fade-out" : "animate-fade-in"}`}
+            className={`lg:hidden fixed top-16 inset-x-0 bottom-0 z-40 bg-black/40 ${closing ? "animate-fade-out" : "animate-fade-in"}`}
             onClick={closeMenu}
             aria-hidden="true"
           />
           <div
-            className={`md:hidden fixed top-16 right-0 bottom-0 z-40 w-[80%] max-w-xs bg-background border-l border-border flex flex-col gap-6 px-6 py-6 shadow-2xl overflow-y-auto ${
+            className={`lg:hidden fixed top-16 right-0 bottom-0 z-40 w-[80%] max-w-xs bg-background border-l border-border flex flex-col gap-6 px-6 py-6 shadow-2xl overflow-y-auto ${
               closing ? "animate-drawer-out" : "animate-drawer-in"
             }`}
           >
