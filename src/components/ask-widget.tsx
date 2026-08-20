@@ -66,7 +66,7 @@ export function AskWidget() {
     <>
       {(open || closing) && (
         <div
-          className={`fixed bottom-24 right-6 z-50 w-[380px] h-[500px] max-h-[70vh] bg-surface border border-border rounded-xl shadow-lg flex flex-col overflow-hidden ${
+          className={`fixed bottom-24 right-4 left-4 sm:left-auto sm:right-6 z-50 w-auto sm:w-[380px] h-[500px] max-h-[70vh] bg-background border border-border rounded-xl shadow-lg flex flex-col overflow-hidden ${
             closing ? "animate-widget-out" : "animate-widget-in"
           }`}
         >

@@ -91,25 +91,25 @@ export default function ActionItemsPage() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[-40%] right-[10%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
         </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-10 animate-fade-in-up">
           <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.title}</h1>
           <p className="text-text-secondary">{t.subtitle}</p>
         </div>
       </div>
 
-      <div className="max-w-[1440px] mx-auto p-8 flex flex-col gap-8">
+      <div className="max-w-[1440px] mx-auto p-4 sm:p-8 flex flex-col gap-8">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in-up [animation-delay:150ms]">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 animate-fade-in-up [animation-delay:150ms]">
           {STAT_CARDS.map(({ label, value, icon: Icon, tone }) => (
-            <Card key={label} className="p-5 relative overflow-hidden group hover:border-border-hover transition-colors">
+            <Card key={label} className="p-3 sm:p-5 relative overflow-hidden group hover:border-border-hover transition-colors">
               <div className="absolute right-[-20%] top-[-30%] w-32 h-32 bg-success/5 rounded-full blur-2xl group-hover:bg-success/10 transition-colors" />
               <div className="relative z-10 flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-text-secondary mb-2">{label}</p>
-                  <p className={`text-3xl font-semibold ${tone}`}>{value}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-text-secondary mb-1 sm:mb-2 truncate">{label}</p>
+                  <p className={`text-xl sm:text-3xl font-semibold ${tone}`}>{value}</p>
                 </div>
-                <div className="w-9 h-9 rounded-lg bg-success-bg flex items-center justify-center text-success shrink-0">
-                  <Icon size={18} />
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-success-bg flex items-center justify-center text-success shrink-0">
+                  <Icon size={16} />
                 </div>
               </div>
             </Card>
@@ -180,29 +180,31 @@ export default function ActionItemsPage() {
               {filtered.map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-4 px-6 py-4 hover:bg-background/50 transition-colors ${
+                  className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-background/50 transition-colors ${
                     item.status === "DONE" ? "bg-surface-low/50" : ""
                   }`}
                 >
-                  <input
-                    type="checkbox"
-                    checked={item.status === "DONE"}
-                    onChange={() => toggleStatus(item.id, item.status)}
-                    className="rounded bg-transparent border-border text-success focus:ring-success cursor-pointer shrink-0"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className={`font-medium text-text-primary truncate ${item.status === "DONE" ? "line-through opacity-60" : ""}`}>
-                      {item.task}
-                    </p>
-                    <div className="flex items-center gap-3 text-xs text-text-secondary mt-0.5">
-                      <span>{item.owner || t.unassigned}</span>
-                      <Link href={`/dashboard/meetings/${item.meeting.id}`} className="text-success hover:underline">
-                        {item.meeting.title}
-                      </Link>
-                      {item.deadline && <span>{new Date(item.deadline).toLocaleDateString()}</span>}
+                  <div className="flex items-start gap-4 flex-1 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={item.status === "DONE"}
+                      onChange={() => toggleStatus(item.id, item.status)}
+                      className="mt-1 rounded bg-transparent border-border text-success focus:ring-success cursor-pointer shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className={`font-medium text-text-primary truncate ${item.status === "DONE" ? "line-through opacity-60" : ""}`}>
+                        {item.task}
+                      </p>
+                      <div className="flex items-center gap-3 text-xs text-text-secondary mt-0.5 flex-wrap">
+                        <span>{item.owner || t.unassigned}</span>
+                        <Link href={`/dashboard/meetings/${item.meeting.id}`} className="text-success hover:underline">
+                          {item.meeting.title}
+                        </Link>
+                        {item.deadline && <span>{new Date(item.deadline).toLocaleDateString()}</span>}
+                      </div>
                     </div>
                   </div>
-                  <Badge variant={PRIORITY_BADGE[item.priority] || "neutral"} className="shrink-0">
+                  <Badge variant={PRIORITY_BADGE[item.priority] || "neutral"} className="shrink-0 ml-8 sm:ml-0 self-start sm:self-auto">
                     {t.priorityLabel[PRIORITY_LABEL_KEY[item.priority] || "low"]}
                   </Badge>
                 </div>
