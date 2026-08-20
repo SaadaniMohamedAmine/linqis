@@ -35,7 +35,7 @@ export default function Home() {
           className="absolute top-20 right-20 w-96 h-96 bg-success/10 rounded-full blur-[120px] -z-10"
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full items-center">
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -71,7 +71,7 @@ export default function Home() {
             initial={{ opacity: 0, x: 50, rotateY: -15 }}
             animate={{ opacity: 1, x: 0, rotateY: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="relative flex items-center justify-center pt-12 md:pt-0 perspective-1000"
+            className="relative flex items-center justify-center pt-12 lg:pt-0 perspective-1000"
           >
             <Card className="p-6 rounded-xl w-full max-w-[580px] shadow-2xl relative z-10 bg-surface/80 backdrop-blur-md border-border hover:border-success/30 transition-colors duration-500">
               <div className="flex items-center justify-between mb-6 border-b border-border pb-4">
@@ -139,7 +139,7 @@ export default function Home() {
             <p className="text-text-secondary max-w-2xl mx-auto">{t.featuresSection.subtitle}</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {t.featuresSection.items.map((feature, i) => (
               <motion.div
                 key={i}
@@ -193,7 +193,7 @@ export default function Home() {
       {/* Steps Section */}
       <section id="steps" className="py-24 border-t border-border">
         <div className="max-w-[1440px] mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center gap-24">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
             <div className="flex-1">
               <motion.h2 
                 initial={{ opacity: 0, x: -30 }}
@@ -255,7 +255,7 @@ export default function Home() {
 
       {/* Ask Your Meetings Section */}
       <section id="ask" className="py-24 bg-surface/50 border-t border-border">
-        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
