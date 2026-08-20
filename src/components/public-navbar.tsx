@@ -73,31 +73,33 @@ export function PublicNavbar() {
   );
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
-      <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
-        <Link href="/" className="text-xl font-bold tracking-tight text-success">
-          Linqis
-        </Link>
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border h-16">
+        <div className="flex justify-between items-center w-full px-6 max-w-[1440px] mx-auto h-full">
+          <Link href="/" className="text-xl font-bold tracking-tight text-success">
+            Linqis
+          </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks}
-        </nav>
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks}
+          </nav>
 
-        <div className="hidden md:flex items-center gap-4">
-          <CommandPalette />
-          <LanguageSwitcher />
-          {authActions}
+          <div className="hidden md:flex items-center gap-4">
+            <CommandPalette />
+            <LanguageSwitcher />
+            {authActions}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-[var(--radius-sm)] text-text-primary hover:bg-surface transition-colors cursor-pointer"
+            aria-label={shouldRender ? t.closeMenu : t.openMenu}
+          >
+            {shouldRender ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setMenuOpen((o) => !o)}
-          className="md:hidden flex items-center justify-center w-10 h-10 rounded-[var(--radius-sm)] text-text-primary hover:bg-surface transition-colors cursor-pointer"
-          aria-label={shouldRender ? t.closeMenu : t.openMenu}
-        >
-          {shouldRender ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
+      </header>
 
       {shouldRender && (
         <>
@@ -124,6 +126,6 @@ export function PublicNavbar() {
           </div>
         </>
       )}
-    </header>
+    </>
   );
 }
