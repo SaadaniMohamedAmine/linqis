@@ -90,14 +90,17 @@ export function PublicNavbar() {
             {authActions}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen((o) => !o)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-[var(--radius-sm)] text-text-primary hover:bg-surface transition-colors cursor-pointer"
-            aria-label={shouldRender ? t.closeMenu : t.openMenu}
-          >
-            {shouldRender ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="flex items-center justify-center w-10 h-10 rounded-[var(--radius-sm)] text-text-primary hover:bg-surface transition-colors cursor-pointer"
+              aria-label={shouldRender ? t.closeMenu : t.openMenu}
+            >
+              {shouldRender ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -118,7 +121,6 @@ export function PublicNavbar() {
             </nav>
             <div className="flex items-center gap-4 border-t border-border pt-6">
               <CommandPalette />
-              <LanguageSwitcher />
             </div>
             <div className="flex flex-row items-center gap-3">
               {authActions}
