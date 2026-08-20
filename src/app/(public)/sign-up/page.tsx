@@ -71,7 +71,7 @@ function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden selection:bg-success selection:text-background">
+    <div className="min-h-[calc(100vh-4rem)] bg-background flex items-center justify-center relative overflow-hidden selection:bg-success selection:text-background py-12">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 -left-1/4 w-[800px] h-[800px] bg-success/10 rounded-full blur-[120px] animate-pulse" />
