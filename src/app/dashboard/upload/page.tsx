@@ -264,7 +264,7 @@ export default function UploadPage() {
                     value={selectedEventId}
                     onChange={(e) => setSelectedEventId(e.target.value)}
                     disabled={isBusy}
-                    className="w-full appearance-none rounded-[var(--radius-sm)] border border-border bg-background py-3 pl-3 pr-10 text-sm text-text-primary outline-none transition-colors focus-visible:border-success focus-visible:ring-1 focus-visible:ring-success disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full cursor-pointer appearance-none rounded-[var(--radius-sm)] border border-border bg-background py-3 pl-3 pr-10 text-sm text-text-primary outline-none transition-colors focus-visible:border-success focus-visible:ring-1 focus-visible:ring-success disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">{t.none}</option>
                     {calendarEvents.map((event) => (
