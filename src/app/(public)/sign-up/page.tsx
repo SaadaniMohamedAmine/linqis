@@ -80,7 +80,7 @@ function SignUpForm() {
 
       <main className="relative z-10 w-full flex flex-col items-center justify-center p-4">
         {/* Auth Card */}
-        <div className="w-1/4 bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
+        <div className="w-full max-w-[420px] bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
           <header className="mb-8 text-center">
             <h1 className="text-xl font-semibold mb-1">{t.title}</h1>
             <p className="text-text-secondary">{t.subtitle}</p>
