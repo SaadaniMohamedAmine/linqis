@@ -1,4 +1,4 @@
-import { MarkdownSummary } from "@/components/markdown-summary";
+import { ShareView } from "@/components/share-view";
 
 interface SharedMeeting {
   id: string;
@@ -23,39 +23,5 @@ export default async function SharedMeetingPage({ params }: { params: Promise<{ 
   const { token } = await params;
   const meeting = await getSharedMeeting(token);
 
-  if (!meeting) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-text-secondary">
-        This link is invalid or sharing has been disabled.
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-background p-8 max-w-[720px] mx-auto">
-      <p className="text-xs text-success font-medium mb-2">Shared via Linqis</p>
-      <h1 className="text-2xl font-semibold text-text-primary mb-4">{meeting.title}</h1>
-      {meeting.summary && (
-        <div className="mb-8">
-          <MarkdownSummary text={meeting.summary} />
-        </div>
-      )}
-
-      <h2 className="text-lg font-semibold text-text-primary mb-3">Decisions</h2>
-      <ul className="mb-8 flex flex-col gap-2">
-        {meeting.decisions.length === 0 && <li className="text-sm text-text-muted">No decisions recorded.</li>}
-        {meeting.decisions.map((d, i) => (
-          <li key={i} className="text-sm text-text-secondary">• {d.statement}</li>
-        ))}
-      </ul>
-
-      <h2 className="text-lg font-semibold text-text-primary mb-3">Action items</h2>
-      <ul className="flex flex-col gap-2">
-        {meeting.actionItems.length === 0 && <li className="text-sm text-text-muted">No action items recorded.</li>}
-        {meeting.actionItems.map((a, i) => (
-          <li key={i} className="text-sm text-text-secondary">• {a.task} — {a.owner || "Unassigned"}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  return <ShareView meeting={meeting} />;
 }
