@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getInvitePreview, type InvitePreview } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { inviteDictionary } from "@/lib/i18n/dictionaries/invite";
 
 /**
  * Landing page for the link in an invitation email. Public on purpose -- the
@@ -13,6 +15,7 @@ import { getInvitePreview, type InvitePreview } from "@/lib/api";
  * off to /invite/accept, which does the actual join.
  */
 export default function InvitePage() {
+  const t = useDictionary(inviteDictionary);
   const { token } = useParams<{ token: string }>();
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -23,7 +26,8 @@ export default function InvitePage() {
   useEffect(() => {
     getInvitePreview(token)
       .then(setInvite)
-      .catch(() => setError("This invitation is invalid, has expired, or was already used."));
+      .catch(() => setError(t.invalidOrExpired));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   // Already signed in: skip the sign-in prompt entirely.
@@ -47,38 +51,38 @@ export default function InvitePage() {
           {error ? (
             <>
               <div className="flex flex-col gap-1">
-                <h2 className="text-lg font-semibold">Invitation unavailable</h2>
+                <h2 className="text-lg font-semibold">{t.unavailableTitle}</h2>
                 <p className="text-sm text-text-secondary">{error}</p>
               </div>
               <Link href="/">
-                <Button variant="secondary" className="w-full h-12">Back to Linqis</Button>
+                <Button variant="secondary" className="w-full h-12">{t.backToLinqis}</Button>
               </Link>
             </>
           ) : !invite ? (
-            <p className="text-sm text-text-secondary">Loading invitation…</p>
+            <p className="text-sm text-text-secondary">{t.loadingInvitation}</p>
           ) : (
             <>
               <div className="flex flex-col gap-1">
                 <h2 className="text-lg font-semibold">
-                  You&apos;ve been invited to join {invite.workspaceName}
+                  {t.invitedToJoin(invite.workspaceName)}
                 </h2>
                 <p className="text-sm text-text-secondary">
-                  Collaborate on meeting summaries, decisions and action items as a{" "}
-                  {invite.role.toLowerCase()}. Sign in with <span className="text-text-primary">{invite.email}</span> to
-                  accept.
+                  {t.collaboratePrefix}{" "}
+                  {t.roleLabel[invite.role]}. {t.signInWith}{" "}
+                  <span className="text-text-primary">{invite.email}</span> {t.signInSuffix}
                 </p>
               </div>
 
               <div className="flex flex-col gap-3">
                 <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-                  <Button variant="primary" className="w-full h-12">Create an account</Button>
+                  <Button variant="primary" className="w-full h-12">{t.createAccount}</Button>
                 </Link>
                 <Link href={`/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-                  <Button variant="secondary" className="w-full h-12">I already have an account</Button>
+                  <Button variant="secondary" className="w-full h-12">{t.alreadyHaveAccount}</Button>
                 </Link>
               </div>
 
-              <p className="text-xs text-text-secondary text-center">This invitation expires 7 days after it was sent.</p>
+              <p className="text-xs text-text-secondary text-center">{t.expiresNotice}</p>
             </>
           )}
         </div>

@@ -23,6 +23,8 @@ import {
   LogOut,
 } from "lucide-react";
 import { searchMeetings, type SearchResult } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { commandPaletteDictionary } from "@/lib/i18n/dictionaries/command-palette";
 
 interface CommandItem {
   id: string;
@@ -32,6 +34,7 @@ interface CommandItem {
 }
 
 export function CommandPalette({ className }: { className?: string }) {
+  const t = useDictionary(commandPaletteDictionary);
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -85,31 +88,31 @@ export function CommandPalette({ className }: { className?: string }) {
   const navCommands: CommandItem[] = useMemo(() => {
     if (isDashboard) {
       return [
-        { id: "dashboard", label: "Go to Dashboard", icon: LayoutDashboard, action: go("/dashboard") },
-        { id: "meetings", label: "Go to Meetings", icon: Video, action: go("/dashboard/meetings") },
-        { id: "action-items", label: "Go to Action Items", icon: CheckSquare, action: go("/dashboard/action-items") },
-        { id: "integrations", label: "Go to Integrations", icon: Plug, action: go("/dashboard/integrations") },
-        { id: "analytics", label: "Go to Analytics", icon: BarChart3, action: go("/dashboard/analytics") },
-        { id: "upload", label: "Upload a meeting", icon: Upload, action: go("/dashboard/upload") },
+        { id: "dashboard", label: t.goToDashboard, icon: LayoutDashboard, action: go("/dashboard") },
+        { id: "meetings", label: t.goToMeetings, icon: Video, action: go("/dashboard/meetings") },
+        { id: "action-items", label: t.goToActionItems, icon: CheckSquare, action: go("/dashboard/action-items") },
+        { id: "integrations", label: t.goToIntegrations, icon: Plug, action: go("/dashboard/integrations") },
+        { id: "analytics", label: t.goToAnalytics, icon: BarChart3, action: go("/dashboard/analytics") },
+        { id: "upload", label: t.uploadMeeting, icon: Upload, action: go("/dashboard/upload") },
       ];
     }
     return [
-      { id: "home", label: "Go to Home", icon: Home, action: go("/") },
-      { id: "features", label: "Go to Features", icon: Sparkles, action: go("/#features") },
-      { id: "use-cases", label: "Go to Use Cases", icon: Layers, action: go("/#use-cases") },
-      { id: "security", label: "Go to Security", icon: ShieldCheck, action: go("/#security") },
-      { id: "pricing", label: "Go to Pricing", icon: CreditCard, action: go("/pricing") },
+      { id: "home", label: t.goToHome, icon: Home, action: go("/") },
+      { id: "features", label: t.goToFeatures, icon: Sparkles, action: go("/#features") },
+      { id: "use-cases", label: t.goToUseCases, icon: Layers, action: go("/#use-cases") },
+      { id: "security", label: t.goToSecurity, icon: ShieldCheck, action: go("/#security") },
+      { id: "pricing", label: t.goToPricing, icon: CreditCard, action: go("/pricing") },
       ...(session
         ? [
-            { id: "dashboard", label: "Go to Dashboard", icon: LayoutDashboard, action: go("/dashboard") },
-            { id: "sign-out", label: "Sign Out", icon: LogOut, action: () => { setOpen(false); signOut({ callbackUrl: "/" }); } },
+            { id: "dashboard", label: t.goToDashboard, icon: LayoutDashboard, action: go("/dashboard") },
+            { id: "sign-out", label: t.signOut, icon: LogOut, action: () => { setOpen(false); signOut({ callbackUrl: "/" }); } },
           ]
         : [
-            { id: "sign-in", label: "Sign In", icon: LogIn, action: go("/sign-in") },
-            { id: "sign-up", label: "Create Account", icon: UserPlus, action: go("/sign-up") },
+            { id: "sign-in", label: t.signIn, icon: LogIn, action: go("/sign-in") },
+            { id: "sign-up", label: t.createAccount, icon: UserPlus, action: go("/sign-up") },
           ]),
     ];
-  }, [isDashboard, session]);
+  }, [isDashboard, session, t]);
 
   const filteredNavCommands = query.trim()
     ? navCommands.filter((c) => c.label.toLowerCase().includes(query.trim().toLowerCase()))
@@ -141,7 +144,7 @@ export function CommandPalette({ className }: { className?: string }) {
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <button
-          aria-label="Open command palette"
+          aria-label={t.ariaLabel}
           className={
             className ??
             "flex items-center gap-1 px-2 py-1.5 rounded-md border border-border text-text-secondary hover:border-border-hover hover:text-text-primary transition-colors cursor-pointer"
@@ -158,7 +161,7 @@ export function CommandPalette({ className }: { className?: string }) {
           className="fixed top-[20%] left-1/2 -translate-x-1/2 z-50 w-full max-w-[560px] bg-surface border border-border rounded-xl shadow-2xl overflow-hidden"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <Dialog.Title className="sr-only">Command palette</Dialog.Title>
+          <Dialog.Title className="sr-only">{t.dialogTitle}</Dialog.Title>
           <div className="flex items-center gap-3 px-4 border-b border-border">
             <Search size={16} className="text-text-muted shrink-0" />
             <input
@@ -166,7 +169,7 @@ export function CommandPalette({ className }: { className?: string }) {
               value={query}
               onChange={(e) => { setQuery(e.target.value); setHighlighted(0); }}
               onKeyDown={handleKeyDown}
-              placeholder="Type a command or search..."
+              placeholder={t.placeholder}
               className="flex-1 bg-transparent py-4 text-sm text-text-primary placeholder:text-text-muted outline-none"
             />
           </div>
@@ -174,7 +177,7 @@ export function CommandPalette({ className }: { className?: string }) {
           <div className="max-h-[360px] overflow-y-auto p-2">
             {filteredNavCommands.length > 0 && (
               <div className="mb-2">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary px-3 py-2">Navigation</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary px-3 py-2">{t.navigationLabel}</p>
                 {filteredNavCommands.map((item, i) => (
                   <CommandRow key={item.id} item={item} active={i === highlighted} onHover={() => setHighlighted(i)} />
                 ))}
@@ -183,7 +186,7 @@ export function CommandPalette({ className }: { className?: string }) {
 
             {meetingItems.length > 0 && (
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary px-3 py-2">Meetings</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-text-secondary px-3 py-2">{t.meetingsLabel}</p>
                 {meetingResults.map((result, i) => (
                   <MeetingResultRow
                     key={result.id}
@@ -197,7 +200,7 @@ export function CommandPalette({ className }: { className?: string }) {
             )}
 
             {flatItems.length === 0 && (
-              <p className="text-sm text-text-secondary text-center py-8">No results.</p>
+              <p className="text-sm text-text-secondary text-center py-8">{t.noResults}</p>
             )}
           </div>
         </Dialog.Content>

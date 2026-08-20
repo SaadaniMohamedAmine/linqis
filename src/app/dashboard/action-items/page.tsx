@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getActionItems, updateActionItemStatus, ApiError, type ActionItemWithMeeting } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { actionItemsDictionary } from "@/lib/i18n/dictionaries/action-items";
 
 type Filter = "all" | "todo" | "done";
 
@@ -16,9 +18,16 @@ const PRIORITY_BADGE: Record<string, "danger" | "warning" | "neutral"> = {
   LOW: "neutral",
 };
 
+const PRIORITY_LABEL_KEY: Record<string, "high" | "medium" | "low"> = {
+  HIGH: "high",
+  MEDIUM: "medium",
+  LOW: "low",
+};
+
 const FILTERS: Filter[] = ["all", "todo", "done"];
 
 export default function ActionItemsPage() {
+  const t = useDictionary(actionItemsDictionary);
   const [items, setItems] = useState<ActionItemWithMeeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +41,7 @@ export default function ActionItemsPage() {
         if (!cancelled) setItems(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof ApiError ? err.message : "Failed to load action items.");
+        if (!cancelled) setError(err instanceof ApiError ? err.message : t.loadFailed);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -40,6 +49,7 @@ export default function ActionItemsPage() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleStatus = async (id: string, current: "TODO" | "DONE") => {
@@ -69,9 +79,9 @@ export default function ActionItemsPage() {
   });
 
   const STAT_CARDS = [
-    { label: "Total Tasks", value: stats.total, icon: ListChecks, tone: "text-text-primary" },
-    { label: "Todo", value: stats.todo, icon: Clock, tone: "text-warning" },
-    { label: "Done", value: stats.done, icon: CheckCircle2, tone: "text-success" },
+    { label: t.statLabels.total, value: stats.total, icon: ListChecks, tone: "text-text-primary" },
+    { label: t.statLabels.todo, value: stats.todo, icon: Clock, tone: "text-warning" },
+    { label: t.statLabels.done, value: stats.done, icon: CheckCircle2, tone: "text-success" },
   ];
 
   return (
@@ -82,8 +92,8 @@ export default function ActionItemsPage() {
           <div className="absolute top-[-40%] right-[10%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
-          <h1 className="text-3xl font-semibold text-text-primary mb-1">Action Items</h1>
-          <p className="text-text-secondary">Every task extracted from your meetings, in one place.</p>
+          <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.title}</h1>
+          <p className="text-text-secondary">{t.subtitle}</p>
         </div>
       </div>
 
@@ -110,7 +120,7 @@ export default function ActionItemsPage() {
           <div className="p-4 border-b border-border flex flex-wrap gap-4 justify-between items-center bg-surface">
             <div className="flex items-center gap-4">
               <Input
-                placeholder="Search tasks..."
+                placeholder={t.searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-[260px]"
@@ -124,7 +134,7 @@ export default function ActionItemsPage() {
                       filter === f ? "bg-success/10 text-success" : "text-text-secondary hover:bg-surface-low"
                     }`}
                   >
-                    {f}
+                    {t.filters[f]}
                   </button>
                 ))}
               </div>
@@ -132,7 +142,7 @@ export default function ActionItemsPage() {
           </div>
 
           {loading ? (
-            <div className="p-16 text-center text-text-secondary">Loading action items...</div>
+            <div className="p-16 text-center text-text-secondary">{t.loading}</div>
           ) : error ? (
             <div className="p-16 text-center text-danger">{error}</div>
           ) : items.length === 0 ? (
@@ -144,9 +154,9 @@ export default function ActionItemsPage() {
                   <ListChecks size={32} />
                 </div>
               </div>
-              <h2 className="relative text-xl font-semibold text-text-primary">No action items yet</h2>
+              <h2 className="relative text-xl font-semibold text-text-primary">{t.emptyTitle}</h2>
               <p className="relative text-sm text-text-secondary max-w-sm">
-                Once a meeting is processed, every decision and task the AI finds shows up here automatically.
+                {t.emptyDesc}
               </p>
             </div>
           ) : filtered.length === 0 ? (
@@ -154,7 +164,7 @@ export default function ActionItemsPage() {
               <div className="w-14 h-14 rounded-full bg-surface-low flex items-center justify-center text-text-secondary">
                 <SearchX size={24} />
               </div>
-              <p className="text-sm text-text-secondary">No action items match this view.</p>
+              <p className="text-sm text-text-secondary">{t.noMatch}</p>
               <button
                 onClick={() => {
                   setSearch("");
@@ -162,7 +172,7 @@ export default function ActionItemsPage() {
                 }}
                 className="text-sm text-success hover:underline cursor-pointer"
               >
-                Clear search & filters
+                {t.clearFilters}
               </button>
             </div>
           ) : (
@@ -185,7 +195,7 @@ export default function ActionItemsPage() {
                       {item.task}
                     </p>
                     <div className="flex items-center gap-3 text-xs text-text-secondary mt-0.5">
-                      <span>{item.owner || "Unassigned"}</span>
+                      <span>{item.owner || t.unassigned}</span>
                       <Link href={`/dashboard/meetings/${item.meeting.id}`} className="text-success hover:underline">
                         {item.meeting.title}
                       </Link>
@@ -193,7 +203,7 @@ export default function ActionItemsPage() {
                     </div>
                   </div>
                   <Badge variant={PRIORITY_BADGE[item.priority] || "neutral"} className="shrink-0">
-                    {item.priority}
+                    {t.priorityLabel[PRIORITY_LABEL_KEY[item.priority] || "low"]}
                   </Badge>
                 </div>
               ))}

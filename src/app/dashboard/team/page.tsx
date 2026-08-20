@@ -17,14 +17,10 @@ import {
   type WorkspaceMember,
   type WorkspaceRole,
 } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { teamDictionary } from "@/lib/i18n/dictionaries/team";
 
 const INVITE_ROLES: ("MEMBER" | "ADMIN")[] = ["MEMBER", "ADMIN"];
-
-const ROLE_HINTS: Record<WorkspaceRole, string> = {
-  OWNER: "Full access, including billing and members.",
-  ADMIN: "Manages members. No access to billing.",
-  MEMBER: "Uploads, reads and exports meetings.",
-};
 
 const ROLE_BADGE: Record<WorkspaceRole, { variant: "success" | "info" | "neutral"; icon: typeof Crown }> = {
   OWNER: { variant: "success", icon: Crown },
@@ -33,6 +29,7 @@ const ROLE_BADGE: Record<WorkspaceRole, { variant: "success" | "info" | "neutral
 };
 
 export default function TeamPage() {
+  const t = useDictionary(teamDictionary);
   const { data: session } = useSession();
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [workspaceName, setWorkspaceName] = useState("");
@@ -58,8 +55,9 @@ export default function TeamPage() {
   useEffect(() => {
     if (!session?.user?.id) return;
     load()
-      .catch(() => setError("Could not load your team."))
+      .catch(() => setError(t.couldNotLoad))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id, load]);
 
   const canManage = myRole === "OWNER" || myRole === "ADMIN";
@@ -77,7 +75,7 @@ export default function TeamPage() {
       setEmail("");
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to send the invitation.");
+      setError(err instanceof ApiError ? err.message : t.inviteFailed);
     } finally {
       setInviting(false);
     }
@@ -90,7 +88,7 @@ export default function TeamPage() {
       await removeWorkspaceMember(member.userId);
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to remove this member.");
+      setError(err instanceof ApiError ? err.message : t.removeFailed);
     }
   };
 
@@ -102,9 +100,9 @@ export default function TeamPage() {
           <div className="absolute top-[-40%] left-[10%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
-          <h1 className="text-3xl font-semibold text-text-primary mb-1">Team</h1>
+          <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.title}</h1>
           <p className="text-text-secondary">
-            {workspaceName ? `Everyone with access to ${workspaceName}.` : "Everyone with access to this workspace."}
+            {workspaceName ? t.subtitleWithName(workspaceName) : t.subtitleGeneric}
           </p>
         </div>
       </div>
@@ -116,13 +114,13 @@ export default function TeamPage() {
         <section className="flex flex-col gap-4 animate-fade-in-up [animation-delay:150ms]">
           <div className="flex items-center gap-2">
             <Users size={16} className="text-text-secondary" />
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Members</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">{t.membersTitle}</h2>
           </div>
 
           <Card className="p-0 divide-y divide-border overflow-hidden">
-            {loading && <p className="p-6 text-sm text-text-secondary">Loading members…</p>}
+            {loading && <p className="p-6 text-sm text-text-secondary">{t.loadingMembers}</p>}
             {!loading && members.length === 0 && (
-              <p className="p-6 text-sm text-text-secondary">No members yet.</p>
+              <p className="p-6 text-sm text-text-secondary">{t.noMembers}</p>
             )}
             {members.map((member) => {
               const roleBadge = ROLE_BADGE[member.role];
@@ -146,7 +144,7 @@ export default function TeamPage() {
                       <p className="font-medium truncate">
                         {member.user.name || member.user.email}
                         {member.userId === session?.user?.id && (
-                          <span className="text-text-secondary text-sm"> (you)</span>
+                          <span className="text-text-secondary text-sm"> {t.you}</span>
                         )}
                       </p>
                       <p className="text-sm text-text-secondary truncate">{member.user.email}</p>
@@ -156,11 +154,11 @@ export default function TeamPage() {
                   <div className="flex items-center gap-4 shrink-0">
                     <Badge variant={roleBadge.variant} className="gap-1">
                       <RoleIcon size={12} />
-                      {member.role}
+                      {t.roleLabel[member.role]}
                     </Badge>
                     {canManage && member.role !== "OWNER" && member.userId !== session?.user?.id && (
                       <Button variant="secondary" size="sm" onClick={() => handleRemove(member)}>
-                        Remove
+                        {t.remove}
                       </Button>
                     )}
                   </div>
@@ -176,27 +174,27 @@ export default function TeamPage() {
           <section className="flex flex-col gap-4 animate-fade-in-up [animation-delay:300ms]">
             <div className="flex items-center gap-2">
               <UserPlus size={16} className="text-text-secondary" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Invite a teammate</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">{t.inviteSectionTitle}</h2>
             </div>
             <Card className="p-6 relative overflow-hidden">
               <div className="absolute right-[-10%] top-[-30%] w-48 h-48 bg-success/5 rounded-full blur-3xl" />
               <p className="relative text-sm text-text-secondary mb-6">
-                They&apos;ll get an email with a link to join. The invite expires in 7 days.
+                {t.inviteDesc}
               </p>
               <form onSubmit={handleInvite} className="relative space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs text-text-secondary uppercase tracking-wider">Email address</label>
+                  <label className="text-xs text-text-secondary uppercase tracking-wider">{t.emailLabel}</label>
                   <Input
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     type="email"
-                    placeholder="teammate@company.com"
+                    placeholder={t.emailPlaceholder}
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs text-text-secondary uppercase tracking-wider">Role</label>
+                  <label className="text-xs text-text-secondary uppercase tracking-wider">{t.roleFieldLabel}</label>
                   <div className="flex bg-background p-1 rounded-lg border border-border w-fit">
                     {INVITE_ROLES.map((r) => (
                       <button
@@ -209,17 +207,17 @@ export default function TeamPage() {
                             : "text-text-secondary hover:text-text-primary"
                         }`}
                       >
-                        {r.charAt(0) + r.slice(1).toLowerCase()}
+                        {t.roleLabel[r]}
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-text-secondary">{ROLE_HINTS[role]}</p>
+                  <p className="text-xs text-text-secondary">{t.roleHints[role]}</p>
                 </div>
 
                 <div className="flex items-center justify-end gap-4">
-                  {sentTo && <span className="text-sm text-success">Invitation sent to {sentTo} ✓</span>}
+                  {sentTo && <span className="text-sm text-success">{t.invitationSent(sentTo)}</span>}
                   <Button variant="primary" type="submit" disabled={inviting}>
-                    {inviting ? "Sending..." : "Send invitation"}
+                    {inviting ? t.sending : t.sendInvitation}
                   </Button>
                 </div>
               </form>

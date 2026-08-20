@@ -14,6 +14,8 @@ import {
   type ProcessingProgressEvent,
   type CalendarEventSummary,
 } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { uploadDictionary } from "@/lib/i18n/dictionaries/upload";
 
 /**
  * Picks the event most likely to be "the meeting you're about to upload":
@@ -41,14 +43,9 @@ type Stage =
   | { kind: "error"; message: string; isPlanLimit?: boolean }
   | { kind: "done" };
 
-const STAGE_LABELS: Record<string, string> = {
-  connected: "Connected to processing pipeline...",
-  transcribing: "Transcribing audio...",
-  analyzing: "Extracting decisions, action items & mood...",
-  saving: "Saving results...",
-};
-
 export default function UploadPage() {
+  const t = useDictionary(uploadDictionary);
+  const STAGE_LABELS: Record<string, string> = t.stageLabels;
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -72,15 +69,16 @@ export default function UploadPage() {
   const validateAndSetFile = useCallback((file: File) => {
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
     if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-      setStage({ kind: "error", message: `Unsupported file type "${ext}". Accepted: ${ACCEPTED_EXTENSIONS.join(", ")}` });
+      setStage({ kind: "error", message: t.unsupportedFileType(ext, ACCEPTED_EXTENSIONS.join(", ")) });
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      setStage({ kind: "error", message: "File exceeds the 100MB limit." });
+      setStage({ kind: "error", message: t.fileTooLarge });
       return;
     }
     setStage({ kind: "idle" });
     setSelectedFile(file);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDrop = useCallback(
@@ -122,7 +120,7 @@ export default function UploadPage() {
 
       const unsubscribe = subscribeToUploadProgress(jobId, (event: ProcessingProgressEvent) => {
         if (event.status === "error") {
-          setStage({ kind: "error", message: event.error || "Processing failed." });
+          setStage({ kind: "error", message: event.error || t.processingFailed });
           unsubscribe();
           return;
         }
@@ -144,10 +142,11 @@ export default function UploadPage() {
         });
       });
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : "Upload failed. Is the backend running?";
+      const message = err instanceof ApiError ? err.message : t.uploadFailed;
       const isPlanLimit = err instanceof ApiError && err.status === 402;
       setStage({ kind: "error", message, isPlanLimit });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFile, router, calendarEvents, selectedEventId]);
 
   const handleCancel = () => {
@@ -168,8 +167,8 @@ export default function UploadPage() {
 
         <div className="container max-w-[720px] px-6 z-10 animate-fade-in-up">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold mb-2">Ingest Meeting Data</h1>
-            <p className="text-text-secondary">Upload a recording for AI analysis.</p>
+            <h1 className="text-3xl font-semibold mb-2">{t.title}</h1>
+            <p className="text-text-secondary">{t.subtitle}</p>
           </div>
 
           <Card className="p-6 flex flex-col gap-6">
@@ -199,22 +198,22 @@ export default function UploadPage() {
               </div>
               <div className="text-center">
                 <p className="font-medium text-text-primary">
-                  {selectedFile ? selectedFile.name : "Drop MP3, MP4, WAV, M4A, MOV or WebM"}
+                  {selectedFile ? selectedFile.name : t.dropZoneHint}
                 </p>
                 <p className="text-sm text-text-secondary">
                   {selectedFile
                     ? `${(selectedFile.size / 1024 / 1024).toFixed(1)} MB`
-                    : "or click to browse from device"}
+                    : t.clickToBrowse}
                 </p>
               </div>
-              <p className="text-xs text-text-secondary opacity-60">Max file size: 100MB</p>
+              <p className="text-xs text-text-secondary opacity-60">{t.maxFileSize}</p>
             </div>
 
             {calendarEvents.length > 0 && (
               <div className="space-y-2">
                 <label className="text-xs text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
                   <CalendarClock size={12} />
-                  Link to calendar event (optional)
+                  {t.linkCalendarLabel}
                 </label>
                 <select
                   value={selectedEventId}
@@ -222,7 +221,7 @@ export default function UploadPage() {
                   disabled={isBusy}
                   className="w-full bg-background border border-border rounded-lg py-2.5 px-3 text-sm text-text-primary outline-none disabled:opacity-60"
                 >
-                  <option value="">None</option>
+                  <option value="">{t.none}</option>
                   {calendarEvents.map((event) => (
                     <option key={event.id} value={event.id}>
                       {event.summary} — {new Date(event.start).toLocaleString(undefined, { weekday: "short", hour: "numeric", minute: "2-digit" })}
@@ -230,7 +229,7 @@ export default function UploadPage() {
                   ))}
                 </select>
                 <p className="text-xs text-text-secondary">
-                  Pre-fills the meeting title from the event and keeps them linked.
+                  {t.linkCalendarHint}
                 </p>
               </div>
             )}
@@ -238,7 +237,7 @@ export default function UploadPage() {
             {stage.kind === "uploading" && (
               <div className="bg-surface-low border border-border rounded-lg p-4 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-text-primary">Uploading...</span>
+                  <span className="text-sm font-medium text-text-primary">{t.uploading}</span>
                   <span className="text-xs text-text-secondary">{stage.percent}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-surface-high rounded-full overflow-hidden">
@@ -256,7 +255,7 @@ export default function UploadPage() {
                 <div className="h-1.5 w-full bg-surface-high rounded-full overflow-hidden">
                   <div className="h-full bg-success rounded-full transition-all" style={{ width: `${stage.percent}%` }} />
                 </div>
-                <p className="text-xs text-text-secondary">This can take a few minutes for longer recordings.</p>
+                <p className="text-xs text-text-secondary">{t.processingHint}</p>
               </div>
             )}
 
@@ -268,7 +267,7 @@ export default function UploadPage() {
                   {stage.isPlanLimit && (
                     <Link href="/pricing" className="text-sm text-success hover:underline inline-flex items-center gap-1 mt-1">
                       <Sparkles size={14} />
-                      Upgrade to Pro
+                      {t.upgradeToPro}
                     </Link>
                   )}
                 </div>
@@ -277,10 +276,10 @@ export default function UploadPage() {
 
             <div className="border-t border-border/30 pt-6 flex justify-end items-center gap-4">
               <Button variant="secondary" onClick={handleCancel} disabled={isBusy || !selectedFile}>
-                Cancel
+                {t.cancel}
               </Button>
               <Button variant="primary" onClick={handleProcess} disabled={isBusy || !selectedFile}>
-                {isBusy ? "Processing..." : "Process Meeting"}
+                {isBusy ? t.processing : t.processMeeting}
               </Button>
             </div>
           </Card>

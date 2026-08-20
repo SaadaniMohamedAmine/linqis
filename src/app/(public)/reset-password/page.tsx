@@ -5,8 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { resetPasswordDictionary } from "@/lib/i18n/dictionaries/reset-password";
 
 function ResetPasswordForm() {
+  const t = useDictionary(resetPasswordDictionary);
   const router = useRouter();
   const token = useSearchParams().get("token");
   const [password, setPassword] = useState("");
@@ -19,15 +22,15 @@ function ResetPasswordForm() {
     setError("");
 
     if (!token) {
-      setError("This reset link is invalid or has expired.");
+      setError(t.invalidOrExpired);
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      setError(t.passwordTooShort);
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords don't match.");
+      setError(t.passwordsDontMatch);
       return;
     }
 
@@ -41,7 +44,7 @@ function ResetPasswordForm() {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body.error || "This reset link is invalid or has expired.");
+      setError(body.error || t.invalidOrExpired);
       return;
     }
 
@@ -60,28 +63,30 @@ function ResetPasswordForm() {
         {/* Auth Card */}
         <div className="bg-surface/80 backdrop-blur-md rounded-xl p-6 flex flex-col gap-6 shadow-lg border border-border">
           <div className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">Choose a new password</h2>
-            <p className="text-sm text-text-secondary">Make it something you haven't used before.</p>
+            <h2 className="text-lg font-semibold">{t.title}</h2>
+            <p className="text-sm text-text-secondary">{t.subtitle}</p>
           </div>
 
           {!token ? (
             <p className="text-xs text-danger bg-danger/10 p-2 rounded">
-              This reset link is invalid or has expired. Request a new one from the{" "}
+              {t.noTokenPrefix}{" "}
               <Link href="/forgot-password" className="underline">
-                forgot password
-              </Link>{" "}
-              page.
+                {t.forgotPasswordLink}
+              </Link>
+              {t.noTokenSuffix}
             </p>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {error && <p className="text-xs text-danger bg-danger/10 p-2 rounded">{error}</p>}
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-text-secondary px-1">New password</label>
+                <label className="text-xs text-text-secondary px-1">{t.newPasswordLabel}</label>
                 <PasswordInput
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  showLabel={t.showPassword}
+                  hideLabel={t.hidePassword}
                 />
                 <div className="flex gap-1 mt-2 px-1">
                   <div className={`h-1 flex-1 rounded ${password.length >= 8 ? 'bg-success' : 'bg-border'}`} />
@@ -89,19 +94,21 @@ function ResetPasswordForm() {
                   <div className={`h-1 flex-1 rounded ${/[0-9]/.test(password) ? 'bg-success' : 'bg-border'}`} />
                   <div className={`h-1 flex-1 rounded ${/[^A-Za-z0-9]/.test(password) ? 'bg-success' : 'bg-border'}`} />
                 </div>
-                <p className="text-xs text-text-secondary mt-1 ml-1">At least 8 characters</p>
+                <p className="text-xs text-text-secondary mt-1 ml-1">{t.passwordHint}</p>
               </div>
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-text-secondary px-1">Confirm new password</label>
+                <label className="text-xs text-text-secondary px-1">{t.confirmPasswordLabel}</label>
                 <PasswordInput
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  showLabel={t.showPassword}
+                  hideLabel={t.hidePassword}
                 />
               </div>
               <Button variant="primary" className="w-full h-12 mt-2" type="submit" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update password"}
+                {isLoading ? t.updating : t.updateButton}
               </Button>
             </form>
           )}
@@ -110,9 +117,9 @@ function ResetPasswordForm() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-sm text-text-secondary">
-            Remembered your password?{" "}
+            {t.rememberedPassword}{" "}
             <Link href="/sign-in" className="text-success font-medium hover:underline ml-1">
-              Sign in
+              {t.signInLink}
             </Link>
           </p>
         </div>

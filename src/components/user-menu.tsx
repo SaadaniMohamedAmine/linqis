@@ -6,8 +6,11 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { LogOut, Settings } from "lucide-react";
 import { getInitials } from "@/lib/utils";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { userMenuDictionary } from "@/lib/i18n/dictionaries/user-menu";
 
 export function UserMenu() {
+  const t = useDictionary(userMenuDictionary);
   const { data: session } = useSession();
   if (!session?.user) return null;
 
@@ -19,7 +22,7 @@ export function UserMenu() {
       <DropdownMenu.Trigger asChild>
         <button
           className="h-9 w-9 shrink-0 rounded-full overflow-hidden border border-border cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-success"
-          aria-label="User menu"
+          aria-label={t.ariaLabel}
         >
           <Avatar.Root className="flex h-full w-full aspect-square items-center justify-center rounded-full bg-success-bg overflow-hidden">
             <Avatar.Image src={image || undefined} alt={name || email || "User"} className="h-full w-full rounded-full object-cover" />
@@ -45,7 +48,7 @@ export function UserMenu() {
               className="flex items-center gap-2 px-3 py-2 text-sm text-text-primary rounded-md cursor-pointer outline-none hover:bg-surface-high data-[highlighted]:bg-surface-high"
             >
               <Settings size={16} />
-              Settings
+              {t.settings}
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-px bg-border my-1" />
@@ -54,7 +57,7 @@ export function UserMenu() {
             className="flex items-center gap-2 px-3 py-2 text-sm text-danger rounded-md cursor-pointer outline-none hover:bg-danger-bg data-[highlighted]:bg-danger-bg"
           >
             <LogOut size={16} />
-            Sign Out
+            {t.signOut}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

@@ -5,8 +5,13 @@ import { Eye, EyeOff } from "lucide-react";
 import { Input, type InputProps } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, ...props }, ref) => {
+interface PasswordInputProps extends InputProps {
+  showLabel?: string;
+  hideLabel?: string;
+}
+
+const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ className, showLabel = "Show password", hideLabel = "Hide password", ...props }, ref) => {
     const [visible, setVisible] = React.useState(false);
 
     return (
@@ -21,7 +26,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
           type="button"
           onClick={() => setVisible((v) => !v)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary cursor-pointer"
-          aria-label={visible ? "Hide password" : "Show password"}
+          aria-label={visible ? hideLabel : showLabel}
           tabIndex={-1}
         >
           {visible ? <EyeOff size={18} /> : <Eye size={18} />}

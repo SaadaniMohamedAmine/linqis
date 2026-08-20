@@ -6,8 +6,11 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ApiError, acceptInvite, setActiveWorkspaceId } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { inviteAcceptDictionary } from "@/lib/i18n/dictionaries/invite-accept";
 
 function AcceptInvite() {
+  const t = useDictionary(inviteAcceptDictionary);
   const router = useRouter();
   const params = useSearchParams();
   const { data: session, status } = useSession();
@@ -22,7 +25,7 @@ function AcceptInvite() {
     if (status === "loading") return;
 
     if (!token) {
-      setError("This link is missing its invitation token.");
+      setError(t.missingToken);
       return;
     }
 
@@ -41,8 +44,9 @@ function AcceptInvite() {
         window.location.href = "/dashboard";
       })
       .catch((err) => {
-        setError(err instanceof ApiError ? err.message : "Failed to accept this invitation.");
+        setError(err instanceof ApiError ? err.message : t.acceptFailed);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, session?.user?.id, token, router]);
 
   return (
@@ -52,15 +56,15 @@ function AcceptInvite() {
           {error ? (
             <>
               <div className="flex flex-col gap-1">
-                <h2 className="text-lg font-semibold">Couldn&apos;t join the workspace</h2>
+                <h2 className="text-lg font-semibold">{t.couldNotJoin}</h2>
                 <p className="text-sm text-text-secondary">{error}</p>
               </div>
               <Link href="/dashboard">
-                <Button variant="secondary" className="w-full h-12">Go to my dashboard</Button>
+                <Button variant="secondary" className="w-full h-12">{t.goToDashboard}</Button>
               </Link>
             </>
           ) : (
-            <p className="text-sm text-text-secondary">Joining the workspace…</p>
+            <p className="text-sm text-text-secondary">{t.joining}</p>
           )}
         </div>
       </main>

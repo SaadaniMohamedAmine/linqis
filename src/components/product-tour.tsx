@@ -3,18 +3,16 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { markTourSeen } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { productTourDictionary } from "@/lib/i18n/dictionaries/product-tour";
 
-interface TourStep {
-  target: string; // CSS selector, e.g. '[data-tour="upload-button"]'
-  title: string;
-  description: string;
-}
-
-const STEPS: TourStep[] = [
-  { target: '[data-tour="upload-button"]', title: "Upload a meeting", description: "Drop an audio or video file here. Linqis transcribes it and extracts the summary automatically." },
-  { target: '[data-tour="meetings-nav"]', title: "Your meetings", description: "Every processed meeting shows up here, with real-time status while it's being analyzed." },
-  { target: '[data-tour="action-items-nav"]', title: "Action items", description: "All action items across every meeting, in one place, so nothing falls through the cracks." },
-  { target: '[data-tour="export-button"]', title: "Export anywhere", description: "Send a summary to Notion, Slack, or by email in one click, once a meeting is ready." },
+// CSS selectors, one per dictionary step -- not translatable content, kept
+// separate from the dictionary and merged with it by index in the component.
+const STEP_TARGETS = [
+  '[data-tour="upload-button"]',
+  '[data-tour="meetings-nav"]',
+  '[data-tour="action-items-nav"]',
+  '[data-tour="export-button"]',
 ];
 
 const CARD_WIDTH = 300;
@@ -49,6 +47,8 @@ function cardPosition(rect: DOMRect): { top: number; left: number } {
 }
 
 export function ProductTour() {
+  const t = useDictionary(productTourDictionary);
+  const steps = t.steps.map((step, i) => ({ ...step, target: STEP_TARGETS[i] }));
   const [stepIndex, setStepIndex] = useState<number | null>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
 
@@ -64,20 +64,21 @@ export function ProductTour() {
 
   useEffect(() => {
     if (stepIndex === null) return;
-    const el = document.querySelector(STEPS[stepIndex].target);
+    const el = document.querySelector(steps[stepIndex].target);
     if (!el) {
       // Target not present on this page (e.g. export button before landing
       // on a meeting) -- skip ahead to the next step.
-      setStepIndex((i) => (i !== null && i < STEPS.length - 1 ? i + 1 : null));
+      setStepIndex((i) => (i !== null && i < steps.length - 1 ? i + 1 : null));
       return;
     }
     setRect(el.getBoundingClientRect());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIndex]);
 
   if (stepIndex === null || !rect) return null;
 
-  const step = STEPS[stepIndex];
-  const isLast = stepIndex === STEPS.length - 1;
+  const step = steps[stepIndex];
+  const isLast = stepIndex === steps.length - 1;
 
   const end = () => {
     setStepIndex(null);
@@ -101,13 +102,13 @@ export function ProductTour() {
         className="fixed bg-surface border border-border rounded-xl p-5 w-[300px] pointer-events-auto shadow-lg"
         style={cardPosition(rect)}
       >
-        <p className="text-xs text-text-secondary mb-1">{stepIndex + 1} / {STEPS.length}</p>
+        <p className="text-xs text-text-secondary mb-1">{stepIndex + 1} / {steps.length}</p>
         <h3 className="font-semibold text-text-primary mb-2">{step.title}</h3>
         <p className="text-sm text-text-secondary mb-4">{step.description}</p>
         <div className="flex justify-between items-center">
-          <button onClick={end} className="text-xs text-text-secondary hover:text-text-primary cursor-pointer">Skip tour</button>
+          <button onClick={end} className="text-xs text-text-secondary hover:text-text-primary cursor-pointer">{t.skipTour}</button>
           <Button variant="primary" size="sm" onClick={() => (isLast ? end() : setStepIndex(stepIndex + 1))}>
-            {isLast ? "Done" : "Next"}
+            {isLast ? t.done : t.next}
           </Button>
         </div>
       </div>

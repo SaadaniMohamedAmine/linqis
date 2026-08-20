@@ -6,11 +6,14 @@ import { LayoutDashboard, Home, Terminal, LineChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicNavbar } from "@/components/public-navbar";
 import { PublicFooter } from "@/components/public-footer";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { notFoundDictionary } from "@/lib/i18n/dictionaries/not-found";
 
 const NOISE_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 export default function NotFound() {
+  const t = useDictionary(notFoundDictionary);
   const glitchLineRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -82,9 +85,9 @@ export default function NotFound() {
 
           {/* Text */}
           <div className="space-y-4 mb-12">
-            <h2 className="text-2xl font-semibold">Page not found</h2>
+            <h2 className="text-2xl font-semibold">{t.title}</h2>
             <p className="text-text-secondary max-w-[420px] mx-auto">
-              The AI couldn't find the coordinates for this meeting room. It might have been archived, deleted, or never existed in this timeline.
+              {t.description}
             </p>
           </div>
 
@@ -93,13 +96,13 @@ export default function NotFound() {
             <Link href="/dashboard">
               <Button variant="primary" size="lg" className="gap-2">
                 <LayoutDashboard size={18} />
-                Back to Dashboard
+                {t.backToDashboard}
               </Button>
             </Link>
             <Link href="/">
               <Button variant="secondary" size="lg" className="gap-2">
                 <Home size={18} />
-                Go Home
+                {t.goHome}
               </Button>
             </Link>
           </div>

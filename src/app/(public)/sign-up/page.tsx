@@ -141,6 +141,8 @@ function SignUpForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                showLabel={t.showPassword}
+                hideLabel={t.hidePassword}
               />
               <div className="flex gap-1 mt-2 px-1">
                 <div className={`h-1 flex-1 rounded ${password.length >= 8 ? 'bg-success' : 'bg-border'}`} />

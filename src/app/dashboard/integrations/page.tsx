@@ -26,6 +26,8 @@ import {
   type WorkspaceRole,
   type CalendarEventSummary,
 } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { integrationsDictionary } from "@/lib/i18n/dictionaries/integrations";
 
 function formatEventTime(startIso: string, endIso: string): string {
   const start = new Date(startIso);
@@ -37,6 +39,7 @@ function formatEventTime(startIso: string, endIso: string): string {
 }
 
 export default function IntegrationsPage() {
+  const t = useDictionary(integrationsDictionary);
   const { data: session } = useSession();
   const [integrations, setIntegrations] = useState<IntegrationStatus[]>([]);
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
@@ -122,9 +125,9 @@ export default function IntegrationsPage() {
           <div className="absolute top-[-40%] left-[20%] w-[450px] h-[450px] bg-success/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
-          <h1 className="text-3xl font-semibold mb-2">Connected Workspace</h1>
+          <h1 className="text-3xl font-semibold mb-2">{t.heroTitle}</h1>
           <p className="text-text-secondary max-w-2xl">
-            Streamline your workflow by connecting your essential productivity tools. AI summaries will automatically sync to your calendar and communication channels.
+            {t.heroSubtitle}
           </p>
         </div>
       </div>
@@ -141,16 +144,16 @@ export default function IntegrationsPage() {
                   <SiGooglecalendar size={20} />
                 </div>
                 <Badge variant={isConnected("google-calendar") ? "success" : "neutral"}>
-                  {isConnected("google-calendar") ? "Active" : "Not Linked"}
+                  {isConnected("google-calendar") ? t.googleCalendar.active : t.googleCalendar.notLinked}
                 </Badge>
               </div>
-              <h3 className="text-lg font-semibold mb-1">Google Calendar</h3>
-              <p className="text-sm text-text-secondary mb-6">Automatically fetch meeting details and update schedule statuses.</p>
+              <h3 className="text-lg font-semibold mb-1">{t.googleCalendar.title}</h3>
+              <p className="text-sm text-text-secondary mb-6">{t.googleCalendar.desc}</p>
             </div>
             {isConnected("google-calendar") ? (
-              <Button variant="secondary" className="relative z-10 w-full" disabled>Connected</Button>
+              <Button variant="secondary" className="relative z-10 w-full" disabled>{t.googleCalendar.connected}</Button>
             ) : (
-              <Button variant="primary" className="relative z-10 w-full" onClick={handleConnectGoogleCalendar}>Connect Google Calendar</Button>
+              <Button variant="primary" className="relative z-10 w-full" onClick={handleConnectGoogleCalendar}>{t.googleCalendar.connect}</Button>
             )}
           </Card>
 
@@ -163,14 +166,14 @@ export default function IntegrationsPage() {
                   <SiZoom size={20} />
                 </div>
                 <Badge variant={zoomConfigured ? "success" : "neutral"}>
-                  {zoomConfigured ? "Configured via environment" : "Not configured"}
+                  {zoomConfigured ? t.zoom.configuredViaEnv : t.zoom.notConfigured}
                 </Badge>
               </div>
-              <h3 className="text-lg font-semibold mb-1">Zoom</h3>
-              <p className="text-sm text-text-secondary mb-6">Record meetings directly and generate AI transcripts in real-time.</p>
+              <h3 className="text-lg font-semibold mb-1">{t.zoom.title}</h3>
+              <p className="text-sm text-text-secondary mb-6">{t.zoom.desc}</p>
             </div>
             {zoomConfigured && canBrowseZoom && (
-              <Button variant="secondary" className="relative z-10 w-full" onClick={() => setZoomModalOpen(true)}>Browse recordings</Button>
+              <Button variant="secondary" className="relative z-10 w-full" onClick={() => setZoomModalOpen(true)}>{t.zoom.browseRecordings}</Button>
             )}
           </Card>
 
@@ -183,14 +186,14 @@ export default function IntegrationsPage() {
                   <SiNotion size={20} />
                 </div>
                 <Badge variant={notionConfigured ? "success" : "neutral"}>
-                  {notionConfigured ? "Connected" : "Not configured"}
+                  {notionConfigured ? t.notion.connected : t.notion.notConfigured}
                 </Badge>
               </div>
-              <h3 className="text-lg font-semibold mb-1">Notion</h3>
-              <p className="text-sm text-text-secondary mb-6">Sync meeting summaries and action items to your workspace databases.</p>
+              <h3 className="text-lg font-semibold mb-1">{t.notion.title}</h3>
+              <p className="text-sm text-text-secondary mb-6">{t.notion.desc}</p>
             </div>
             <Link href="/dashboard/settings?tab=api-keys" className="relative z-10">
-              <Button variant="secondary" className="w-full">Configure in Settings</Button>
+              <Button variant="secondary" className="w-full">{t.notion.configureInSettings}</Button>
             </Link>
           </Card>
 
@@ -203,14 +206,14 @@ export default function IntegrationsPage() {
                   <FaSlack size={20} />
                 </div>
                 <Badge variant={slackWebhookUrl ? "success" : "neutral"}>
-                  {slackWebhookUrl ? `Connected${slackChannelName ? ` · ${slackChannelName.startsWith("#") ? slackChannelName : `#${slackChannelName}`}` : ""}` : "Not configured"}
+                  {slackWebhookUrl ? `${t.slack.connected}${slackChannelName ? ` · ${slackChannelName.startsWith("#") ? slackChannelName : `#${slackChannelName}`}` : ""}` : t.slack.notConfigured}
                 </Badge>
               </div>
-              <h3 className="text-lg font-semibold mb-1">Slack</h3>
-              <p className="text-sm text-text-secondary mb-6">Push summaries to designated channels and tag participants.</p>
+              <h3 className="text-lg font-semibold mb-1">{t.slack.title}</h3>
+              <p className="text-sm text-text-secondary mb-6">{t.slack.desc}</p>
             </div>
             <Link href="/dashboard/settings?tab=api-keys" className="relative z-10">
-              <Button variant="secondary" className="w-full">Configure in Settings</Button>
+              <Button variant="secondary" className="w-full">{t.slack.configureInSettings}</Button>
             </Link>
           </Card>
         </div>
@@ -220,12 +223,12 @@ export default function IntegrationsPage() {
           <section className="mt-12 animate-fade-in-up [animation-delay:220ms]">
             <div className="flex items-center gap-2 mb-4">
               <CalendarClock size={16} className="text-text-secondary" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Upcoming from Google Calendar</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">{t.upcomingTitle}</h2>
             </div>
             <Card className="p-0 divide-y divide-border overflow-hidden">
-              {eventsLoading && <p className="p-6 text-sm text-text-secondary">Loading events…</p>}
+              {eventsLoading && <p className="p-6 text-sm text-text-secondary">{t.loadingEvents}</p>}
               {!eventsLoading && upcomingEvents.length === 0 && (
-                <p className="p-6 text-sm text-text-secondary">No events in the next 7 days.</p>
+                <p className="p-6 text-sm text-text-secondary">{t.noEvents}</p>
               )}
               {upcomingEvents.map((event) => (
                 <div key={event.id} className="p-5 flex items-center justify-between gap-4">
@@ -236,14 +239,14 @@ export default function IntegrationsPage() {
                   {event.meetingUrl && (
                     <Badge variant="info" className="shrink-0 flex items-center gap-1">
                       <Link2 size={12} />
-                      Meeting link detected
+                      {t.meetingLinkDetected}
                     </Badge>
                   )}
                 </div>
               ))}
             </Card>
             <p className="text-xs text-text-secondary mt-3">
-              Pick any of these when uploading a recording to auto-fill its title -- see the Upload page.
+              {t.upcomingHint}
             </p>
           </section>
         )}
@@ -256,14 +259,14 @@ export default function IntegrationsPage() {
                 <div className="w-11 h-11 rounded-lg bg-success-bg flex items-center justify-center text-success mb-4">
                   <Webhook size={20} />
                 </div>
-                <h2 className="text-2xl font-semibold mb-4">Custom Webhooks</h2>
-                <p className="text-text-secondary mb-8 max-w-lg">Build your own workflows. Send Linqis data to any endpoint using our high-performance REST API and secure webhooks.</p>
+                <h2 className="text-2xl font-semibold mb-4">{t.webhooksTitle}</h2>
+                <p className="text-text-secondary mb-8 max-w-lg">{t.webhooksDesc}</p>
                 <div className="flex gap-4">
                   <Link href="/dashboard/developers">
-                    <Button variant="primary">Manage API Keys</Button>
+                    <Button variant="primary">{t.manageApiKeys}</Button>
                   </Link>
                   <Link href="/dashboard/developers">
-                    <Button variant="secondary">Webhooks</Button>
+                    <Button variant="secondary">{t.webhooksButton}</Button>
                   </Link>
                 </div>
               </div>
@@ -273,8 +276,8 @@ export default function IntegrationsPage() {
               <div className="w-14 h-14 rounded-full bg-warning-bg flex items-center justify-center text-warning mb-4">
                 <ShieldCheck size={26} />
               </div>
-              <h3 className="text-lg font-semibold mb-2">Enterprise Security</h3>
-              <p className="text-sm text-text-secondary">All integrations use OAuth 2.0 with end-to-end encryption for your workspace data.</p>
+              <h3 className="text-lg font-semibold mb-2">{t.enterpriseSecurityTitle}</h3>
+              <p className="text-sm text-text-secondary">{t.enterpriseSecurityDesc}</p>
             </Card>
           </div>
         </section>

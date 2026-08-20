@@ -9,23 +9,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getMeetings, deleteMeeting, ApiError, type MeetingListItem } from "@/lib/api";
 import { formatDuration, formatMeetingDate } from "@/lib/utils";
-
-const STATUS_BADGE: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
-  DONE: { variant: "success", label: "Processed" },
-  PROCESSING: { variant: "warning", label: "Processing..." },
-  FAILED: { variant: "danger", label: "Failed" },
-};
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { meetingsListDictionary } from "@/lib/i18n/dictionaries/meetings-list";
 
 type Filter = "all" | "PROCESSING" | "DONE" | "FAILED";
 
-const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "PROCESSING", label: "Processing" },
-  { value: "DONE", label: "Done" },
-  { value: "FAILED", label: "Failed" },
-];
-
 export default function MeetingsListPage() {
+  const t = useDictionary(meetingsListDictionary);
   const [meetings, setMeetings] = useState<MeetingListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +29,7 @@ export default function MeetingsListPage() {
         if (!cancelled) setMeetings(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof ApiError ? err.message : "Failed to load meetings.");
+        if (!cancelled) setError(err instanceof ApiError ? err.message : t.loadFailed);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -47,14 +37,28 @@ export default function MeetingsListPage() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const STATUS_BADGE: Record<string, { variant: "success" | "warning" | "danger"; label: string }> = {
+    DONE: { variant: "success", label: t.statusBadge.done },
+    PROCESSING: { variant: "warning", label: t.statusBadge.processing },
+    FAILED: { variant: "danger", label: t.statusBadge.failed },
+  };
+
+  const FILTERS: { value: Filter; label: string }[] = [
+    { value: "all", label: t.filters.all },
+    { value: "PROCESSING", label: t.filters.processing },
+    { value: "DONE", label: t.filters.done },
+    { value: "FAILED", label: t.filters.failed },
+  ];
 
   const filtered = meetings.filter(
     (m) => (filter === "all" || m.status === filter) && m.title.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this meeting? This cannot be undone.")) return;
+    if (!confirm(t.deleteConfirm)) return;
     await deleteMeeting(id);
     setMeetings((prev) => prev.filter((m) => m.id !== id));
   };
@@ -68,13 +72,13 @@ export default function MeetingsListPage() {
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in-up">
           <div>
-            <h1 className="text-3xl font-semibold text-text-primary mb-1">All Meetings</h1>
-            <p className="text-text-secondary">Browse and manage your recorded sessions and AI transcriptions.</p>
+            <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.title}</h1>
+            <p className="text-text-secondary">{t.subtitle}</p>
           </div>
           <Link href="/dashboard/upload">
             <Button variant="primary" className="gap-2">
               <Upload size={16} />
-              Upload
+              {t.upload}
             </Button>
           </Link>
         </div>
@@ -84,7 +88,7 @@ export default function MeetingsListPage() {
         {/* Search + filters */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 animate-fade-in-up [animation-delay:150ms]">
           <Input
-            placeholder="Search by title..."
+            placeholder={t.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="sm:max-w-[320px]"
@@ -106,7 +110,7 @@ export default function MeetingsListPage() {
 
         <Card className="p-0 overflow-hidden animate-fade-in-up [animation-delay:300ms]">
           {loading ? (
-            <div className="p-16 text-center text-text-secondary">Loading meetings...</div>
+            <div className="p-16 text-center text-text-secondary">{t.loading}</div>
           ) : error ? (
             <div className="p-16 text-center text-danger">{error}</div>
           ) : meetings.length === 0 ? (
@@ -118,14 +122,14 @@ export default function MeetingsListPage() {
                   <Video size={32} />
                 </div>
               </div>
-              <h2 className="relative text-xl font-semibold text-text-primary">No meetings yet</h2>
+              <h2 className="relative text-xl font-semibold text-text-primary">{t.emptyTitle}</h2>
               <p className="relative text-sm text-text-secondary max-w-sm">
-                Upload a recording to get a transcript, executive summary, decisions, and action items — in minutes.
+                {t.emptyDesc}
               </p>
               <Link href="/dashboard/upload" className="relative">
                 <Button variant="primary" className="gap-2 mt-2">
                   <Upload size={16} />
-                  Upload your first meeting
+                  {t.uploadFirstMeeting}
                 </Button>
               </Link>
             </div>
@@ -134,7 +138,7 @@ export default function MeetingsListPage() {
               <div className="w-14 h-14 rounded-full bg-surface-low flex items-center justify-center text-text-secondary">
                 <SearchX size={24} />
               </div>
-              <p className="text-sm text-text-secondary">No meetings match your search or filter.</p>
+              <p className="text-sm text-text-secondary">{t.noMatchText}</p>
               <button
                 onClick={() => {
                   setSearch("");
@@ -142,7 +146,7 @@ export default function MeetingsListPage() {
                 }}
                 className="text-sm text-success hover:underline cursor-pointer"
               >
-                Clear search & filters
+                {t.clearFilters}
               </button>
             </div>
           ) : (
@@ -179,7 +183,7 @@ export default function MeetingsListPage() {
                     <button
                       onClick={() => handleDelete(meeting.id)}
                       className="text-text-secondary hover:text-danger transition-colors shrink-0 p-1 cursor-pointer"
-                      aria-label="Delete meeting"
+                      aria-label={t.deleteAriaLabel}
                     >
                       <Trash2 size={16} />
                     </button>
