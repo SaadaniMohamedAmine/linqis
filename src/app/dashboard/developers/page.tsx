@@ -21,9 +21,11 @@ import {
   type ApiKeySummary,
   type WebhookSubscriptionSummary,
 } from "@/lib/api";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { developersDictionary } from "@/lib/i18n/dictionaries/developers";
 
-function formatDate(value: string | null): string {
-  if (!value) return "Never";
+function formatDate(value: string | null, neverLabel: string): string {
+  if (!value) return neverLabel;
   return new Date(value).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
@@ -46,6 +48,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 
 /** Shown once, right after a key/secret is created. Never persisted, never re-shown after a refresh. */
 function RevealBanner({ label, value }: { label: string; value: string }) {
+  const t = useDictionary(developersDictionary);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -58,12 +61,12 @@ function RevealBanner({ label, value }: { label: string; value: string }) {
     <div className="p-4 rounded-lg bg-warning/10 border border-warning/30 space-y-2">
       <p className="text-sm font-medium text-warning flex items-center gap-2">
         <Lock size={14} />
-        Copy this {label} now -- you won&apos;t see it again.
+        {t.revealCopyNow(label)}
       </p>
       <div className="flex items-center gap-2">
         <code className="flex-1 min-w-0 truncate text-xs bg-background px-3 py-2 rounded-md border border-border">{value}</code>
         <Button variant="secondary" size="sm" onClick={handleCopy}>
-          {copied ? "Copied!" : "Copy"}
+          {copied ? t.copied : t.copy}
         </Button>
       </div>
     </div>
@@ -71,6 +74,7 @@ function RevealBanner({ label, value }: { label: string; value: string }) {
 }
 
 export default function DevelopersPage() {
+  const t = useDictionary(developersDictionary);
   const { data: session } = useSession();
   const [myRole, setMyRole] = useState<WorkspaceRole | null>(null);
 
@@ -102,8 +106,9 @@ export default function DevelopersPage() {
   useEffect(() => {
     if (!session?.user?.id) return;
     load()
-      .catch(() => setError("Could not load your developer settings."))
+      .catch(() => setError(t.errors.loadFailed))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id, load]);
 
   const canManage = myRole === "OWNER" || myRole === "ADMIN";
@@ -119,7 +124,7 @@ export default function DevelopersPage() {
       setKeyName("");
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to create the API key.");
+      setError(err instanceof ApiError ? err.message : t.errors.createKeyFailed);
     } finally {
       setCreatingKey(false);
     }
@@ -131,7 +136,7 @@ export default function DevelopersPage() {
       await revokeApiKey(id);
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to revoke this key.");
+      setError(err instanceof ApiError ? err.message : t.errors.revokeKeyFailed);
     }
   };
 
@@ -147,7 +152,7 @@ export default function DevelopersPage() {
       setHookUrl("");
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to create the webhook.");
+      setError(err instanceof ApiError ? err.message : t.errors.createHookFailed);
     } finally {
       setCreatingHook(false);
     }
@@ -159,7 +164,7 @@ export default function DevelopersPage() {
       await deleteWebhook(id);
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to remove this webhook.");
+      setError(err instanceof ApiError ? err.message : t.errors.deleteHookFailed);
     }
   };
 
@@ -171,9 +176,9 @@ export default function DevelopersPage() {
           <div className="absolute top-[-40%] left-[15%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
-          <h1 className="text-3xl font-semibold text-text-primary mb-1">Developers</h1>
+          <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.heroTitle}</h1>
           <p className="text-text-secondary">
-            Read-only REST API and outbound webhooks for building your own integrations on top of Linqis.
+            {t.heroSubtitle}
           </p>
         </div>
       </div>
@@ -186,29 +191,29 @@ export default function DevelopersPage() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <KeyRound size={16} className="text-text-secondary" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">API Keys</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">{t.apiKeys.title}</h2>
             </div>
             {canManage && (
               <Button variant="primary" size="sm" onClick={() => setKeyModalOpen(true)}>
-                Create key
+                {t.apiKeys.createKey}
               </Button>
             )}
           </div>
           <p className="text-sm text-text-secondary -mt-2">
-            Authenticate requests to <code className="text-xs">/api/v1</code> with{" "}
+            {t.apiKeys.authHintPrefix} <code className="text-xs">/api/v1</code> {t.apiKeys.authHintWith}{" "}
             <code className="text-xs">Authorization: Bearer &lt;key&gt;</code>.
           </p>
 
-          {revealedKey && <RevealBanner label="API key" value={revealedKey} />}
+          {revealedKey && <RevealBanner label={t.apiKeyLabel} value={revealedKey} />}
 
-          {loading && <p className="text-sm text-text-secondary">Loading keys…</p>}
+          {loading && <p className="text-sm text-text-secondary">{t.apiKeys.loading}</p>}
 
           {!loading && keys.length === 0 && (
             <Card className="p-10 flex flex-col items-center text-center gap-2">
               <div className="w-11 h-11 rounded-full bg-success-bg flex items-center justify-center text-success">
                 <KeyRound size={18} />
               </div>
-              <p className="text-sm text-text-secondary">No API keys yet.</p>
+              <p className="text-sm text-text-secondary">{t.apiKeys.empty}</p>
             </Card>
           )}
 
@@ -222,18 +227,18 @@ export default function DevelopersPage() {
                         <KeyRound size={20} />
                       </div>
                       <Badge variant={key.lastUsedAt ? "success" : "neutral"}>
-                        {key.lastUsedAt ? "Active" : "Unused"}
+                        {key.lastUsedAt ? t.apiKeys.active : t.apiKeys.unused}
                       </Badge>
                     </div>
                     <h4 className="text-lg font-semibold mb-1 truncate">{key.name}</h4>
                     <p className="text-sm text-text-secondary font-mono mb-2">{key.keyPrefix}••••••••</p>
                     <p className="text-xs text-text-secondary mb-6">
-                      Created {formatDate(key.createdAt)} · Last used {formatDate(key.lastUsedAt)}
+                      {t.apiKeys.createdLastUsed(formatDate(key.createdAt, t.never), formatDate(key.lastUsedAt, t.never))}
                     </p>
                   </div>
                   {canManage && (
                     <Button variant="danger" size="sm" className="w-full" onClick={() => handleRevokeKey(key.id)}>
-                      Revoke
+                      {t.apiKeys.revoke}
                     </Button>
                   )}
                 </Card>
@@ -247,28 +252,28 @@ export default function DevelopersPage() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <WebhookIcon size={16} className="text-text-secondary" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">Webhooks</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">{t.webhooks.title}</h2>
             </div>
             {canManage && (
               <Button variant="primary" size="sm" onClick={() => setHookModalOpen(true)}>
-                Create webhook
+                {t.webhooks.createWebhook}
               </Button>
             )}
           </div>
           <p className="text-sm text-text-secondary -mt-2">
-            Get a signed <code className="text-xs">meeting.completed</code> POST whenever a meeting finishes processing.
+            {t.webhooks.hintPrefix} <code className="text-xs">meeting.completed</code> {t.webhooks.hintSuffix}
           </p>
 
-          {revealedSecret && <RevealBanner label="signing secret" value={revealedSecret} />}
+          {revealedSecret && <RevealBanner label={t.signingSecretLabel} value={revealedSecret} />}
 
-          {loading && <p className="text-sm text-text-secondary">Loading webhooks…</p>}
+          {loading && <p className="text-sm text-text-secondary">{t.webhooks.loading}</p>}
 
           {!loading && hooks.length === 0 && (
             <Card className="p-10 flex flex-col items-center text-center gap-2">
               <div className="w-11 h-11 rounded-full bg-info-bg flex items-center justify-center text-info">
                 <WebhookIcon size={18} />
               </div>
-              <p className="text-sm text-text-secondary">No webhooks yet.</p>
+              <p className="text-sm text-text-secondary">{t.webhooks.empty}</p>
             </Card>
           )}
 
@@ -282,16 +287,16 @@ export default function DevelopersPage() {
                         <WebhookIcon size={20} />
                       </div>
                       <Badge variant={hook.active ? "success" : "neutral"}>
-                        {hook.active ? "Active" : "Inactive"}
+                        {hook.active ? t.webhooks.active : t.webhooks.inactive}
                       </Badge>
                     </div>
                     <h4 className="text-lg font-semibold mb-1 truncate" title={hook.url}>{hook.url}</h4>
                     <p className="text-sm text-text-secondary font-mono mb-2">{hook.event}</p>
-                    <p className="text-xs text-text-secondary mb-6">Created {formatDate(hook.createdAt)}</p>
+                    <p className="text-xs text-text-secondary mb-6">{t.webhooks.created(formatDate(hook.createdAt, t.never))}</p>
                   </div>
                   {canManage && (
                     <Button variant="danger" size="sm" className="w-full" onClick={() => handleDeleteHook(hook.id)}>
-                      Remove
+                      {t.webhooks.remove}
                     </Button>
                   )}
                 </Card>
@@ -302,23 +307,23 @@ export default function DevelopersPage() {
       </div>
 
       {keyModalOpen && (
-        <Modal title="Create API key" onClose={() => setKeyModalOpen(false)}>
+        <Modal title={t.keyModal.title} onClose={() => setKeyModalOpen(false)}>
           <form onSubmit={handleCreateKey} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs text-text-secondary uppercase tracking-wider">Name</label>
+              <label className="text-xs text-text-secondary uppercase tracking-wider">{t.keyModal.nameLabel}</label>
               <Input
                 value={keyName}
                 onChange={(e) => setKeyName(e.target.value)}
-                placeholder="e.g. CI pipeline"
+                placeholder={t.keyModal.namePlaceholder}
                 autoFocus
               />
             </div>
             <div className="flex justify-end gap-3">
               <Button type="button" variant="secondary" onClick={() => setKeyModalOpen(false)}>
-                Cancel
+                {t.keyModal.cancel}
               </Button>
               <Button type="submit" variant="primary" disabled={creatingKey}>
-                {creatingKey ? "Creating..." : "Create"}
+                {creatingKey ? t.keyModal.creating : t.keyModal.create}
               </Button>
             </div>
           </form>
@@ -326,26 +331,26 @@ export default function DevelopersPage() {
       )}
 
       {hookModalOpen && (
-        <Modal title="Create webhook" onClose={() => setHookModalOpen(false)}>
+        <Modal title={t.hookModal.title} onClose={() => setHookModalOpen(false)}>
           <form onSubmit={handleCreateHook} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs text-text-secondary uppercase tracking-wider">Endpoint URL</label>
+              <label className="text-xs text-text-secondary uppercase tracking-wider">{t.hookModal.urlLabel}</label>
               <Input
                 type="url"
                 value={hookUrl}
                 onChange={(e) => setHookUrl(e.target.value)}
-                placeholder="https://example.com/webhooks/linqis"
+                placeholder={t.hookModal.urlPlaceholder}
                 required
                 autoFocus
               />
-              <p className="text-xs text-text-secondary">Fires on {"meeting.completed"}.</p>
+              <p className="text-xs text-text-secondary">{t.hookModal.firesOn("meeting.completed")}</p>
             </div>
             <div className="flex justify-end gap-3">
               <Button type="button" variant="secondary" onClick={() => setHookModalOpen(false)}>
-                Cancel
+                {t.hookModal.cancel}
               </Button>
               <Button type="submit" variant="primary" disabled={creatingHook}>
-                {creatingHook ? "Creating..." : "Create"}
+                {creatingHook ? t.hookModal.creating : t.hookModal.create}
               </Button>
             </div>
           </form>
