@@ -16,19 +16,21 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/toast-provider";
 import { ACTIVE_WORKSPACE_KEY, getUser, updateUser, type UserProfile } from "@/lib/api";
 import { getInitials } from "@/lib/utils";
+import { useDictionary } from "@/lib/i18n/locale-context";
+import { settingsDictionary } from "@/lib/i18n/dictionaries/settings";
 
 const SUMMARY_LENGTHS: UserProfile["summaryLength"][] = ["CONCISE", "STANDARD", "DETAILED"];
 
 type TabId = "profile" | "preferences" | "api-keys" | "billing" | "danger";
 
-const TABS: { id: TabId; label: string; icon: typeof User }[] = [
-  { id: "profile", label: "Profile", icon: User },
-  { id: "preferences", label: "Preferences", icon: SlidersHorizontal },
-  { id: "api-keys", label: "API Keys", icon: KeyRound },
-  { id: "billing", label: "Billing", icon: CreditCard },
-];
-
 function SettingsPageContent() {
+  const t = useDictionary(settingsDictionary);
+  const TABS: { id: TabId; label: string; icon: typeof User }[] = [
+    { id: "profile", label: t.tabs.profile, icon: User },
+    { id: "preferences", label: t.tabs.preferences, icon: SlidersHorizontal },
+    { id: "api-keys", label: t.tabs.apiKeys, icon: KeyRound },
+    { id: "billing", label: t.tabs.billing, icon: CreditCard },
+  ];
   const { data: session } = useSession();
   // Integrations page links here with ?tab=api-keys so "Configure in
   // Settings" lands directly on the Notion/Slack fields instead of dumping
@@ -36,7 +38,7 @@ function SettingsPageContent() {
   const searchParams = useSearchParams();
   const requestedTab = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<TabId>(
-    TABS.some((t) => t.id === requestedTab) ? (requestedTab as TabId) : "profile"
+    TABS.some((tab) => tab.id === requestedTab) ? (requestedTab as TabId) : "profile"
   );
   const [name, setName] = useState("");
   const [summaryLength, setSummaryLength] = useState<UserProfile["summaryLength"]>("STANDARD");
@@ -111,7 +113,7 @@ function SettingsPageContent() {
       await updateUser({ name, summaryLength, emailNotifications });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-      showToast("Settings saved.");
+      showToast(t.toasts.settingsSaved);
     } finally {
       setSaving(false);
     }
@@ -138,7 +140,7 @@ function SettingsPageContent() {
     try {
       await updateUser({ notionApiKey, notionDatabaseId });
       setSavedNotion({ apiKey: notionApiKey, databaseId: notionDatabaseId });
-      showToast("Notion integration saved.");
+      showToast(t.toasts.notionSaved);
       setActiveModal(null);
     } finally {
       setNotionSaving(false);
@@ -151,7 +153,7 @@ function SettingsPageContent() {
     try {
       await updateUser({ slackWebhookUrl, slackChannelName });
       setSavedSlack({ webhookUrl: slackWebhookUrl, channelName: slackChannelName });
-      showToast("Slack integration saved.");
+      showToast(t.toasts.slackSaved);
       setActiveModal(null);
     } finally {
       setSlackSaving(false);
@@ -171,9 +173,9 @@ function SettingsPageContent() {
           <div className="absolute top-[-40%] left-[20%] w-[450px] h-[450px] bg-success/10 rounded-full blur-[120px]" />
         </div>
         <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
-          <h1 className="text-3xl font-semibold mb-2">Settings</h1>
+          <h1 className="text-3xl font-semibold mb-2">{t.heroTitle}</h1>
           <p className="text-text-secondary max-w-2xl">
-            Manage your profile, preferences, API keys, billing, and workspace data.
+            {t.heroSubtitle}
           </p>
         </div>
       </div>
@@ -202,7 +204,7 @@ function SettingsPageContent() {
             }`}
           >
             <AlertTriangle size={16} />
-            Danger Zone
+            {t.tabs.dangerZone}
           </button>
         </nav>
       </div>
@@ -216,8 +218,8 @@ function SettingsPageContent() {
           {activeTab === "profile" && (
             <section className="space-y-6">
               <div>
-                <h3 className="text-2xl font-semibold">Profile</h3>
-                <p className="text-text-secondary">Update your photo and personal details.</p>
+                <h3 className="text-2xl font-semibold">{t.profile.title}</h3>
+                <p className="text-text-secondary">{t.profile.subtitle}</p>
               </div>
               <Card className="p-6 space-y-8">
                 <div className="flex items-center gap-8">
@@ -234,21 +236,21 @@ function SettingsPageContent() {
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold">{name || "—"}</h4>
+                    <h4 className="text-lg font-semibold">{name || t.profile.noName}</h4>
                     <p className="text-sm text-text-secondary">{session?.user?.email}</p>
                     <div className="mt-4 flex gap-2">
-                      <Button variant="primary" size="sm">Upload New</Button>
-                      <Button variant="secondary" size="sm">Remove</Button>
+                      <Button variant="primary" size="sm">{t.profile.uploadNew}</Button>
+                      <Button variant="secondary" size="sm">{t.profile.remove}</Button>
                     </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs text-text-secondary uppercase tracking-wider">Full Name</label>
+                    <label className="text-xs text-text-secondary uppercase tracking-wider">{t.profile.fullNameLabel}</label>
                     <Input value={name} onChange={(e) => setName(e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs text-text-secondary uppercase tracking-wider">Email Address</label>
+                    <label className="text-xs text-text-secondary uppercase tracking-wider">{t.profile.emailLabel}</label>
                     <Input value={session?.user?.email || ""} type="email" disabled />
                   </div>
                 </div>
@@ -259,14 +261,14 @@ function SettingsPageContent() {
           {activeTab === "preferences" && (
             <section className="space-y-6">
               <div>
-                <h3 className="text-2xl font-semibold">Preferences</h3>
-                <p className="text-text-secondary">Customize your workspace experience.</p>
+                <h3 className="text-2xl font-semibold">{t.preferences.title}</h3>
+                <p className="text-text-secondary">{t.preferences.subtitle}</p>
               </div>
               <Card className="p-0 divide-y divide-border">
                 <div className="p-6 flex items-center justify-between">
                   <div>
-                    <p className="text-lg font-semibold">AI Summary Length</p>
-                    <p className="text-sm text-text-secondary">Choose how detailed your automatic summaries should be.</p>
+                    <p className="text-lg font-semibold">{t.preferences.summaryLengthTitle}</p>
+                    <p className="text-sm text-text-secondary">{t.preferences.summaryLengthDesc}</p>
                   </div>
                   <div className="flex bg-background p-1 rounded-lg border border-border">
                     {SUMMARY_LENGTHS.map((length) => (
@@ -279,15 +281,15 @@ function SettingsPageContent() {
                             : "text-text-secondary hover:text-text-primary"
                         }`}
                       >
-                        {length.charAt(0) + length.slice(1).toLowerCase()}
+                        {t.preferences.summaryOptions[length.toLowerCase() as "concise" | "standard" | "detailed"]}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div className="p-6 flex items-center justify-between">
                   <div>
-                    <p className="text-lg font-semibold">Email Notifications</p>
-                    <p className="text-sm text-text-secondary">Receive summaries directly in your inbox after meetings.</p>
+                    <p className="text-lg font-semibold">{t.preferences.emailNotifTitle}</p>
+                    <p className="text-sm text-text-secondary">{t.preferences.emailNotifDesc}</p>
                   </div>
                   <button
                     onClick={() => setEmailNotifications(!emailNotifications)}
@@ -307,8 +309,8 @@ function SettingsPageContent() {
           {activeTab === "api-keys" && (
             <section className="space-y-6">
               <div>
-                <h3 className="text-2xl font-semibold">API Keys</h3>
-                <p className="text-text-secondary">Connect your own AI models and export destinations.</p>
+                <h3 className="text-2xl font-semibold">{t.apiKeys.title}</h3>
+                <p className="text-text-secondary">{t.apiKeys.subtitle}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* OpenAI -- not wired to a real field yet, shown for parity
@@ -319,12 +321,12 @@ function SettingsPageContent() {
                       <div className="w-12 h-12 rounded-lg bg-text-primary/5 flex items-center justify-center text-text-secondary">
                         <RiOpenaiFill size={22} />
                       </div>
-                      <Badge variant="neutral">Not configured</Badge>
+                      <Badge variant="neutral">{t.apiKeys.notConfigured}</Badge>
                     </div>
-                    <h4 className="text-lg font-semibold mb-1">OpenAI Key</h4>
-                    <p className="text-sm text-text-secondary mb-6">Bring your own key for custom AI processing.</p>
+                    <h4 className="text-lg font-semibold mb-1">{t.apiKeys.openaiTitle}</h4>
+                    <p className="text-sm text-text-secondary mb-6">{t.apiKeys.openaiDesc}</p>
                   </div>
-                  <Button variant="secondary" className="w-full" disabled>Coming soon</Button>
+                  <Button variant="secondary" className="w-full" disabled>{t.apiKeys.comingSoon}</Button>
                 </Card>
 
                 {/* Notion */}
@@ -335,14 +337,14 @@ function SettingsPageContent() {
                         <SiNotion size={20} />
                       </div>
                       <Badge variant={notionConnected ? "success" : "neutral"}>
-                        {notionConnected ? "Connected" : "Not configured"}
+                        {notionConnected ? t.apiKeys.connected : t.apiKeys.notConfigured}
                       </Badge>
                     </div>
-                    <h4 className="text-lg font-semibold mb-1">Notion</h4>
-                    <p className="text-sm text-text-secondary mb-6">Export meeting summaries to your own Notion workspace.</p>
+                    <h4 className="text-lg font-semibold mb-1">{t.apiKeys.notionTitle}</h4>
+                    <p className="text-sm text-text-secondary mb-6">{t.apiKeys.notionDesc}</p>
                   </div>
                   <Button variant="secondary" className="w-full" onClick={() => setActiveModal("notion")}>
-                    {notionConnected ? "Update connection" : "Set up integration"}
+                    {notionConnected ? t.apiKeys.updateConnection : t.apiKeys.setupIntegration}
                   </Button>
                 </Card>
 
@@ -355,15 +357,15 @@ function SettingsPageContent() {
                       </div>
                       <Badge variant={slackConnected ? "success" : "neutral"}>
                         {slackConnected
-                          ? `Connected${savedSlack.channelName ? ` · ${savedSlack.channelName.startsWith("#") ? savedSlack.channelName : `#${savedSlack.channelName}`}` : ""}`
-                          : "Not configured"}
+                          ? `${t.apiKeys.connected}${savedSlack.channelName ? ` · ${savedSlack.channelName.startsWith("#") ? savedSlack.channelName : `#${savedSlack.channelName}`}` : ""}`
+                          : t.apiKeys.notConfigured}
                       </Badge>
                     </div>
-                    <h4 className="text-lg font-semibold mb-1">Slack</h4>
-                    <p className="text-sm text-text-secondary mb-6">Save a default webhook so exports pre-fill automatically.</p>
+                    <h4 className="text-lg font-semibold mb-1">{t.apiKeys.slackTitle}</h4>
+                    <p className="text-sm text-text-secondary mb-6">{t.apiKeys.slackDesc}</p>
                   </div>
                   <Button variant="secondary" className="w-full" onClick={() => setActiveModal("slack")}>
-                    {slackConnected ? "Update connection" : "Set up integration"}
+                    {slackConnected ? t.apiKeys.updateConnection : t.apiKeys.setupIntegration}
                   </Button>
                 </Card>
               </div>
@@ -373,33 +375,33 @@ function SettingsPageContent() {
           {activeTab === "billing" && (
             <section className="space-y-6">
               <div>
-                <h3 className="text-2xl font-semibold">Billing</h3>
-                <p className="text-text-secondary">Manage your plan and subscription.</p>
+                <h3 className="text-2xl font-semibold">{t.billing.title}</h3>
+                <p className="text-text-secondary">{t.billing.subtitle}</p>
               </div>
               <Card className="p-6 flex items-center justify-between">
                 <div>
                   <p className="text-lg font-semibold text-text-primary">
-                    {plan === "PRO" ? "Pro plan" : "Free plan"}
+                    {plan === "PRO" ? t.billing.proPlan : t.billing.freePlan}
                   </p>
                   {plan === "PRO" ? (
                     <p className="text-sm text-text-secondary">
                       {subscriptionStatus === "active" || subscriptionStatus === "trialing"
                         ? currentPeriodEnd
-                          ? `Renews on ${new Date(currentPeriodEnd).toLocaleDateString()}`
-                          : "Active subscription"
-                        : `Status: ${subscriptionStatus || "unknown"}`}
+                          ? t.billing.renewsOn(new Date(currentPeriodEnd).toLocaleDateString())
+                          : t.billing.activeSubscription
+                        : t.billing.statusLabel(subscriptionStatus || t.billing.unknownStatus)}
                     </p>
                   ) : (
-                    <p className="text-sm text-text-secondary">5 meetings/month, 30 min max, no exports.</p>
+                    <p className="text-sm text-text-secondary">{t.billing.freeLimits}</p>
                   )}
                 </div>
                 {plan === "PRO" ? (
                   <Button variant="secondary" onClick={handleManageBilling} disabled={portalLoading}>
-                    {portalLoading ? "Loading..." : "Manage billing"}
+                    {portalLoading ? t.billing.loading : t.billing.manageBilling}
                   </Button>
                 ) : (
                   <Link href="/pricing">
-                    <Button variant="primary">Upgrade to Pro</Button>
+                    <Button variant="primary">{t.billing.upgradeToPro}</Button>
                   </Link>
                 )}
               </Card>
@@ -409,18 +411,18 @@ function SettingsPageContent() {
           {activeTab === "danger" && (
             <section className="space-y-6">
               <div className="flex items-center gap-3 text-danger">
-                <h3 className="text-2xl font-semibold">Danger Zone</h3>
+                <h3 className="text-2xl font-semibold">{t.danger.title}</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="border-danger/30 bg-danger/5 p-6 space-y-4 hover:border-danger transition-colors">
-                  <h4 className="text-lg font-semibold text-danger">Clear Data</h4>
-                  <p className="text-sm text-text-secondary">Remove all meeting transcripts and AI summaries from our servers. This action is irreversible.</p>
-                  <Button variant="danger" className="w-full">Wipe All History</Button>
+                  <h4 className="text-lg font-semibold text-danger">{t.danger.clearDataTitle}</h4>
+                  <p className="text-sm text-text-secondary">{t.danger.clearDataDesc}</p>
+                  <Button variant="danger" className="w-full">{t.danger.wipeButton}</Button>
                 </Card>
                 <Card className="border-danger/30 bg-danger/5 p-6 space-y-4 hover:border-danger transition-colors">
-                  <h4 className="text-lg font-semibold text-danger">Delete Account</h4>
-                  <p className="text-sm text-text-secondary">Permanently deactivate your Linqis profile and forfeit any remaining subscription balance.</p>
-                  <Button variant="danger" className="w-full">Delete Permanently</Button>
+                  <h4 className="text-lg font-semibold text-danger">{t.danger.deleteAccountTitle}</h4>
+                  <p className="text-sm text-text-secondary">{t.danger.deleteAccountDesc}</p>
+                  <Button variant="danger" className="w-full">{t.danger.deleteButton}</Button>
                 </Card>
               </div>
             </section>
@@ -429,9 +431,9 @@ function SettingsPageContent() {
 
         {showSaveBar && (
           <div className="flex items-center justify-end gap-4 pt-8 mt-8 border-t border-border">
-            {saved && <span className="text-sm text-success">Saved ✓</span>}
+            {saved && <span className="text-sm text-success">{t.saveBar.saved}</span>}
             <Button variant="primary" onClick={handleSave} disabled={saving || !session?.user?.id}>
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? t.saveBar.saving : t.saveBar.saveChanges}
             </Button>
           </div>
         )}
@@ -442,14 +444,14 @@ function SettingsPageContent() {
           <div className="w-full max-w-[420px] bg-surface-high border border-border rounded-xl shadow-lg flex flex-col overflow-hidden">
             <div className="p-6 border-b border-border flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-semibold text-text-primary mb-1">Notion Integration</h2>
-                <p className="text-sm text-text-secondary">Export meeting summaries to your own Notion workspace instead of the shared default.</p>
+                <h2 className="text-lg font-semibold text-text-primary mb-1">{t.notionModal.title}</h2>
+                <p className="text-sm text-text-secondary">{t.notionModal.description}</p>
               </div>
               <button onClick={closeNotionModal} className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer">✕</button>
             </div>
             <div className="p-6 flex flex-col gap-6">
               <div className="space-y-2">
-                <label className="text-xs text-text-secondary uppercase tracking-wider">Notion API Key</label>
+                <label className="text-xs text-text-secondary uppercase tracking-wider">{t.notionModal.apiKeyLabel}</label>
                 <PasswordInput
                   value={notionApiKey}
                   onChange={(e) => setNotionApiKey(e.target.value)}
@@ -462,12 +464,12 @@ function SettingsPageContent() {
                     rel="noopener noreferrer"
                     className="text-success hover:underline"
                   >
-                    How to get your Notion API key?
+                    {t.notionModal.apiKeyHelp}
                   </Link>
                 </p>
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-text-secondary uppercase tracking-wider">Notion Database ID</label>
+                <label className="text-xs text-text-secondary uppercase tracking-wider">{t.notionModal.databaseIdLabel}</label>
                 <Input
                   value={notionDatabaseId}
                   onChange={(e) => setNotionDatabaseId(e.target.value)}
@@ -476,9 +478,9 @@ function SettingsPageContent() {
               </div>
             </div>
             <div className="p-6 bg-surface-low border-t border-border flex gap-4">
-              <Button variant="secondary" className="flex-1" onClick={closeNotionModal} disabled={notionSaving}>Cancel</Button>
+              <Button variant="secondary" className="flex-1" onClick={closeNotionModal} disabled={notionSaving}>{t.notionModal.cancel}</Button>
               <Button variant="primary" className="flex-1" onClick={handleSaveNotion} disabled={notionSaving}>
-                {notionSaving ? "Saving..." : "Save Changes"}
+                {notionSaving ? t.saveBar.saving : t.saveBar.saveChanges}
               </Button>
             </div>
           </div>
@@ -490,14 +492,14 @@ function SettingsPageContent() {
           <div className="w-full max-w-[420px] bg-surface-high border border-border rounded-xl shadow-lg flex flex-col overflow-hidden">
             <div className="p-6 border-b border-border flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-semibold text-text-primary mb-1">Slack Integration</h2>
-                <p className="text-sm text-text-secondary">Save a default webhook so exports pre-fill instead of asking every time.</p>
+                <h2 className="text-lg font-semibold text-text-primary mb-1">{t.slackModal.title}</h2>
+                <p className="text-sm text-text-secondary">{t.slackModal.description}</p>
               </div>
               <button onClick={closeSlackModal} className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer">✕</button>
             </div>
             <div className="p-6 flex flex-col gap-6">
               <div className="space-y-2">
-                <label className="text-xs text-text-secondary uppercase tracking-wider">Slack Webhook URL</label>
+                <label className="text-xs text-text-secondary uppercase tracking-wider">{t.slackModal.webhookLabel}</label>
                 <PasswordInput
                   value={slackWebhookUrl}
                   onChange={(e) => setSlackWebhookUrl(e.target.value)}
@@ -510,12 +512,12 @@ function SettingsPageContent() {
                     rel="noopener noreferrer"
                     className="text-success hover:underline"
                   >
-                    How to create a Slack incoming webhook?
+                    {t.slackModal.webhookHelp}
                   </Link>
                 </p>
               </div>
               <div className="space-y-2">
-                <label className="text-xs text-text-secondary uppercase tracking-wider">Channel Name</label>
+                <label className="text-xs text-text-secondary uppercase tracking-wider">{t.slackModal.channelLabel}</label>
                 <Input
                   value={slackChannelName}
                   onChange={(e) => setSlackChannelName(e.target.value)}
@@ -525,14 +527,14 @@ function SettingsPageContent() {
                     metadata, so this just labels the saved connection and
                     names the channel in the export confirmation toast. */}
                 <p className="text-xs text-text-secondary">
-                  Display only -- the webhook itself is already bound to a channel when you create it in Slack.
+                  {t.slackModal.channelHelpText}
                 </p>
               </div>
             </div>
             <div className="p-6 bg-surface-low border-t border-border flex gap-4">
-              <Button variant="secondary" className="flex-1" onClick={closeSlackModal} disabled={slackSaving}>Cancel</Button>
+              <Button variant="secondary" className="flex-1" onClick={closeSlackModal} disabled={slackSaving}>{t.slackModal.cancel}</Button>
               <Button variant="primary" className="flex-1" onClick={handleSaveSlack} disabled={slackSaving}>
-                {slackSaving ? "Saving..." : "Save Changes"}
+                {slackSaving ? t.saveBar.saving : t.saveBar.saveChanges}
               </Button>
             </div>
           </div>
