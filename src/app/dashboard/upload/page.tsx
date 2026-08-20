@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Upload, AlertCircle, Sparkles, CalendarClock } from "lucide-react";
+import { Upload, AlertCircle, Sparkles, CalendarClock, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { UploadStepper, type StepStatus } from "@/components/upload-stepper";
 import {
   uploadMeetingFile,
   subscribeToUploadProgress,
@@ -43,6 +44,26 @@ type Stage =
   | { kind: "error"; message: string; isPlanLimit?: boolean }
   | { kind: "done" };
 
+/**
+ * Derives the 4-step progress indicator's status from the current stage.
+ * The pipeline is fully automatic (no manual "Next"), so this only ever
+ * reflects state that already happened -- it never drives navigation itself.
+ * `hasAttemptedProcess` disambiguates the error case: a rejected file (bad
+ * extension/too large) fails before a file is ever accepted, while an
+ * upload/processing failure happens after steps 1-2 are already done.
+ */
+function getStepStatuses(stage: Stage, hasFile: boolean, hasAttemptedProcess: boolean): [StepStatus, StepStatus, StepStatus, StepStatus] {
+  if (stage.kind === "done") return ["complete", "complete", "complete", "complete"];
+  if (stage.kind === "uploading" || stage.kind === "processing") return ["complete", "complete", "active", "upcoming"];
+  if (stage.kind === "error") {
+    if (hasAttemptedProcess) return ["complete", "complete", "error", "upcoming"];
+    if (hasFile) return ["complete", "error", "upcoming", "upcoming"];
+    return ["error", "upcoming", "upcoming", "upcoming"];
+  }
+  // idle
+  return hasFile ? ["complete", "active", "upcoming", "upcoming"] : ["active", "upcoming", "upcoming", "upcoming"];
+}
+
 export default function UploadPage() {
   const t = useDictionary(uploadDictionary);
   const STAGE_LABELS: Record<string, string> = t.stageLabels;
@@ -53,6 +74,7 @@ export default function UploadPage() {
   const [stage, setStage] = useState<Stage>({ kind: "idle" });
   const [calendarEvents, setCalendarEvents] = useState<CalendarEventSummary[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const [hasAttemptedProcess, setHasAttemptedProcess] = useState(false);
 
   // Silently no-ops when Google Calendar isn't connected (404) -- this picker
   // just doesn't appear rather than showing an error for an optional feature.
@@ -102,6 +124,7 @@ export default function UploadPage() {
   const handleProcess = useCallback(async () => {
     if (!selectedFile) return;
 
+    setHasAttemptedProcess(true);
     setStage({ kind: "uploading", percent: 0 });
 
     const linkedEvent = calendarEvents.find((e) => e.id === selectedEventId);
@@ -152,9 +175,17 @@ export default function UploadPage() {
   const handleCancel = () => {
     setSelectedFile(null);
     setStage({ kind: "idle" });
+    setHasAttemptedProcess(false);
   };
 
   const isBusy = stage.kind === "uploading" || stage.kind === "processing";
+  const stepStatuses = getStepStatuses(stage, !!selectedFile, hasAttemptedProcess);
+  const steps = [
+    { label: t.stepSelect, icon: Upload, status: stepStatuses[0] },
+    { label: t.stepLink, icon: CalendarClock, status: stepStatuses[1] },
+    { label: t.stepProcess, icon: Sparkles, status: stepStatuses[2] },
+    { label: t.stepDone, icon: CheckCircle2, status: stepStatuses[3] },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-text-primary flex flex-col">
@@ -167,11 +198,15 @@ export default function UploadPage() {
 
         <div className="container max-w-[720px] px-6 z-10 animate-fade-in-up">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold mb-2">{t.title}</h1>
+            <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-text-primary to-text-primary/70 bg-clip-text">{t.title}</h1>
             <p className="text-text-secondary">{t.subtitle}</p>
           </div>
 
-          <Card className="p-6 flex flex-col gap-6">
+          <div className="mb-8 px-2">
+            <UploadStepper steps={steps} />
+          </div>
+
+          <Card className="p-6 flex flex-col gap-6 border-border/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.35)]">
             <input
               ref={fileInputRef}
               type="file"
