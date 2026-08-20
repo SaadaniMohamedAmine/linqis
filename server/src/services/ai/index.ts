@@ -28,35 +28,49 @@ const secondary = services[PROVIDER === "gemini" ? "groq" : "gemini"];
 // same call -- narrowing this to specific status codes meant a Gemini 503
 // (seen in practice, high-demand overload) fell straight through to the user
 // instead of failing over to Groq.
+//
+// `label` exists purely for the logs below -- without it, a failure just
+// says "AI provider failed" with no way to tell which of the 7 calls it was
+// or whether the fallback itself also failed, which is exactly the question
+// live debugging needed an answer to.
 function withFallback<Args extends unknown[], R>(
+  label: string,
   primaryFn: (...args: Args) => Promise<R>,
   fallbackFn: (...args: Args) => Promise<R>
 ): (...args: Args) => Promise<R> {
   return async (...args: Args) => {
     try {
       return await primaryFn(...args);
-    } catch (err) {
+    } catch (primaryErr) {
       console.warn(
-        `AI provider (${PROVIDER}) failed, falling back to ${PROVIDER === "gemini" ? "groq" : "gemini"}:`,
-        err instanceof Error ? err.message : err
+        `[ai:${label}] primary (${PROVIDER}) failed, falling back to ${PROVIDER === "gemini" ? "groq" : "gemini"}:`,
+        primaryErr instanceof Error ? primaryErr.message : primaryErr
       );
-      return fallbackFn(...args);
+      try {
+        return await fallbackFn(...args);
+      } catch (fallbackErr) {
+        console.error(
+          `[ai:${label}] fallback also failed:`,
+          fallbackErr instanceof Error ? fallbackErr.message : fallbackErr
+        );
+        throw fallbackErr;
+      }
     }
   };
 }
 
 export const ai = {
-  generateExecutiveSummary: withFallback(primary.generateExecutiveSummary, secondary.generateExecutiveSummary),
-  extractDecisions: withFallback(primary.extractDecisions, secondary.extractDecisions),
-  extractActionItems: withFallback(primary.extractActionItems, secondary.extractActionItems),
+  generateExecutiveSummary: withFallback("generateExecutiveSummary", primary.generateExecutiveSummary, secondary.generateExecutiveSummary),
+  extractDecisions: withFallback("extractDecisions", primary.extractDecisions, secondary.extractDecisions),
+  extractActionItems: withFallback("extractActionItems", primary.extractActionItems, secondary.extractActionItems),
   // Was missing entirely -- chat.ts calls ai.answerFromContext(...), which
   // was undefined here even though both providers implement it, so every
   // "Ask your meetings" request threw and fell into the generic 500.
-  answerFromContext: withFallback(primary.answerFromContext, secondary.answerFromContext),
+  answerFromContext: withFallback("answerFromContext", primary.answerFromContext, secondary.answerFromContext),
 };
 
-export const detectDisagreements = withFallback(primary.detectDisagreements, secondary.detectDisagreements);
-export const detectMood = withFallback(primary.detectMood, secondary.detectMood);
-export const detectMoodWithAnalysis = withFallback(primary.detectMoodWithAnalysis, secondary.detectMoodWithAnalysis);
+export const detectDisagreements = withFallback("detectDisagreements", primary.detectDisagreements, secondary.detectDisagreements);
+export const detectMood = withFallback("detectMood", primary.detectMood, secondary.detectMood);
+export const detectMoodWithAnalysis = withFallback("detectMoodWithAnalysis", primary.detectMoodWithAnalysis, secondary.detectMoodWithAnalysis);
 
 export { gemini, groq };
