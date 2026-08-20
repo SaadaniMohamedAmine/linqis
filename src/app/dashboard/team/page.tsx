@@ -99,7 +99,7 @@ export default function TeamPage() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[-40%] left-[10%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
         </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-10 animate-fade-in-up">
           <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.title}</h1>
           <p className="text-text-secondary">
             {workspaceName ? t.subtitleWithName(workspaceName) : t.subtitleGeneric}
@@ -107,7 +107,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      <div className="max-w-[800px] mx-auto p-8 flex flex-col gap-12">
+      <div className="max-w-[800px] mx-auto p-4 sm:p-8 flex flex-col gap-12">
         {error && <p className="text-sm text-danger bg-danger/10 p-3 rounded-lg">{error}</p>}
 
         {/* Members */}
@@ -126,7 +126,7 @@ export default function TeamPage() {
               const roleBadge = ROLE_BADGE[member.role];
               const RoleIcon = roleBadge.icon;
               return (
-                <div key={member.id} className="p-5 flex items-center justify-between gap-4 hover:bg-background/50 transition-colors">
+                <div key={member.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-background/50 transition-colors">
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="w-10 h-10 rounded-full overflow-hidden bg-success-bg border border-border shrink-0 flex items-center justify-center text-success font-semibold">
                       {member.user.image ? (

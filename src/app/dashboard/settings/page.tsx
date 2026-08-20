@@ -172,7 +172,7 @@ function SettingsPageContent() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[-40%] left-[20%] w-[450px] h-[450px] bg-success/10 rounded-full blur-[120px]" />
         </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 animate-fade-in-up">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-10 animate-fade-in-up">
           <h1 className="text-3xl font-semibold mb-2">{t.heroTitle}</h1>
           <p className="text-text-secondary max-w-2xl">
             {t.heroSubtitle}
@@ -182,7 +182,7 @@ function SettingsPageContent() {
 
       {/* Horizontal tab bar */}
       <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
-        <nav className="max-w-[1440px] mx-auto px-8 flex items-center gap-1 overflow-x-auto animate-fade-in-up [animation-delay:100ms]">
+        <nav className="max-w-[1440px] mx-auto px-4 sm:px-8 flex items-center gap-1 overflow-x-auto animate-fade-in-up [animation-delay:100ms]">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -207,13 +207,14 @@ function SettingsPageContent() {
             {t.tabs.dangerZone}
           </button>
         </nav>
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent sm:hidden" />
       </div>
 
       {/* Tab panel */}
       {/* API Keys renders a card grid like the Integrations page, which
           needs real room to breathe -- the other tabs are narrow forms and
           stay at the original width. */}
-      <main className={`mx-auto p-8 lg:p-12 ${activeTab === "api-keys" ? "max-w-[1100px]" : "max-w-[800px]"}`}>
+      <main className={`mx-auto p-4 sm:p-8 lg:p-12 ${activeTab === "api-keys" ? "max-w-[1100px]" : "max-w-[800px]"}`}>
         <div key={activeTab} className="space-y-6 animate-tab-in">
           {activeTab === "profile" && (
             <section className="space-y-6">
@@ -265,12 +266,12 @@ function SettingsPageContent() {
                 <p className="text-text-secondary">{t.preferences.subtitle}</p>
               </div>
               <Card className="p-0 divide-y divide-border">
-                <div className="p-6 flex items-center justify-between">
+                <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <p className="text-lg font-semibold">{t.preferences.summaryLengthTitle}</p>
                     <p className="text-sm text-text-secondary">{t.preferences.summaryLengthDesc}</p>
                   </div>
-                  <div className="flex bg-background p-1 rounded-lg border border-border">
+                  <div className="flex bg-background p-1 rounded-lg border border-border w-fit">
                     {SUMMARY_LENGTHS.map((length) => (
                       <button
                         key={length}
@@ -286,14 +287,14 @@ function SettingsPageContent() {
                     ))}
                   </div>
                 </div>
-                <div className="p-6 flex items-center justify-between">
+                <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <p className="text-lg font-semibold">{t.preferences.emailNotifTitle}</p>
                     <p className="text-sm text-text-secondary">{t.preferences.emailNotifDesc}</p>
                   </div>
                   <button
                     onClick={() => setEmailNotifications(!emailNotifications)}
-                    className={`w-12 h-6 rounded-full relative transition-colors cursor-pointer ${emailNotifications ? "bg-success" : "bg-border"}`}
+                    className={`w-12 h-6 rounded-full relative transition-colors cursor-pointer shrink-0 ${emailNotifications ? "bg-success" : "bg-border"}`}
                   >
                     <span
                       className={`absolute top-1 w-4 h-4 bg-background rounded-full transition-all ${
@@ -378,7 +379,7 @@ function SettingsPageContent() {
                 <h3 className="text-2xl font-semibold">{t.billing.title}</h3>
                 <p className="text-text-secondary">{t.billing.subtitle}</p>
               </div>
-              <Card className="p-6 flex items-center justify-between">
+              <Card className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-lg font-semibold text-text-primary">
                     {plan === "PRO" ? t.billing.proPlan : t.billing.freePlan}

@@ -10,6 +10,8 @@ export interface HomeDictionary {
     dashboard: string;
     signIn: string;
     getStarted: string;
+    openMenu: string;
+    closeMenu: string;
   };
   hero: {
     badge: string;
@@ -72,6 +74,8 @@ export const homeDictionary: Record<LocaleCode, HomeDictionary> = {
       dashboard: "Dashboard",
       signIn: "Sign In",
       getStarted: "Get Started",
+      openMenu: "Open menu",
+      closeMenu: "Close menu",
     },
     hero: {
       badge: "AI-powered meeting intelligence",
@@ -164,6 +168,8 @@ export const homeDictionary: Record<LocaleCode, HomeDictionary> = {
       dashboard: "Tableau de bord",
       signIn: "Se connecter",
       getStarted: "Commencer",
+      openMenu: "Ouvrir le menu",
+      closeMenu: "Fermer le menu",
     },
     hero: {
       badge: "L'intelligence des réunions par l'IA",

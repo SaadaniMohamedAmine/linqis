@@ -70,13 +70,13 @@ export default function MeetingsListPage() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[-40%] left-[10%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[120px]" />
         </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-8 py-10 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in-up">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 py-6 sm:py-10 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in-up">
           <div>
             <h1 className="text-3xl font-semibold text-text-primary mb-1">{t.title}</h1>
             <p className="text-text-secondary">{t.subtitle}</p>
           </div>
           <Link href="/dashboard/upload">
-            <Button variant="primary" className="gap-2">
+            <Button variant="primary" className="gap-2 w-full sm:w-auto">
               <Upload size={16} />
               {t.upload}
             </Button>
@@ -84,7 +84,7 @@ export default function MeetingsListPage() {
         </div>
       </div>
 
-      <div className="max-w-[1440px] mx-auto p-8">
+      <div className="max-w-[1440px] mx-auto p-4 sm:p-8">
         {/* Search + filters */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 animate-fade-in-up [animation-delay:150ms]">
           <Input
@@ -93,7 +93,7 @@ export default function MeetingsListPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="sm:max-w-[320px]"
           />
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {FILTERS.map((f) => (
               <button
                 key={f.value}
@@ -156,17 +156,17 @@ export default function MeetingsListPage() {
                 return (
                   <div
                     key={meeting.id}
-                    className="flex items-center gap-4 px-6 py-4 hover:bg-background/50 transition-colors group"
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-background/50 transition-colors group"
                   >
                     <Link href={`/dashboard/meetings/${meeting.id}`} className="flex items-center gap-4 flex-1 min-w-0">
                       <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success font-semibold shrink-0">
                         {meeting.title.charAt(0).toUpperCase()}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="font-medium text-text-primary truncate group-hover:text-success transition-colors">
                           {meeting.title}
                         </p>
-                        <div className="flex items-center gap-3 text-xs text-text-secondary mt-0.5">
+                        <div className="flex items-center gap-3 text-xs text-text-secondary mt-0.5 flex-wrap">
                           <span>{formatMeetingDate(meeting.createdAt)} · {formatDuration(meeting.duration)}</span>
                           <span className="flex items-center gap-1">
                             <Users size={12} />
@@ -179,14 +179,16 @@ export default function MeetingsListPage() {
                         </div>
                       </div>
                     </Link>
-                    <Badge variant={badge.variant} className="shrink-0">{badge.label}</Badge>
-                    <button
-                      onClick={() => handleDelete(meeting.id)}
-                      className="text-text-secondary hover:text-danger transition-colors shrink-0 p-1 cursor-pointer"
-                      aria-label={t.deleteAriaLabel}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pl-14 sm:pl-0 sm:shrink-0">
+                      <Badge variant={badge.variant} className="shrink-0">{badge.label}</Badge>
+                      <button
+                        onClick={() => handleDelete(meeting.id)}
+                        className="text-text-secondary hover:text-danger transition-colors shrink-0 p-1 cursor-pointer"
+                        aria-label={t.deleteAriaLabel}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
