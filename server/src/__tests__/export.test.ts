@@ -1,23 +1,31 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 
+// Plain arrow-function mockImplementations here previously made `new Client()`
+// / `new IncomingWebhook()` throw "is not a constructor" (arrow functions have
+// no [[Construct]]) -- classes work as real constructors instead.
 const notionCreate = vi.fn();
 vi.mock("@notionhq/client", () => ({
-  Client: vi.fn().mockImplementation(() => ({
-    pages: { create: notionCreate },
-  })),
+  Client: class {
+    pages = { create: notionCreate };
+  },
 }));
 
 const slackSend = vi.fn();
 vi.mock("@slack/webhook", () => ({
-  IncomingWebhook: vi.fn().mockImplementation(() => ({
-    send: slackSend,
-  })),
+  IncomingWebhook: class {
+    send = slackSend;
+  },
 }));
 
-const sendMail = vi.fn();
-vi.mock("nodemailer", () => ({
-  default: {
-    createTransport: vi.fn().mockReturnValue({ sendMail }),
+// email.ts constructs `new Resend(...)` at module load time (not lazily,
+// unlike notion.ts/slack.ts's clients), which runs before a plain top-level
+// `const emailsSend = vi.fn()` below would -- ESM hoists this file's imports
+// (and everything they trigger) above its own non-import statements.
+// vi.hoisted() makes emailsSend exist before that constructor call.
+const { emailsSend } = vi.hoisted(() => ({ emailsSend: vi.fn() }));
+vi.mock("resend", () => ({
+  Resend: class {
+    emails = { send: emailsSend };
   },
 }));
 
@@ -36,7 +44,7 @@ const baseData = {
 beforeEach(() => {
   notionCreate.mockReset().mockResolvedValue({ id: "notion-page-123" });
   slackSend.mockReset().mockResolvedValue(undefined);
-  sendMail.mockReset().mockResolvedValue(undefined);
+  emailsSend.mockReset().mockResolvedValue({ data: { id: "email-1" }, error: null });
 });
 
 const notionCredentials = { apiKey: "test-key", databaseId: "test-db" };
@@ -83,10 +91,18 @@ describe("exportToEmail", () => {
   test("sends HTML mail with the meeting title in the subject", async () => {
     await exportToEmail({ ...baseData, mood: "NEUTRAL", to: "stakeholder@example.com" });
 
-    expect(sendMail).toHaveBeenCalledTimes(1);
-    const mailOptions = sendMail.mock.calls[0][0];
+    expect(emailsSend).toHaveBeenCalledTimes(1);
+    const mailOptions = emailsSend.mock.calls[0][0];
     expect(mailOptions.to).toBe("stakeholder@example.com");
     expect(mailOptions.subject).toContain("Q3 Planning");
     expect(mailOptions.html).toContain(baseData.summary);
+  });
+
+  test("throws when Resend reports an error instead of silently succeeding", async () => {
+    emailsSend.mockResolvedValue({ data: null, error: { message: "Invalid `from` address" } });
+
+    await expect(
+      exportToEmail({ ...baseData, mood: "NEUTRAL", to: "stakeholder@example.com" })
+    ).rejects.toThrow("Invalid `from` address");
   });
 });

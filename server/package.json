@@ -19,7 +19,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
-    "pdfkit": "^0.19.1"
+    "pdfkit": "^0.19.1",
+    "resend": "^6.21.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

@@ -1,15 +1,14 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { markdownToHtml } from "../../lib/markdown";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Raw SMTP (nodemailer) connected fine from localhost but hung for ~2
+// minutes and then timed out on Render -- PaaS hosts commonly block or
+// throttle outbound SMTP (25/465/587) for anti-spam reasons, regardless of
+// valid credentials. Resend sends over plain HTTPS, so it isn't affected.
+// RESEND_API_KEY must be set; SMTP_FROM is reused as the from-address so no
+// new env var is needed for that half -- verify it against a domain added
+// in Resend, or use their onboarding@resend.dev sandbox sender for now.
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export interface EmailExport {
   meetingId: string;
@@ -59,10 +58,17 @@ export async function exportToEmail(data: EmailExport): Promise<void> {
     </div>
   `;
 
-  await transporter.sendMail({
-    from: `"Linqis" <${process.env.SMTP_FROM || "noreply@linqis.app"}>`,
+  const { error } = await resend.emails.send({
+    from: `Linqis <${process.env.SMTP_FROM || "onboarding@resend.dev"}>`,
     to: data.to,
     subject: `Meeting Summary: ${data.title}`,
     html,
   });
+
+  // The SDK resolves with an `error` field instead of throwing -- without
+  // this check a bad API key or unverified from-address would silently
+  // report "completed" to the caller despite nothing being sent.
+  if (error) {
+    throw new Error(error.message);
+  }
 }
