@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UploadStepper, type StepStatus } from "@/components/upload-stepper";
+import { useMeetingsCounter } from "@/components/dashboard-chrome";
 import {
   uploadMeetingFile,
   subscribeToUploadProgress,
@@ -69,6 +70,7 @@ export default function UploadPage() {
   const t = useDictionary(uploadDictionary);
   const STAGE_LABELS: Record<string, string> = t.stageLabels;
   const router = useRouter();
+  const { refresh: refreshMeetingsCounter } = useMeetingsCounter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -151,10 +153,13 @@ export default function UploadPage() {
         if (event.status === "completed") {
           setStage({ kind: "done" });
           unsubscribe();
-          // The sidebar's meeting list and the dashboard's stats are fetched
-          // by the shared layout Server Component -- router.push alone
-          // reuses that cached render across client-side navigation, so
-          // without this they'd keep showing pre-upload data indefinitely.
+          // router.refresh() re-fetches the layout's Server Component props,
+          // but that fetch races the immediately-following push and isn't
+          // reliably won before the sidebar re-renders -- so the usage
+          // counter still showed the pre-upload count until a hard reload.
+          // Refreshing it explicitly through its own client-side fetch
+          // sidesteps that race entirely.
+          refreshMeetingsCounter();
           router.refresh();
           router.push(`/dashboard/meetings/${meetingId}`);
           return;
