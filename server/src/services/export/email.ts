@@ -5,10 +5,13 @@ import { markdownToHtml } from "../../lib/markdown";
 // minutes and then timed out on Render -- PaaS hosts commonly block or
 // throttle outbound SMTP (25/465/587) for anti-spam reasons, regardless of
 // valid credentials. Resend sends over plain HTTPS, so it isn't affected.
-// RESEND_API_KEY must be set; SMTP_FROM is reused as the from-address so no
-// new env var is needed for that half -- verify it against a domain added
-// in Resend, or use their onboarding@resend.dev sandbox sender for now.
+// RESEND_API_KEY must be set. Resend also requires the from-address's
+// domain to be verified in the Resend account -- SMTP_FROM was an SMTP
+// login, not a verified Resend domain, so it got rejected either on format
+// or (next) on verification. onboarding@resend.dev is Resend's own sandbox
+// sender and needs no domain setup; swap in a verified domain address later.
 const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM_ADDRESS = "Linqis <onboarding@resend.dev>";
 
 export interface EmailExport {
   meetingId: string;
@@ -59,7 +62,7 @@ export async function exportToEmail(data: EmailExport): Promise<void> {
   `;
 
   const { error } = await resend.emails.send({
-    from: `Linqis <${process.env.SMTP_FROM || "onboarding@resend.dev"}>`,
+    from: FROM_ADDRESS,
     to: data.to,
     subject: `Meeting Summary: ${data.title}`,
     html,
