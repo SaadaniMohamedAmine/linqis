@@ -54,7 +54,7 @@ function SignInForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+    <div className="bg-background flex items-center justify-center relative overflow-hidden py-10 sm:min-h-screen sm:py-0">
       {/* Ambient Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-success/5 rounded-full blur-[120px]" />

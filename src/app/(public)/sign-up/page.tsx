@@ -71,16 +71,16 @@ function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden selection:bg-success selection:text-background">
+    <div className="bg-background flex items-center justify-center relative overflow-hidden selection:bg-success selection:text-background py-10 sm:min-h-screen sm:py-0">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 -left-1/4 w-[800px] h-[800px] bg-success/10 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-0 -right-1/4 w-[600px] h-[600px] bg-info/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "-4s" }} />
       </div>
 
-      <main className="relative z-10 w-full flex flex-col items-center justify-center p-4">
+      <main className="relative z-10 w-full max-w-[480px] flex flex-col items-center justify-center p-4">
         {/* Auth Card */}
-        <div className="w-1/4 bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
+        <div className="w-full bg-surface border border-border rounded-xl shadow-lg p-8 overflow-hidden relative">
           <header className="mb-8 text-center">
             <h1 className="text-xl font-semibold mb-1">{t.title}</h1>
             <p className="text-text-secondary">{t.subtitle}</p>
