@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { X } from "lucide-react";
+import { X, CheckCircle2, AlertTriangle, Info, Bell } from "lucide-react";
 import { getNotifications, markAllNotificationsRead, type Notification } from "@/lib/api";
 import { useDictionary } from "@/lib/i18n/locale-context";
 import { notificationsDictionary, type NotificationsDictionary } from "@/lib/i18n/dictionaries/notifications";
@@ -13,6 +13,22 @@ interface NotificationsPanelProps {
 }
 
 const CLOSE_ANIMATION_MS = 200;
+
+// NotificationType enum values (see prisma/schema.prisma) arrive uppercase
+// from the API; normalized to lowercase here since it's only ever compared
+// against string literals, never persisted or sent back.
+function getNotificationIcon(type: string) {
+  switch (type.toLowerCase()) {
+    case "success":
+      return CheckCircle2;
+    case "warning":
+      return AlertTriangle;
+    case "info":
+      return Info;
+    default:
+      return Bell;
+  }
+}
 
 function timeAgo(iso: string, t: NotificationsDictionary): string {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -101,37 +117,47 @@ export default function NotificationsPanel({ isOpen, onClose }: NotificationsPan
           {unread.length > 0 && (
             <div className="px-4 mb-4">
               <p className="text-xs font-bold uppercase tracking-widest text-text-secondary px-4 mb-4">{t.unread}</p>
-              {unread.map((notification) => (
-                <div key={notification.id} className="p-4 rounded-xl cursor-pointer transition-all flex gap-4 relative hover:bg-surface/50">
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-success rounded-full"></div>
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                    notification.type.toLowerCase() === "success" ? "bg-success/20 text-success" :
-                    notification.type.toLowerCase() === "warning" ? "bg-warning/20 text-warning" :
-                    "bg-info/20 text-info"
-                  }`} />
-                  <div className="flex-1 pr-6">
-                    <p className="font-medium leading-tight">{notification.title}</p>
-                    <p className="text-sm text-text-secondary mt-1 line-clamp-2">{notification.message}</p>
-                    <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt, t)}</p>
+              {unread.map((notification) => {
+                const Icon = getNotificationIcon(notification.type);
+                return (
+                  <div key={notification.id} className="p-4 rounded-xl cursor-pointer transition-all flex gap-4 relative hover:bg-surface/50">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-success rounded-full"></div>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      notification.type.toLowerCase() === "success" ? "bg-success/20 text-success" :
+                      notification.type.toLowerCase() === "warning" ? "bg-warning/20 text-warning" :
+                      "bg-info/20 text-info"
+                    }`}>
+                      <Icon size={18} />
+                    </div>
+                    <div className="flex-1 pr-6">
+                      <p className="font-medium leading-tight">{notification.title}</p>
+                      <p className="text-sm text-text-secondary mt-1 line-clamp-2">{notification.message}</p>
+                      <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt, t)}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
           {earlier.length > 0 && (
             <div className="px-4">
               <p className="text-xs font-bold uppercase tracking-widest text-text-secondary px-4 mb-4">{t.earlier}</p>
-              {earlier.map((notification) => (
-                <div key={notification.id} className="p-4 rounded-xl cursor-pointer transition-all flex gap-4 opacity-80 hover:bg-surface/50">
-                  <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center text-text-secondary shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium leading-tight">{notification.title}</p>
-                    <p className="text-sm text-text-secondary mt-1">{notification.message}</p>
-                    <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt, t)}</p>
+              {earlier.map((notification) => {
+                const Icon = getNotificationIcon(notification.type);
+                return (
+                  <div key={notification.id} className="p-4 rounded-xl cursor-pointer transition-all flex gap-4 opacity-80 hover:bg-surface/50">
+                    <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center text-text-secondary shrink-0">
+                      <Icon size={18} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium leading-tight">{notification.title}</p>
+                      <p className="text-sm text-text-secondary mt-1">{notification.message}</p>
+                      <p className="text-[10px] text-text-secondary mt-2">{timeAgo(notification.createdAt, t)}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
