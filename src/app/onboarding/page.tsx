@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const [teamSize, setTeamSize] = useState("");
   const [useCase, setUseCase] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(false);
 
   const steps = [
     { title: t.stepTitles.role, value: role, setValue: setRole, options: t.roles },
@@ -51,28 +52,44 @@ export default function OnboardingPage() {
       setStep(step + 1);
       return;
     }
+    setError(false);
     setSaving(true);
-    await completeOnboarding({
-      role: ROLE_VALUES[role] || role,
-      teamSize: TEAM_SIZE_VALUES[teamSize] || teamSize,
-      primaryUseCase: useCase || "decisions",
-    });
-    // The JWT still says onboardingCompleted: false until it's refreshed --
-    // without this, the middleware would bounce us straight back here.
-    await update({ onboardingCompleted: true });
-    router.push("/dashboard?tour=start");
+    try {
+      await completeOnboarding({
+        role: ROLE_VALUES[role] || role,
+        teamSize: TEAM_SIZE_VALUES[teamSize] || teamSize,
+        primaryUseCase: useCase || "decisions",
+      });
+      // The JWT still says onboardingCompleted: false until it's refreshed --
+      // without this, the middleware would bounce us straight back here.
+      await update({ onboardingCompleted: true });
+      router.push("/dashboard?tour=start");
+    } catch {
+      // Previously uncaught -- any failure here (network, auth, backend
+      // down) left the button stuck on "Saving..." forever with no way to
+      // retry, since nothing ever reset `saving` back to false.
+      setSaving(false);
+      setError(true);
+    }
   };
 
   const handleSkip = async () => {
-    // Must still mark onboarding as completed -- otherwise the middleware
-    // would immediately redirect straight back here from /dashboard.
-    await completeOnboarding({
-      role: ROLE_VALUES[role] || role,
-      teamSize: TEAM_SIZE_VALUES[teamSize] || teamSize,
-      primaryUseCase: "decisions",
-    });
-    await update({ onboardingCompleted: true });
-    router.push("/dashboard");
+    setError(false);
+    setSaving(true);
+    try {
+      // Must still mark onboarding as completed -- otherwise the middleware
+      // would immediately redirect straight back here from /dashboard.
+      await completeOnboarding({
+        role: ROLE_VALUES[role] || role,
+        teamSize: TEAM_SIZE_VALUES[teamSize] || teamSize,
+        primaryUseCase: "decisions",
+      });
+      await update({ onboardingCompleted: true });
+      router.push("/dashboard");
+    } catch {
+      setSaving(false);
+      setError(true);
+    }
   };
 
   return (
@@ -102,10 +119,13 @@ export default function OnboardingPage() {
           ))}
         </div>
 
+        {error && <p className="text-sm text-danger mb-4">{t.saveError}</p>}
+
         <div className="flex justify-between items-center">
           <button
             onClick={handleSkip}
-            className="text-sm text-text-secondary hover:text-text-primary cursor-pointer"
+            disabled={saving}
+            className="text-sm text-text-secondary hover:text-text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t.skip}
           </button>

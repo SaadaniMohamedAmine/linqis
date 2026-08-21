@@ -9,6 +9,7 @@ export interface OnboardingDictionary {
   saving: string;
   getStarted: string;
   next: string;
+  saveError: string;
 }
 
 export const onboardingDictionary: Record<LocaleCode, OnboardingDictionary> = {
@@ -41,6 +42,7 @@ export const onboardingDictionary: Record<LocaleCode, OnboardingDictionary> = {
     saving: "Saving...",
     getStarted: "Get started",
     next: "Next",
+    saveError: "Something went wrong saving your answers. Please try again.",
   },
   fr: {
     stepTitles: {
@@ -71,5 +73,6 @@ export const onboardingDictionary: Record<LocaleCode, OnboardingDictionary> = {
     saving: "Enregistrement...",
     getStarted: "Commencer",
     next: "Suivant",
+    saveError: "Une erreur est survenue lors de l'enregistrement. Veuillez réessayer.",
   },
 };
