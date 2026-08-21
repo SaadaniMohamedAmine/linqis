@@ -24,6 +24,8 @@ export interface UploadDictionary {
   stepLink: string;
   stepProcess: string;
   stepDone: string;
+  limitReachedTitle: string;
+  limitReachedBody: (limit: number) => string;
 }
 
 export const uploadDictionary: Record<LocaleCode, UploadDictionary> = {
@@ -56,6 +58,8 @@ export const uploadDictionary: Record<LocaleCode, UploadDictionary> = {
     stepLink: "Link event",
     stepProcess: "Process",
     stepDone: "Done",
+    limitReachedTitle: "You've reached your monthly limit",
+    limitReachedBody: (limit) => `You've used all ${limit} meetings included in your Free plan this month. Upgrade to Pro for unlimited uploads.`,
   },
   fr: {
     title: "Ingestion de données de réunion",
@@ -86,5 +90,7 @@ export const uploadDictionary: Record<LocaleCode, UploadDictionary> = {
     stepLink: "Lier l'événement",
     stepProcess: "Traitement",
     stepDone: "Terminé",
+    limitReachedTitle: "Vous avez atteint votre limite mensuelle",
+    limitReachedBody: (limit) => `Vous avez utilisé vos ${limit} réunions incluses dans le plan Gratuit ce mois-ci. Passez à Pro pour des envois illimités.`,
   },
 };

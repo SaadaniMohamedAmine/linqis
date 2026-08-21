@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Upload, AlertCircle, Sparkles, CalendarClock, CheckCircle2, ChevronDown } from "lucide-react";
+import { Upload, AlertCircle, Sparkles, CalendarClock, CheckCircle2, ChevronDown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +70,9 @@ export default function UploadPage() {
   const t = useDictionary(uploadDictionary);
   const STAGE_LABELS: Record<string, string> = t.stageLabels;
   const router = useRouter();
-  const { refresh: refreshMeetingsCounter } = useMeetingsCounter();
+  const { meetingsThisMonth, maxMeetingsPerMonth, refresh: refreshMeetingsCounter } = useMeetingsCounter();
+  // maxMeetingsPerMonth === null means unlimited (Pro) -- see UserProfile.maxMeetingsPerMonth.
+  const atUploadLimit = maxMeetingsPerMonth !== null && meetingsThisMonth >= maxMeetingsPerMonth;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -202,6 +204,23 @@ export default function UploadPage() {
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-warning/20 blur-[120px] rounded-full"></div>
         </div>
 
+        {atUploadLimit ? (
+          <div className="container max-w-[520px] px-6 z-10 animate-fade-in-up">
+            <Card className="p-10 flex flex-col items-center gap-4 text-center border-border/60 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.35)]">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-warning/30 bg-warning/10 text-warning">
+                <Lock size={28} />
+              </div>
+              <h1 className="text-2xl font-semibold text-text-primary">{t.limitReachedTitle}</h1>
+              <p className="text-text-secondary">{t.limitReachedBody(maxMeetingsPerMonth ?? 0)}</p>
+              <Link href="/pricing" className="mt-2">
+                <Button variant="primary" size="lg" className="gap-2 shadow-[0_8px_24px_-8px_rgba(34,197,94,0.5)]">
+                  <Sparkles size={16} />
+                  {t.upgradeToPro}
+                </Button>
+              </Link>
+            </Card>
+          </div>
+        ) : (
         <div className="container max-w-[720px] px-6 z-10 animate-fade-in-up">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold mb-2 bg-gradient-to-r from-text-primary to-text-primary/70 bg-clip-text">{t.title}</h1>
@@ -343,6 +362,7 @@ export default function UploadPage() {
             </div>
           </Card>
         </div>
+        )}
       </main>
     </div>
   );
